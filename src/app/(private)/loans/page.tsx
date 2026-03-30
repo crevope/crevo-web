@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useLoanStore } from '@/features/request-loan'
-import { formatCurrency, formatDate } from '@/shared/lib/utils'
+import { formatCurrency, formatDate, loanRef } from '@/shared/lib/utils'
 import type { Loan } from '@/entities/loan'
 import {
   Select,
@@ -10,7 +10,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@/shared/ui/select'
+import { Skeleton } from '@/shared/ui/skeleton'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
 
@@ -41,7 +42,7 @@ function LoanCard({ loan }: Readonly<{ loan: Loan }>) {
   const isActive = ACTIVE_STATUSES.includes(loan.status)
   const isReview = REVIEW_STATUSES.includes(loan.status)
   const isPaid = loan.status === 'PAID'
-  const loanRef = `#${loan.id.substring(0, 12).toUpperCase()}`
+  const ref = `#${loanRef(loan.id)}`
 
   return (
     <div className={`${cardCls} p-6 border-l-2 ${statusBorderColor(loan.status)} hover:bg-gray-50 dark:hover:bg-[#0F172A]/50 transition-colors`}>
@@ -58,7 +59,7 @@ function LoanCard({ loan }: Readonly<{ loan: Loan }>) {
                 </h3>
                 {statusBadge(loan.status)}
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Ref: {loanRef}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Ref: {ref}</p>
             </div>
             <div className="text-right hidden lg:block">
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Monto Original</p>
@@ -212,23 +213,37 @@ export default function LoansPage() {
 
       {/* Summary stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { icon: 'fa-solid fa-wallet', iconBg: 'bg-[#D4AF37]/20 text-yellow-600 dark:text-[#D4AF37]', label: 'Total Activo', value: isLoading ? '–' : formatCurrency(totalActive) },
-          { icon: 'fa-solid fa-clock-rotate-left', iconBg: 'bg-[#00E5FF]/20 text-cyan-600 dark:text-[#00E5FF]', label: 'Próximo Pago Total', value: isLoading ? '–' : '—' },
-          { icon: 'fa-solid fa-file-invoice', iconBg: 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400', label: 'Préstamos en Revisión', value: isLoading ? '–' : String(reviewCount) },
-        ].map(s => (
-          <div key={s.label} className={`${cardCls} p-6 flex flex-col justify-between`}>
-            <div className="mb-4">
-              <div className={`w-9 h-9 rounded-lg ${s.iconBg} flex items-center justify-center`}>
-                <i className={s.icon} />
+        {isLoading ? (
+          [1, 2, 3].map(i => (
+            <div key={i} className={`${cardCls} p-6 flex flex-col justify-between`}>
+              <div className="mb-4">
+                <Skeleton className="w-9 h-9 rounded-lg" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-3 w-28" />
+                <Skeleton className="h-8 w-32" />
               </div>
             </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">{s.label}</p>
-              <h3 className="text-2xl font-bold text-[#0A192F] dark:text-white">{s.value}</h3>
+          ))
+        ) : (
+          [
+            { icon: 'fa-solid fa-wallet', iconBg: 'bg-[#D4AF37]/20 text-yellow-600 dark:text-[#D4AF37]', label: 'Total Activo', value: formatCurrency(totalActive) },
+            { icon: 'fa-solid fa-clock-rotate-left', iconBg: 'bg-[#00E5FF]/20 text-cyan-600 dark:text-[#00E5FF]', label: 'Próximo Pago Total', value: '—' },
+            { icon: 'fa-solid fa-file-invoice', iconBg: 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400', label: 'Préstamos en Revisión', value: String(reviewCount) },
+          ].map(s => (
+            <div key={s.label} className={`${cardCls} p-6 flex flex-col justify-between`}>
+              <div className="mb-4">
+                <div className={`w-9 h-9 rounded-lg ${s.iconBg} flex items-center justify-center`}>
+                  <i className={s.icon} />
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">{s.label}</p>
+                <h3 className="text-2xl font-bold text-[#0A192F] dark:text-white">{s.value}</h3>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Tabs + filters */}
@@ -286,7 +301,35 @@ export default function LoansPage() {
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className={`${cardCls} h-44 animate-pulse`} />
+            <div key={i} className={`${cardCls} p-6 border-l-2 border-l-gray-200 dark:border-l-white/10`}>
+              <div className="flex flex-col lg:flex-row justify-between gap-6">
+                <div className="flex-1 space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-5 w-16 rounded-full" />
+                      </div>
+                      <Skeleton className="h-4 w-40" />
+                    </div>
+                    <Skeleton className="h-6 w-24 hidden lg:block" />
+                  </div>
+                  <div className="grid grid-cols-4 gap-4 pt-4 border-t border-gray-100 dark:border-white/6">
+                    {[1, 2, 3, 4].map(j => (
+                      <div key={j} className="space-y-1.5">
+                        <Skeleton className="h-3 w-20" />
+                        <Skeleton className="h-4 w-16" />
+                      </div>
+                    ))}
+                  </div>
+                  <Skeleton className="h-1.5 w-full rounded-full" />
+                </div>
+                <div className="flex flex-row lg:flex-col gap-2.5 lg:w-44 lg:border-l lg:border-gray-100 dark:lg:border-white/6 lg:pl-5">
+                  <Skeleton className="h-9 flex-1 lg:flex-none rounded-lg" />
+                  <Skeleton className="h-9 flex-1 lg:flex-none rounded-lg" />
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       ) : sortedAndFiltered.length === 0 ? (

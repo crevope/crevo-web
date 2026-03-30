@@ -9,7 +9,8 @@ import { toast } from 'sonner'
 import { Loader2, Sparkles, TrendingDown } from 'lucide-react'
 import { loanRepository, useLoanStore } from '@/features/request-loan'
 import { useAuthStore } from '@/features/auth'
-import { formatCurrency } from '@/shared/lib/utils'
+import { formatCurrency, loanRef } from '@/shared/lib/utils'
+import { Skeleton } from '@/shared/ui/skeleton'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
 
@@ -73,7 +74,7 @@ export default function PayLoanPage() {
     culqi.open({
       settings: {
         title: 'Solvo', currency: 'PEN',
-        description: `Pago préstamo #${loanId.substring(0, 8).toUpperCase()}`,
+        description: `Pago préstamo #${loanRef(loanId)}`,
         amount: Math.round(balance.remaining * 100),
       },
     })
@@ -120,10 +121,47 @@ export default function PayLoanPage() {
 
   if (isLoading || !loan || !balance) {
     return (
-      <div className="space-y-6">
-        <div className="h-8 w-40 bg-gray-200 dark:bg-[#334155] rounded-xl animate-pulse" />
-        <div className={`${cardCls} h-40 animate-pulse`} />
-        <div className={`${cardCls} h-64 animate-pulse`} />
+      <div className="space-y-6 max-w-2xl">
+        {/* Breadcrumb */}
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-48" />
+          <Skeleton className="h-7 w-56" />
+        </div>
+        {/* Balance summary card */}
+        <div className={`${cardCls} p-6 space-y-4`}>
+          <div className="flex justify-between items-start">
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-28" />
+              <Skeleton className="h-8 w-36" />
+            </div>
+            <Skeleton className="h-5 w-20 rounded-full" />
+          </div>
+          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100 dark:border-white/6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="space-y-1.5">
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-5 w-20" />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Payment form card */}
+        <div className={`${cardCls} p-6 space-y-5`}>
+          <Skeleton className="h-5 w-40" />
+          <div className="space-y-3">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-white/6">
+                <Skeleton className="w-9 h-9 rounded-lg shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+                <Skeleton className="w-5 h-5 rounded-full shrink-0" />
+              </div>
+            ))}
+          </div>
+          <Skeleton className="h-10 w-full rounded-lg" />
+        </div>
       </div>
     )
   }
@@ -143,7 +181,7 @@ export default function PayLoanPage() {
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-[#0A192F] dark:text-white">Realizar Pago</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Préstamo #{loanId.substring(0, 8).toUpperCase()}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Préstamo #{loanRef(loanId)}</p>
         </div>
       </div>
 
@@ -217,8 +255,8 @@ export default function PayLoanPage() {
                     <button key={m.value} type="button"
                       onClick={() => earlyPayoffForm.setValue('method', m.value)}
                       className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${selected
-                          ? 'border-[#0A192F] dark:border-[#D4AF37] bg-[#0A192F]/5 dark:bg-[#D4AF37]/10 text-[#0A192F] dark:text-[#D4AF37]'
-                          : 'border-gray-100 dark:border-white/6 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#0F172A]'
+                        ? 'border-[#0A192F] dark:border-[#D4AF37] bg-[#0A192F]/5 dark:bg-[#D4AF37]/10 text-[#0A192F] dark:text-[#D4AF37]'
+                        : 'border-gray-100 dark:border-white/6 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#0F172A]'
                         }`}
                     >
                       <i className={`${m.icon} text-base`} />
@@ -264,8 +302,8 @@ export default function PayLoanPage() {
               ].map(m => (
                 <button key={m.id} onClick={() => setActiveMethod(m.id)}
                   className={`flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-all ${activeMethod === m.id
-                      ? 'bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#0F172A]'
+                    ? 'bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#0F172A]'
                     }`}
                 >
                   <i className={m.icon} />
@@ -350,8 +388,8 @@ export default function PayLoanPage() {
                         <button key={m.value} type="button"
                           onClick={() => form.setValue('method', m.value)}
                           className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${selected
-                              ? 'border-[#0A192F] dark:border-[#D4AF37] bg-[#0A192F]/5 dark:bg-[#D4AF37]/10 text-[#0A192F] dark:text-[#D4AF37]'
-                              : 'border-gray-100 dark:border-white/6 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#0F172A]'
+                            ? 'border-[#0A192F] dark:border-[#D4AF37] bg-[#0A192F]/5 dark:bg-[#D4AF37]/10 text-[#0A192F] dark:text-[#D4AF37]'
+                            : 'border-gray-100 dark:border-white/6 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#0F172A]'
                             }`}
                         >
                           <i className={`${m.icon} text-base`} />

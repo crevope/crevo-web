@@ -5,7 +5,8 @@ import { useAuthStore } from '@/features/auth'
 import { useLoanStore, RequestLoanModal } from '@/features/request-loan'
 import { useNotificationStore } from '@/features/notifications'
 import { kycRepository } from '@/features/upload-kyc'
-import { formatCurrency, formatDate } from '@/shared/lib/utils'
+import { formatCurrency, formatDate, loanRef } from '@/shared/lib/utils'
+import { Skeleton } from '@/shared/ui/skeleton'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
 
@@ -15,6 +16,7 @@ export default function DashboardPage() {
   const { unreadCount, load: loadNotifications } = useNotificationStore()
   const [showModal, setShowModal] = useState(false)
   const [kycApproved, setKycApproved] = useState(false)
+  const [kycLoading, setKycLoading] = useState(true)
 
   useEffect(() => {
     loadMyLoans()
@@ -22,6 +24,7 @@ export default function DashboardPage() {
     kycRepository.getStatus()
       .then(s => setKycApproved(s.isIdentityVerified))
       .catch(() => { })
+      .finally(() => setKycLoading(false))
   }, [loadMyLoans, loadNotifications])
 
   const activeLoans = loans.filter(l => ['APPROVED', 'SIGNED', 'ACTIVE', 'OVERDUE'].includes(l.status))
@@ -64,48 +67,78 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Security Banner */}
-      <div className={`${cardCls} p-4 flex items-center justify-between border-l-2 border-l-[#00E5FF]`}>
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-[#00E5FF]/10 flex items-center justify-center text-[#00E5FF]">
-            <i className="fa-solid fa-shield-halved text-xl" />
+      {/* Security + KYC Banners */}
+      {kycLoading ? (
+        <div className="space-y-4">
+          {/* Security banner skeleton */}
+          <div className={`${cardCls} p-4 flex items-center justify-between border-l-2 border-l-gray-200 dark:border-l-white/10`}>
+            <div className="flex items-center gap-4">
+              <Skeleton className="w-10 h-10 rounded-full shrink-0" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-52" />
+                <Skeleton className="h-3 w-72" />
+              </div>
+            </div>
+            <Skeleton className="h-4 w-20 shrink-0" />
           </div>
-          <div>
-            <h4 className="text-[#0A192F] dark:text-white font-medium text-sm">
-              Protección de cuenta activada
-            </h4>
-            <p className="text-gray-500 dark:text-gray-400 text-xs">
-              Tu cuenta está protegida con cifrado 256-bits regulado por SBS.
-            </p>
+          {/* KYC banner skeleton */}
+          <div className={`${cardCls} p-5 flex items-center justify-between border-l-2 border-l-gray-200 dark:border-l-white/10`}>
+            <div className="flex items-center gap-4">
+              <Skeleton className="w-10 h-10 rounded-full shrink-0" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-64" />
+                <Skeleton className="h-3 w-48" />
+              </div>
+            </div>
+            <Skeleton className="h-9 w-28 rounded-xl shrink-0" />
           </div>
         </div>
-        <button type="button" className="text-sm text-[#00E5FF] font-medium hover:text-[#0A192F] dark:hover:text-[#D4AF37] transition-colors shrink-0">
-          Ver detalles
-        </button>
-      </div>
-
-      {/* KYC Banner */}
-      {!kycApproved && (
-        <div className={`${cardCls} p-5 flex items-center justify-between border-l-2 border-l-amber-400`}>
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
-              <i className="fa-solid fa-id-card text-xl" />
+      ) : (
+        <div className="space-y-4">
+          {/* Security Banner */}
+          <div className={`${cardCls} p-4 flex items-center justify-between border-l-2 border-l-[#00E5FF]`}>
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-[#00E5FF]/10 flex items-center justify-center text-[#00E5FF]">
+                <i className="fa-solid fa-shield-halved text-xl" />
+              </div>
+              <div>
+                <h4 className="text-[#0A192F] dark:text-white font-medium text-sm">
+                  Protección de cuenta activada
+                </h4>
+                <p className="text-gray-500 dark:text-gray-400 text-xs">
+                  Tu cuenta está protegida con cifrado 256-bits regulado por SBS.
+                </p>
+              </div>
             </div>
-            <div>
-              <h4 className="text-[#0A192F] dark:text-white font-medium text-sm">
-                Verifica tu identidad para solicitar préstamos
-              </h4>
-              <p className="text-gray-500 dark:text-gray-400 text-xs">
-                Es rápido — solo necesitas tu DNI y una selfie.
-              </p>
-            </div>
+            <button type="button" className="text-sm text-[#00E5FF] font-medium hover:text-[#0A192F] dark:hover:text-[#D4AF37] transition-colors shrink-0">
+              Ver detalles
+            </button>
           </div>
-          <Link
-            href="/kyc"
-            className="bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold px-4 py-2 rounded-xl text-sm hover:opacity-90 transition-opacity shrink-0"
-          >
-            Verificar ahora
-          </Link>
+
+          {/* KYC Banner */}
+          {!kycApproved && (
+            <div className={`${cardCls} p-5 flex items-center justify-between border-l-2 border-l-amber-400`}>
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                  <i className="fa-solid fa-id-card text-xl" />
+                </div>
+                <div>
+                  <h4 className="text-[#0A192F] dark:text-white font-medium text-sm">
+                    Verifica tu identidad para solicitar préstamos
+                  </h4>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">
+                    Es rápido — solo necesitas tu DNI y una selfie.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/kyc"
+                className="bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold px-4 py-2 rounded-xl text-sm hover:opacity-90 transition-opacity shrink-0"
+              >
+                Verificar ahora
+              </Link>
+            </div>
+          )}
         </div>
       )}
 
@@ -122,7 +155,7 @@ export default function DashboardPage() {
               <div>
                 <p className="text-gray-300 font-medium text-sm mb-1">Saldo Pendiente Total</p>
                 {isLoading ? (
-                  <div className="h-10 w-32 bg-white/10 rounded-lg animate-pulse" />
+                  <Skeleton className="h-10 w-36 bg-white/10" />
                 ) : (
                   <h2 className="text-4xl font-bold text-white tracking-tight">
                     {activeLoan ? formatCurrency(activeLoan.amount) : 'S/ 0.00'}
@@ -185,9 +218,13 @@ export default function DashboardPage() {
           </div>
           <div>
             <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">Préstamos Activos</p>
-            <h3 className="text-2xl font-bold text-[#0A192F] dark:text-white mb-2">
-              {isLoading ? '–' : activeLoans.length}
-            </h3>
+            {isLoading ? (
+              <Skeleton className="h-8 w-12 mb-2" />
+            ) : (
+              <h3 className="text-2xl font-bold text-[#0A192F] dark:text-white mb-2">
+                {activeLoans.length}
+              </h3>
+            )}
             {activeLoan?.dueDate ? (
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Vence el {formatDate(activeLoan.dueDate)}
@@ -226,9 +263,13 @@ export default function DashboardPage() {
           </div>
           <div>
             <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">Solicitudes Pendientes</p>
-            <h3 className="text-xl font-bold text-[#0A192F] dark:text-white mb-2">
-              {isLoading ? '–' : pendingLoans.length}
-            </h3>
+            {isLoading ? (
+              <Skeleton className="h-7 w-10 mb-2" />
+            ) : (
+              <h3 className="text-xl font-bold text-[#0A192F] dark:text-white mb-2">
+                {pendingLoans.length}
+              </h3>
+            )}
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {pendingLoans.length > 0
                 ? 'Analizando historial crediticio...'
@@ -333,9 +374,19 @@ export default function DashboardPage() {
             <Link href="/loans" className="text-sm text-[#00E5FF] font-medium hover:underline">Ver todo</Link>
           </div>
           {isLoading ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {[1, 2, 3].map(i => (
-                <div key={i} className="h-16 bg-gray-100 dark:bg-[#0F172A] rounded-xl animate-pulse" />
+                <div key={i} className="flex items-center gap-4 p-4 rounded-xl">
+                  <Skeleton className="w-9 h-9 rounded-lg shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                  <div className="space-y-2 text-right">
+                    <Skeleton className="h-4 w-20 ml-auto" />
+                    <Skeleton className="h-3 w-14 ml-auto" />
+                  </div>
+                </div>
               ))}
             </div>
           ) : recentActivity.length === 0 ? (
@@ -366,7 +417,7 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <h4 className="text-[#0A192F] dark:text-white font-medium text-sm">
-                        Préstamo #{loan.id.substring(0, 8).toUpperCase()}
+                        Préstamo #{loanRef(loan.id)}
                       </h4>
                       <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(loan.createdAt)}</p>
                     </div>
@@ -413,19 +464,30 @@ export default function DashboardPage() {
           {/* Account summary */}
           <div className={`${cardCls} p-6`}>
             <h3 className="text-base font-semibold text-[#0A192F] dark:text-white mb-4">Datos de Cuenta</h3>
-            <div className="space-y-3">
-              {[
-                { label: 'Titular', value: user ? `${user.firstName} ${user.lastName}` : '–' },
-                { label: 'Email', value: user?.email ?? '–' },
-                { label: 'Verificado', value: user?.emailVerified ? '✓ Email verificado' : 'Pendiente' },
-                { label: 'Estado KYC', value: kycApproved ? '✓ Identidad verificada' : 'Pendiente de verificación' },
-              ].map((item, i, arr) => (
-                <div key={item.label} className={`flex justify-between items-center ${i < arr.length - 1 ? 'pb-3 border-b border-gray-100 dark:border-white/6' : ''}`}>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">{item.label}</span>
-                  <span className="text-sm text-gray-800 dark:text-gray-200 font-medium text-right max-w-[55%] truncate">{item.value}</span>
-                </div>
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="space-y-3">
+                {[1, 2, 3, 4].map((i, idx, arr) => (
+                  <div key={i} className={`flex justify-between items-center ${idx < arr.length - 1 ? 'pb-3 border-b border-gray-100 dark:border-white/6' : ''}`}>
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {[
+                  { label: 'Titular', value: user ? `${user.firstName} ${user.lastName}` : '–' },
+                  { label: 'Email', value: user?.email ?? '–' },
+                  { label: 'Verificado', value: user?.emailVerified ? '✓ Email verificado' : 'Pendiente' },
+                  { label: 'Estado KYC', value: kycApproved ? '✓ Identidad verificada' : 'Pendiente de verificación' },
+                ].map((item, i, arr) => (
+                  <div key={item.label} className={`flex justify-between items-center ${i < arr.length - 1 ? 'pb-3 border-b border-gray-100 dark:border-white/6' : ''}`}>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{item.label}</span>
+                    <span className="text-sm text-gray-800 dark:text-gray-200 font-medium text-right max-w-[55%] truncate">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

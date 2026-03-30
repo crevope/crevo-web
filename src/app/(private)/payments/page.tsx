@@ -2,8 +2,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { loanRepository, useLoanStore } from '@/features/request-loan'
-import { formatCurrency, formatDate } from '@/shared/lib/utils'
+import { formatCurrency, formatDate, loanRef } from '@/shared/lib/utils'
 import type { Loan, LoanBalance, Payment } from '@/entities/loan'
+import { Skeleton } from '@/shared/ui/skeleton'
 
 const ACTIVE_STATUSES = ['APPROVED', 'SIGNED', 'ACTIVE', 'OVERDUE']
 
@@ -63,6 +64,7 @@ export default function PaymentsPage() {
   const [balance, setBalance] = useState<LoanBalance | null>(null)
   const [payments, setPayments] = useState<Payment[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoadingBalance, setIsLoadingBalance] = useState(true)
   const [success, setSuccess] = useState<Payment | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -71,6 +73,7 @@ export default function PaymentsPage() {
   const activeLoans = loans.filter(l => ACTIVE_STATUSES.includes(l.status))
 
   const loadLoanData = useCallback(async (loanId: string) => {
+    setIsLoadingBalance(true)
     try {
       const [bal, pays] = await Promise.all([
         loanRepository.getLoanBalance(loanId),
@@ -81,6 +84,8 @@ export default function PaymentsPage() {
     } catch {
       setBalance(null)
       setPayments([])
+    } finally {
+      setIsLoadingBalance(false)
     }
   }, [])
 
@@ -160,7 +165,21 @@ export default function PaymentsPage() {
 
             {isLoading ? (
               <div className="space-y-3">
-                {[1, 2].map(i => <div key={i} className="h-16 rounded-xl bg-gray-100 dark:bg-[#334155] animate-pulse" />)}
+                {[1, 2].map(i => (
+                  <div key={i} className="p-4 rounded-lg border border-gray-100 dark:border-white/6 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="w-9 h-9 rounded-lg shrink-0" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-28" />
+                        <Skeleton className="h-3 w-36" />
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-right">
+                      <Skeleton className="h-3 w-16 ml-auto" />
+                      <Skeleton className="h-4 w-20 ml-auto" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : activeLoans.length === 0 ? (
               <div className="text-center py-8">
@@ -198,7 +217,7 @@ export default function PaymentsPage() {
                         <div>
                           <h4 className="text-[#0A192F] dark:text-white font-medium">Préstamo Solvo</h4>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Ref: #{loan.id.substring(0, 12).toUpperCase()}
+                            Ref: #{loanRef(loan.id)}
                           </p>
                         </div>
                       </div>
@@ -234,85 +253,101 @@ export default function PaymentsPage() {
               Monto a Pagar
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              {/* Full installment */}
-              <label className="cursor-pointer block">
-                <input
-                  type="radio"
-                  name="amount-type"
-                  className="sr-only peer"
-                  checked={amountType === 'full'}
-                  onChange={() => setAmountType('full')}
-                />
-                <div className={`p-4 rounded-lg border-2 transition-all flex items-center justify-between
-                  ${amountType === 'full'
-                    ? 'border-[#0A192F] dark:border-[#D4AF37] bg-[#0A192F]/5 dark:bg-[#D4AF37]/5'
-                    : 'border-gray-100 dark:border-white/6 bg-white dark:bg-[#0F172A] hover:bg-gray-50 dark:hover:bg-[#334155]/30'
-                  }`}
-                >
+            {isLoadingBalance || !balance ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[1, 2].map(i => (
+                  <div key={i} className="p-4 rounded-lg border border-gray-100 dark:border-white/6 flex items-center justify-between">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                    <Skeleton className="w-5 h-5 rounded-full shrink-0" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  {/* Full installment */}
+                  <label className="cursor-pointer block">
+                    <input
+                      type="radio"
+                      name="amount-type"
+                      className="sr-only peer"
+                      checked={amountType === 'full'}
+                      onChange={() => setAmountType('full')}
+                    />
+                    <div className={`p-4 rounded-lg border-2 transition-all flex items-center justify-between
+                      ${amountType === 'full'
+                        ? 'border-[#0A192F] dark:border-[#D4AF37] bg-[#0A192F]/5 dark:bg-[#D4AF37]/5'
+                        : 'border-gray-100 dark:border-white/6 bg-white dark:bg-[#0F172A] hover:bg-gray-50 dark:hover:bg-[#334155]/30'
+                      }`}
+                    >
+                      <div>
+                        <h4 className="text-sm font-medium text-[#0A192F] dark:text-white">Pago Total de Cuota</h4>
+                        <p className="text-sm font-semibold text-[#0A192F] dark:text-[#D4AF37] mt-0.5">
+                          {formatCurrency(selectedLoan!.installmentAmount)}
+                        </p>
+                      </div>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors
+                        ${amountType === 'full' ? 'border-[#0A192F] dark:border-[#D4AF37]' : 'border-gray-300 dark:border-gray-500'}`}
+                      >
+                        {amountType === 'full' && <div className="w-2.5 h-2.5 rounded-full bg-[#0A192F] dark:bg-[#D4AF37]" />}
+                      </div>
+                    </div>
+                  </label>
+
+                  {/* Custom amount */}
+                  <label className="cursor-pointer block">
+                    <input
+                      type="radio"
+                      name="amount-type"
+                      className="sr-only peer"
+                      checked={amountType === 'custom'}
+                      onChange={() => setAmountType('custom')}
+                    />
+                    <div className={`p-4 rounded-lg border-2 transition-all flex items-center justify-between
+                      ${amountType === 'custom'
+                        ? 'border-[#0A192F] dark:border-[#D4AF37] bg-[#0A192F]/5 dark:bg-[#D4AF37]/5'
+                        : 'border-gray-100 dark:border-white/6 bg-white dark:bg-[#0F172A] hover:bg-gray-50 dark:hover:bg-[#334155]/30'
+                      }`}
+                    >
+                      <div>
+                        <h4 className="text-sm font-medium text-[#0A192F] dark:text-white">Otro Monto</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Pago parcial o adelantado</p>
+                      </div>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors
+                        ${amountType === 'custom' ? 'border-[#0A192F] dark:border-[#D4AF37]' : 'border-gray-300 dark:border-gray-500'}`}
+                      >
+                        {amountType === 'custom' && <div className="w-2.5 h-2.5 rounded-full bg-[#0A192F] dark:bg-[#D4AF37]" />}
+                      </div>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Custom amount input */}
+                {amountType === 'custom' && (
                   <div>
-                    <h4 className="text-sm font-medium text-[#0A192F] dark:text-white">Pago Total de Cuota</h4>
-                    <p className="text-sm font-semibold text-[#0A192F] dark:text-[#D4AF37] mt-0.5">
-                      {selectedLoan ? formatCurrency(selectedLoan.installmentAmount) : '—'}
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Ingresa el monto a pagar
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold">S/</span>
+                      <input
+                        type="number"
+                        placeholder="0.00"
+                        value={customAmount}
+                        onChange={e => setCustomAmount(e.target.value)}
+                        className="w-full bg-white dark:bg-[#0F172A] border border-gray-100 dark:border-white/6 rounded-lg py-3 pl-10 pr-4 text-gray-900 dark:text-white focus:outline-none focus:border-[#0A192F] dark:focus:border-[#D4AF37] transition-colors text-lg"
+                      />
+                    </div>
+                    <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-2 flex items-center gap-1">
+                      <i className="fa-solid fa-triangle-exclamation" />
+                      El monto mínimo aceptado es de S/ 50.00
                     </p>
                   </div>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors
-                    ${amountType === 'full' ? 'border-[#0A192F] dark:border-[#D4AF37]' : 'border-gray-300 dark:border-gray-500'}`}
-                  >
-                    {amountType === 'full' && <div className="w-2.5 h-2.5 rounded-full bg-[#0A192F] dark:bg-[#D4AF37]" />}
-                  </div>
-                </div>
-              </label>
-
-              {/* Custom amount */}
-              <label className="cursor-pointer block">
-                <input
-                  type="radio"
-                  name="amount-type"
-                  className="sr-only peer"
-                  checked={amountType === 'custom'}
-                  onChange={() => setAmountType('custom')}
-                />
-                <div className={`p-4 rounded-lg border-2 transition-all flex items-center justify-between
-                  ${amountType === 'custom'
-                    ? 'border-[#0A192F] dark:border-[#D4AF37] bg-[#0A192F]/5 dark:bg-[#D4AF37]/5'
-                    : 'border-gray-100 dark:border-white/6 bg-white dark:bg-[#0F172A] hover:bg-gray-50 dark:hover:bg-[#334155]/30'
-                  }`}
-                >
-                  <div>
-                    <h4 className="text-sm font-medium text-[#0A192F] dark:text-white">Otro Monto</h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Pago parcial o adelantado</p>
-                  </div>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors
-                    ${amountType === 'custom' ? 'border-[#0A192F] dark:border-[#D4AF37]' : 'border-gray-300 dark:border-gray-500'}`}
-                  >
-                    {amountType === 'custom' && <div className="w-2.5 h-2.5 rounded-full bg-[#0A192F] dark:bg-[#D4AF37]" />}
-                  </div>
-                </div>
-              </label>
-            </div>
-
-            {/* Custom amount input */}
-            {amountType === 'custom' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Ingresa el monto a pagar
-                </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold">S/</span>
-                  <input
-                    type="number"
-                    placeholder="0.00"
-                    value={customAmount}
-                    onChange={e => setCustomAmount(e.target.value)}
-                    className="w-full bg-white dark:bg-[#0F172A] border border-gray-100 dark:border-white/6 rounded-lg py-3 pl-10 pr-4 text-gray-900 dark:text-white focus:outline-none focus:border-[#0A192F] dark:focus:border-[#D4AF37] transition-colors text-lg"
-                  />
-                </div>
-                <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-2 flex items-center gap-1">
-                  <i className="fa-solid fa-triangle-exclamation" />
-                  El monto mínimo aceptado es de S/ 50.00
-                </p>
-              </div>
+                )}
+              </>
             )}
           </section>
 
@@ -377,65 +412,82 @@ export default function PaymentsPage() {
               Resumen de Pago
             </h3>
 
-            <div className="space-y-3 mb-4">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Préstamo</span>
-                <span className="text-[#0A192F] dark:text-white font-medium text-right">
-                  {selectedLoan ? (
-                    <>Préstamo Solvo<br /><span className="text-xs text-gray-400">#{selectedLoan.id.substring(0, 12).toUpperCase()}</span></>
-                  ) : '—'}
-                </span>
+            {isLoadingBalance || !balance ? (
+              <div className="space-y-3">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="flex justify-between items-center">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                ))}
+                <div className="flex justify-between items-center border-t border-gray-100 dark:border-white/6 pt-3">
+                  <Skeleton className="h-5 w-24" />
+                  <Skeleton className="h-6 w-24" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-lg mt-2" />
+                <Skeleton className="h-3 w-40 mx-auto mt-1" />
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Saldo pendiente</span>
-                <span className="text-[#0A192F] dark:text-white font-medium">
-                  {balance ? formatCurrency(balance.remaining) : '—'}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
-                <span className="text-[#0A192F] dark:text-white font-medium">
-                  {paymentAmount > 0 ? formatCurrency(paymentAmount) : '—'}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">IGV (18%)</span>
-                <span className="text-[#0A192F] dark:text-white font-medium">S/ 0.00</span>
-              </div>
-            </div>
+            ) : (
+              <>
+                <div className="space-y-3 mb-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500 dark:text-gray-400">Préstamo</span>
+                    <span className="text-[#0A192F] dark:text-white font-medium text-right">
+                      <>Préstamo Solvo<br /><span className="text-xs text-gray-400">#{loanRef(selectedLoan!.id)}</span></>
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500 dark:text-gray-400">Saldo pendiente</span>
+                    <span className="text-[#0A192F] dark:text-white font-medium">
+                      {formatCurrency(balance.remaining)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
+                    <span className="text-[#0A192F] dark:text-white font-medium">
+                      {paymentAmount > 0 ? formatCurrency(paymentAmount) : '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500 dark:text-gray-400">IGV (18%)</span>
+                    <span className="text-[#0A192F] dark:text-white font-medium">S/ 0.00</span>
+                  </div>
+                </div>
 
-            <div className="border-t border-gray-100 dark:border-white/6 pt-3 mb-5">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-semibold text-[#0A192F] dark:text-white">Total a Pagar</span>
-                <span className="text-xl font-semibold text-[#0A192F] dark:text-[#D4AF37]">
-                  {paymentAmount > 0 ? formatCurrency(paymentAmount) : '—'}
-                </span>
-              </div>
-            </div>
+                <div className="border-t border-gray-100 dark:border-white/6 pt-3 mb-5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-semibold text-[#0A192F] dark:text-white">Total a Pagar</span>
+                    <span className="text-xl font-semibold text-[#0A192F] dark:text-[#D4AF37]">
+                      {paymentAmount > 0 ? formatCurrency(paymentAmount) : '—'}
+                    </span>
+                  </div>
+                </div>
 
-            {error && (
-              <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 text-red-600 dark:text-red-400 text-sm flex items-start gap-2">
-                <i className="fa-solid fa-circle-exclamation mt-0.5 shrink-0" />
-                {error}
-              </div>
+                {error && (
+                  <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 text-red-600 dark:text-red-400 text-sm flex items-start gap-2">
+                    <i className="fa-solid fa-circle-exclamation mt-0.5 shrink-0" />
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting || !selectedLoanId || paymentAmount <= 0}
+                  className="w-full bg-[#0A192F] hover:bg-[#0A192F]/90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded-lg flex justify-center items-center gap-2 mb-3 font-medium transition-all text-sm"
+                >
+                  {isSubmitting ? (
+                    <><i className="fa-solid fa-circle-notch fa-spin" /> Procesando...</>
+                  ) : (
+                    <><i className="fa-solid fa-lock" /> Confirmar Pago</>
+                  )}
+                </button>
+
+                <p className="text-xs text-gray-400 dark:text-gray-500 text-center flex items-center justify-center gap-1">
+                  <i className="fa-solid fa-shield-halved" />
+                  Protegido por SBS · Cifrado 256-bit
+                </p>
+              </>
             )}
-
-            <button
-              onClick={handleSubmit}
-              disabled={isSubmitting || !selectedLoanId || paymentAmount <= 0}
-              className="w-full bg-[#0A192F] hover:bg-[#0A192F]/90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded-lg flex justify-center items-center gap-2 mb-3 font-medium transition-all text-sm"
-            >
-              {isSubmitting ? (
-                <><i className="fa-solid fa-circle-notch fa-spin" /> Procesando...</>
-              ) : (
-                <><i className="fa-solid fa-lock" /> Confirmar Pago</>
-              )}
-            </button>
-
-            <p className="text-xs text-gray-400 dark:text-gray-500 text-center flex items-center justify-center gap-1">
-              <i className="fa-solid fa-shield-halved" />
-              Protegido por SBS · Cifrado 256-bit
-            </p>
           </section>
 
           {/* Recent payments */}
@@ -452,9 +504,24 @@ export default function PaymentsPage() {
               )}
             </div>
 
-            {payments.length === 0 ? (
+            {isLoadingBalance ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 dark:border-white/6">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="w-8 h-8 rounded-lg shrink-0" />
+                      <div className="space-y-1.5">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-3 w-16" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                ))}
+              </div>
+            ) : payments.length === 0 ? (
               <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">
-                {selectedLoanId ? 'Sin pagos registrados aún.' : 'Selecciona un préstamo para ver el historial.'}
+                Sin pagos registrados aún.
               </p>
             ) : (
               <div className="space-y-3">
@@ -537,7 +604,7 @@ export default function PaymentsPage() {
             <div className="bg-gray-50 dark:bg-[#0F172A] rounded-lg p-4 mb-6 text-left space-y-2.5 border border-gray-100 dark:border-white/6">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500 dark:text-gray-400">Referencia</span>
-                <span className="text-[#0A192F] dark:text-white font-medium">#{success.id.substring(0, 12).toUpperCase()}</span>
+                <span className="text-[#0A192F] dark:text-white font-medium">#{loanRef(success.id)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500 dark:text-gray-400">Fecha</span>

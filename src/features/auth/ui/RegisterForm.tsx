@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Checkbox } from '@/shared/ui/checkbox'
 import { registerSchema, type RegisterInput } from '../lib/authSchemas'
 import { useAuthStore } from '../model/useAuthStore'
 

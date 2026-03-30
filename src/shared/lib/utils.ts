@@ -39,6 +39,15 @@ export function calculateTotalWithInterest(amount: number, termDays: number, tea
 /** Returns "PrimerNombre PrimerApellido" — trims compound names. */
 export function shortName(firstName: string, lastName: string): string {
   const first = firstName.trim().split(/\s+/)[0] ?? firstName
-  const last  = lastName.trim().split(/\s+/)[0]  ?? lastName
+  const last = lastName.trim().split(/\s+/)[0] ?? lastName
   return `${first} ${last}`
+}
+
+/**
+ * Returns the last 12 hex characters of a UUID as an uppercase string,
+ * suitable as a human-readable loan reference (e.g. "A4F0C2E18B3D").
+ * The last segment of a UUID is always 12 pure hex chars with no dashes.
+ */
+export function loanRef(id: string): string {
+  return id.slice(-12).toUpperCase()
 }

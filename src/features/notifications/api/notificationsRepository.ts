@@ -7,9 +7,11 @@ export const notificationsRepository = {
     const result = data?.data?.notifications
     return Array.isArray(result) ? result : []
   },
+
   async markAsRead(id: string): Promise<void> {
     await apiClient.patch(`/notifications/${id}/read`)
   },
+
   async markAllAsRead(): Promise<void> {
     await apiClient.patch('/notifications/read-all')
   },

@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useNotificationStore } from '@/features/notifications'
 import { NOTIFICATION_ICONS } from '@/entities/notification'
 import { formatRelativeDate } from '@/shared/lib/utils'
+import { Skeleton } from '@/shared/ui/skeleton'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
 
@@ -56,14 +57,15 @@ export default function NotificationsPage() {
 
       {/* Content */}
       {isLoading ? (
-        <div className={`${cardCls} p-6 space-y-4`}>
+        <div className={`${cardCls} overflow-hidden divide-y divide-gray-100 dark:divide-white/6`}>
           {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-[#0F172A] animate-pulse shrink-0" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-100 dark:bg-[#0F172A] rounded animate-pulse w-3/4" />
-                <div className="h-3 bg-gray-100 dark:bg-[#0F172A] rounded animate-pulse w-1/2" />
+            <div key={i} className="flex items-start gap-4 p-5">
+              <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
+              <div className="flex-1 space-y-2 pt-0.5">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
               </div>
+              <Skeleton className="h-3 w-10 shrink-0 mt-1" />
             </div>
           ))}
         </div>

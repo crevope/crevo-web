@@ -7,7 +7,8 @@ import { toast } from 'sonner'
 import { useLoanStore, loanRepository } from '@/features/request-loan'
 import { canSign, isActiveLoan, canPay, LoanStatusBadge } from '@/entities/loan'
 import type { InstallmentStatus } from '@/entities/loan'
-import { formatCurrency, formatDate, formatDateTime } from '@/shared/lib/utils'
+import { formatCurrency, formatDate, formatDateTime, loanRef } from '@/shared/lib/utils'
+import { Skeleton } from '@/shared/ui/skeleton'
 
 type TabId = 'calendario' | 'desglose' | 'documentos'
 
@@ -55,9 +56,74 @@ export default function LoanDetailPage() {
   if (isLoading || !loan) {
     return (
       <div className="space-y-6">
-        <div className="h-8 w-48 bg-gray-200 dark:bg-[#334155] rounded-xl animate-pulse" />
-        <div className={`${cardCls} h-44 animate-pulse`} />
-        <div className={`${cardCls} h-64 animate-pulse`} />
+        {/* Breadcrumb + header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-48" />
+            <Skeleton className="h-7 w-64" />
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-9 w-44 rounded-lg" />
+            <Skeleton className="h-9 w-28 rounded-lg" />
+          </div>
+        </div>
+        {/* Hero grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 rounded-lg p-6 space-y-6" style={{ background: 'linear-gradient(135deg, #0A192F 0%, #1A365D 100%)' }}>
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-32 bg-white/10" />
+              <Skeleton className="h-10 w-40 bg-white/10" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white/10 rounded-lg p-4 space-y-2">
+                <Skeleton className="h-3 w-24 bg-white/10" />
+                <Skeleton className="h-6 w-28 bg-white/10" />
+                <Skeleton className="h-3 w-20 bg-white/10" />
+              </div>
+              <div className="bg-white/10 rounded-lg p-4 space-y-2">
+                <Skeleton className="h-3 w-24 bg-white/10" />
+                <Skeleton className="h-4 w-full bg-white/10 rounded-full" />
+                <div className="flex justify-between">
+                  <Skeleton className="h-3 w-16 bg-white/10" />
+                  <Skeleton className="h-3 w-16 bg-white/10" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className={`${cardCls} p-6 space-y-4`}>
+            <Skeleton className="h-5 w-36" />
+            <div className="space-y-2.5">
+              <Skeleton className="h-10 w-full rounded-lg" />
+              <Skeleton className="h-10 w-full rounded-lg" />
+            </div>
+            <div className="pt-4 border-t border-gray-100 dark:border-white/6 space-y-3">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="flex justify-between">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-3 w-28" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        {/* Tabs */}
+        <div className={`${cardCls}`}>
+          <div className="flex gap-1 p-4 border-b border-gray-100 dark:border-white/6">
+            {[1, 2, 3].map(i => <Skeleton key={i} className="h-8 w-40 rounded-lg" />)}
+          </div>
+          <div className="p-6 space-y-3">
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="flex gap-4">
+                <Skeleton className="h-4 w-6" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-16 ml-auto" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
@@ -66,7 +132,7 @@ export default function LoanDetailPage() {
   const nextInstallment = activeInstallments.find(i => i.status === 'PENDING' || i.status === 'OVERDUE')
   const paidCount = activeInstallments.filter(i => i.status === 'PAID').length
   const progressPct = balance ? Math.min(100, Math.round((balance.totalPaid / balance.totalAmount) * 100)) : 0
-  const loanRef = loan.id.slice(0, 8).toUpperCase()
+  const ref = loanRef(loan.id)
 
   return (
     <div className="space-y-6">
@@ -79,7 +145,7 @@ export default function LoanDetailPage() {
               Mis Préstamos
             </Link>
             <i className="fa-solid fa-chevron-right text-[10px] text-gray-400" />
-            <span className="text-[#0A192F] dark:text-[#D4AF37] font-medium">Detalle #{loanRef}</span>
+            <span className="text-[#0A192F] dark:text-[#D4AF37] font-medium">Detalle #{ref}</span>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -243,11 +309,11 @@ export default function LoanDetailPage() {
           <div className="mt-4 pt-4 border-t border-gray-100 dark:border-white/6 space-y-2.5">
             <div className="flex justify-between text-xs">
               <span className="text-gray-500 dark:text-gray-400">Referencia</span>
-              <span className="font-mono text-gray-800 dark:text-gray-200">#{loanRef}</span>
+              <span className="font-mono text-gray-700 dark:text-gray-200">#{ref}</span>
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-gray-500 dark:text-gray-400">Solicitado</span>
-              <span className="text-gray-800 dark:text-gray-200">{formatDate(loan.createdAt)}</span>
+              <span className="text-gray-700 dark:text-gray-200">{formatDate(loan.createdAt)}</span>
             </div>
             {loan.dueDate && (
               <div className="flex justify-between text-xs">

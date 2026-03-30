@@ -6,7 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { Loader2, ArrowRight } from 'lucide-react'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Checkbox } from '@/shared/ui/checkbox'
+import { Skeleton } from '@/shared/ui/skeleton'
 import { useTheme } from 'next-themes'
 import { useLoanStore, loanRepository, type SimulationResult } from '@/features/request-loan'
 import { kycRepository } from '@/features/upload-kyc'
@@ -19,11 +20,11 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@/shared/ui/select'
 import Link from 'next/link'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
-const inputCls = 'w-full px-4 py-2.5 rounded-lg border border-gray-100 dark:border-white/6 bg-[#F9FAFB] dark:bg-[#0F172A] text-gray-800 dark:text-gray-200 focus:outline-none focus:border-[#00E5FF] focus:ring-2 focus:ring-[#00E5FF]/20 transition-all text-sm placeholder-gray-400 dark:placeholder-gray-500'
+const inputCls = 'w-full px-3.5 py-2.5 rounded-lg border border-gray-100 dark:border-white/6 bg-[#F9FAFB] dark:bg-[#0F172A] text-gray-800 dark:text-gray-200 focus:outline-none focus:border-[#00E5FF] focus:ring-2 focus:ring-[#00E5FF]/20 transition-all text-sm placeholder-gray-400 dark:placeholder-gray-500'
 
 const TOOLTIPS = {
   techFee: 'Cubre los costos de la plataforma digital, verificación de identidad y procesamiento de tu solicitud.',
@@ -82,7 +83,7 @@ const requestSchema = z.object({
 })
 type RequestInput = z.infer<typeof requestSchema>
 
-function StepHeader({ step, title, subtitle }: { step: number; title: string; subtitle: string }) {
+function StepHeader({ step, title, subtitle }: Readonly<{ step: number; title: string; subtitle: string }>) {
   return (
     <div className="p-6 border-b border-gray-100 dark:border-white/6">
       <div className="flex items-center gap-3">
@@ -104,7 +105,7 @@ export default function RequestLoanPage() {
   const { requestLoan } = useLoanStore()
   const [kycApproved, setKycApproved] = useState<boolean | null>(null)
   const [simulation, setSimulation] = useState<SimulationResult | null>(null)
-  const [simLoading, setSimLoading] = useState(false)
+  const [simLoading, setSimLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
 
@@ -183,7 +184,7 @@ export default function RequestLoanPage() {
   // Slider fill style
   const fillColor = mounted && resolvedTheme === 'dark' ? '#D4AF37' : '#0A192F'
   const trackColor = mounted && resolvedTheme === 'dark' ? 'rgba(255,255,255,0.12)' : '#E5E7EB'
-  const safeAmount = isNaN(amount) ? cfg.defaultAmount : amount
+  const safeAmount = Number.isNaN(amount) ? cfg.defaultAmount : amount
   const fillPct = ((safeAmount - cfg.minAmount) / (cfg.maxAmount - cfg.minAmount)) * 100
   const rangeStyle = { background: `linear-gradient(to right, ${fillColor} ${fillPct}%, ${trackColor} ${fillPct}%)` }
 
@@ -208,6 +209,7 @@ export default function RequestLoanPage() {
             className="inline-flex items-center gap-2 bg-[#D4AF37] text-[#0A192F] font-medium px-6 py-2.5 rounded-lg hover:bg-[#B8941F] transition-colors text-sm"
           >
             <i className="fa-solid fa-shield-halved" />
+            {' '}
             Verificar identidad ahora
           </Link>
         </div>
@@ -305,8 +307,8 @@ export default function RequestLoanPage() {
                           type="button"
                           onClick={() => handleProductChange(key)}
                           className={`flex-1 py-2.5 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex flex-col items-center justify-center gap-1 ${selected
-                              ? `${p.borderActive} ${p.accentBg} text-[#0A192F] dark:text-white`
-                              : 'border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/20'
+                            ? `${p.borderActive} ${p.accentBg} text-[#0A192F] dark:text-white`
+                            : 'border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/20'
                             }`}
                         >
                           <i className={`${p.icon} text-sm ${selected ? p.textActive : ''}`} />
@@ -320,6 +322,7 @@ export default function RequestLoanPage() {
                   {productType === 'PLUS' && (
                     <p className="text-xs text-purple-400 dark:text-purple-300 mt-2 flex items-center gap-1.5">
                       <i className="fa-solid fa-lock text-[10px]" />
+                      {' '}
                       Disponible para clientes con 10+ préstamos pagados
                     </p>
                   )}
@@ -328,14 +331,14 @@ export default function RequestLoanPage() {
                 {/* Frequency + Installments */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+                    <label htmlFor="frequency" className="block text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
                       Frecuencia
                     </label>
                     {productType === 'PLUS' ? (
-                      <div className={`${inputCls} opacity-60 cursor-default`}>Mensual</div>
+                      <div className={`${inputCls} opacity-60 cursor-default w-full h-11.5 flex items-center`}>Mensual</div>
                     ) : (
-                      <Select value={frequency} onValueChange={(v) => setFrequency(v as 'QUINCENAL' | 'MENSUAL')}>
-                        <SelectTrigger className="w-full h-[46px] rounded-xl border-gray-100 dark:border-white/6 bg-[#F9FAFB] dark:bg-[#0F172A] text-gray-800 dark:text-gray-200 px-4 text-sm">
+                      <Select id="frequency" value={frequency} onValueChange={(v) => setFrequency(v as 'QUINCENAL' | 'MENSUAL')}>
+                        <SelectTrigger className="w-full h-11.5 rounded-lg border-gray-100 dark:border-white/6 bg-[#F9FAFB] dark:bg-[#0F172A] text-gray-800 dark:text-gray-200 px-4 text-sm">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -346,14 +349,14 @@ export default function RequestLoanPage() {
                     )}
                   </div>
                   <div>
-                    <label className="block text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+                    <label htmlFor="installments" className="block text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
                       Cuotas
                     </label>
                     {productType === 'EXPRESS' ? (
-                      <div className={`${inputCls} opacity-60 cursor-default`}>1 cuota</div>
+                      <div className={`${inputCls} opacity-60 cursor-default w-full h-11.5 flex items-center`}>1 cuota</div>
                     ) : (
-                      <Select value={String(installments)} onValueChange={(v) => setInstallments(Number(v))}>
-                        <SelectTrigger className="w-full h-[46px] rounded-xl border-gray-100 dark:border-white/6 bg-[#F9FAFB] dark:bg-[#0F172A] text-gray-800 dark:text-gray-200 px-4 text-sm">
+                      <Select id="installments" value={String(installments)} onValueChange={(v) => setInstallments(Number(v))}>
+                        <SelectTrigger className="w-full h-11.5 rounded-lg border-gray-100 dark:border-white/6 bg-[#F9FAFB] dark:bg-[#0F172A] text-gray-800 dark:text-gray-200 px-4 text-sm">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -380,9 +383,9 @@ export default function RequestLoanPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Banco</label>
+                    <label htmlFor="bank" className="block text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Banco</label>
                     {/* TODO: connect bank to API submission */}
-                    <Select value={bank} onValueChange={v => setBank(v ?? '')}>
+                    <Select id="bank" value={bank} onValueChange={v => setBank(v ?? '')}>
                       <SelectTrigger className="w-full py-2.5">
                         <SelectValue placeholder="Seleccione su banco" />
                       </SelectTrigger>
@@ -392,12 +395,13 @@ export default function RequestLoanPage() {
                     </Select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">CCI (20 dígitos)</label>
+                    <label htmlFor="cci" className="block text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">CCI (20 dígitos)</label>
                     {/* TODO: connect CCI to API submission */}
                     <input
                       type="text"
+                      id="cci"
                       value={cci}
-                      onChange={e => setCci(e.target.value.replace(/\D/g, '').slice(0, 20))}
+                      onChange={e => setCci(e.target.value.replaceAll(/\D/g, '').slice(0, 20))}
                       placeholder="00000000000000000000"
                       maxLength={20}
                       className={inputCls}
@@ -464,12 +468,27 @@ export default function RequestLoanPage() {
                 <h2 className="text-base font-semibold text-[#0A192F] dark:text-white">Resumen del préstamo</h2>
               </div>
               <div className="p-5">
-                {simLoading ? (
-                  <div className="flex items-center justify-center gap-2 py-8 text-sm text-gray-500 dark:text-gray-400">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Calculando...
+                {simLoading || !simulation ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="flex justify-between items-center">
+                        <Skeleton className="h-4 w-36" />
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                    ))}
+                    <div className="flex justify-between items-center border-t border-gray-100 dark:border-white/6 pt-3">
+                      <Skeleton className="h-5 w-32" />
+                      <Skeleton className="h-5 w-24" />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <Skeleton className="h-3 w-28" />
+                      <Skeleton className="h-3 w-16" />
+                    </div>
+                    <Skeleton className="h-12 w-full rounded-lg mt-1" />
+                    <Skeleton className="h-20 w-full rounded-lg mt-1" />
+                    <Skeleton className="h-10 w-full rounded-lg mt-2" />
                   </div>
-                ) : simulation ? (
+                ) : (
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-500 dark:text-gray-400">Monto solicitado</span>
@@ -553,10 +572,6 @@ export default function RequestLoanPage() {
                       </p>
                     )}
                   </div>
-                ) : (
-                  <p className="text-center text-sm text-gray-400 dark:text-gray-500 py-8">
-                    Ingresa un monto para ver el desglose
-                  </p>
                 )}
 
                 <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4">

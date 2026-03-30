@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTheme } from 'next-themes'
-import { Loader2, Zap, TrendingUp, Star, Info } from 'lucide-react'
+import { Zap, TrendingUp, Star, Info } from 'lucide-react'
+import { Skeleton } from '@/shared/ui/skeleton'
 import Link from 'next/link'
 import { simulate, type SimulationResult, type LoanProductType, type PaymentFrequency } from '../api/simulatorRepository'
 import {
@@ -11,7 +12,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@/shared/ui/select'
 
 // ─── Config por producto ──────────────────────────────────────────────────────
 
@@ -69,7 +70,7 @@ export function LoanSimulator() {
   const [installments, setInstallments] = useState<number>(PRODUCT_CONFIG.EXPRESS.defaultInstallments)
 
   const [result, setResult] = useState<SimulationResult | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
@@ -135,11 +136,10 @@ export function LoanSimulator() {
               <button
                 type="button"
                 onClick={() => handleProductChange('EXPRESS')}
-                className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-1.5 ${
-                  product === 'EXPRESS'
-                    ? 'border-[#00E5FF] bg-[#00E5FF]/10 text-[#0A192F] dark:text-white'
-                    : 'border-gray-200 dark:border-[#334155] text-gray-500 hover:border-[#00E5FF] hover:text-[#00E5FF]'
-                }`}
+                className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-1.5 ${product === 'EXPRESS'
+                  ? 'border-[#00E5FF] bg-[#00E5FF]/10 text-[#0A192F] dark:text-white'
+                  : 'border-gray-200 dark:border-[#334155] text-gray-500 hover:border-[#00E5FF] hover:text-[#00E5FF]'
+                  }`}
               >
                 <Zap className="h-4 w-4 text-[#00E5FF] shrink-0" />
                 Express
@@ -147,11 +147,10 @@ export function LoanSimulator() {
               <button
                 type="button"
                 onClick={() => handleProductChange('FLEX')}
-                className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-1.5 ${
-                  product === 'FLEX'
-                    ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#0A192F] dark:text-white'
-                    : 'border-gray-200 dark:border-[#334155] text-gray-500 hover:border-[#D4AF37] hover:text-[#D4AF37]'
-                }`}
+                className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-1.5 ${product === 'FLEX'
+                  ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#0A192F] dark:text-white'
+                  : 'border-gray-200 dark:border-[#334155] text-gray-500 hover:border-[#D4AF37] hover:text-[#D4AF37]'
+                  }`}
               >
                 <TrendingUp className="h-4 w-4 shrink-0" />
                 Flex
@@ -159,11 +158,10 @@ export function LoanSimulator() {
               <button
                 type="button"
                 onClick={() => handleProductChange('PLUS')}
-                className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-1.5 ${
-                  product === 'PLUS'
-                    ? 'border-purple-400 bg-purple-400/10 text-[#0A192F] dark:text-white'
-                    : 'border-gray-200 dark:border-[#334155] text-gray-500 hover:border-purple-400 hover:text-purple-400'
-                }`}
+                className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-1.5 ${product === 'PLUS'
+                  ? 'border-purple-400 bg-purple-400/10 text-[#0A192F] dark:text-white'
+                  : 'border-gray-200 dark:border-[#334155] text-gray-500 hover:border-purple-400 hover:text-purple-400'
+                  }`}
               >
                 <Star className="h-4 w-4 shrink-0" />
                 Plus
@@ -293,13 +291,24 @@ export function LoanSimulator() {
               Resumen de tu préstamo
             </h3>
 
-            {loading ? (
-              <div className="flex justify-center py-10">
-                <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+            {loading || !result ? (
+              <div className="space-y-4">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="flex justify-between items-center">
+                    <Skeleton className="h-4 w-32 bg-white/10" />
+                    <Skeleton className="h-4 w-20 bg-white/10" />
+                  </div>
+                ))}
+                <div className="w-full h-px bg-gray-700 my-1" />
+                <div className="flex justify-between items-center">
+                  <Skeleton className="h-5 w-28 bg-white/10" />
+                  <Skeleton className="h-5 w-24 bg-white/10" />
+                </div>
+                <Skeleton className="h-16 w-full rounded-xl bg-white/10 mt-2" />
               </div>
             ) : error ? (
               <p className="text-red-400 text-sm py-4">{error}</p>
-            ) : result ? (
+            ) : (
               <>
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between items-center">
@@ -336,7 +345,7 @@ export function LoanSimulator() {
                   </div>
                 </div>
               </>
-            ) : null}
+            )}
           </div>
 
           <Link

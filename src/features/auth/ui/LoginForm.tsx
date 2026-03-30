@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { useState } from 'react'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Checkbox } from '@/shared/ui/checkbox'
 import { loginSchema, type LoginInput } from '../lib/authSchemas'
 import { useAuthStore } from '../model/useAuthStore'
 
