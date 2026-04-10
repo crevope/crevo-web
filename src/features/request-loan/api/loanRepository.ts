@@ -84,12 +84,8 @@ export const loanRepository = {
     const { data } = await apiClient.post('/payments/charge', dto)
     return data.data
   },
-  async createCheckout(dto: { loanId: string; amount: number; paymentType: 'regular' | 'early_payoff' }): Promise<{ checkoutUrl: string; paymentId: string; orderId: string; amount: number }> {
-    const { data } = await apiClient.post('/payments/checkout', dto)
-    return data.data
-  },
-  async createIzipayCheckout(dto: { loanId: string; amount: number; paymentType: 'regular' | 'early_payoff' }): Promise<{ checkoutUrl: string; paymentId: string; orderId: string; amount: number }> {
-    const { data } = await apiClient.post('/payments/checkout/izipay', dto)
+  async createCheckout(dto: { loanId: string; amount: number; paymentType: 'regular' | 'early_payoff'; gateway?: 'culqi' | 'izipay' }): Promise<{ checkoutUrl: string; paymentId: string; orderId: string; gateway: string; amount: number }> {
+    const { data } = await apiClient.post('/payments/checkout', { ...dto, gateway: dto.gateway ?? 'culqi' })
     return data.data
   },
   async restructureLoan(loanId: string, newNumInstallments?: number): Promise<RestructureResult> {
