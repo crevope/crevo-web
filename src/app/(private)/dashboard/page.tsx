@@ -1,7 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
+import { authRepository } from '@/features/auth'
 import { useLoanStore, RequestLoanModal } from '@/features/request-loan'
 import { useNotificationStore } from '@/features/notifications'
 import { kycRepository } from '@/features/upload-kyc'
@@ -10,6 +13,27 @@ import { Skeleton } from '@/shared/ui/skeleton'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
 
+const ONBOARDING_STEPS = [
+  {
+    id: 'email' as const,
+    icon: 'fa-solid fa-envelope',
+    title: 'Verifica tu email',
+    desc: 'Confirma tu correo para activar tu cuenta.',
+  },
+  {
+    id: 'kyc' as const,
+    icon: 'fa-solid fa-id-card',
+    title: 'Verifica tu identidad',
+    desc: 'DNI + selfie. Menos de 2 minutos.',
+  },
+  {
+    id: 'loan' as const,
+    icon: 'fa-solid fa-hand-holding-dollar',
+    title: 'Solicita tu primer préstamo',
+    desc: 'Hasta S/ 2,000 con aprobación en minutos.',
+  },
+]
+
 export default function DashboardPage() {
   const { user } = useAuthStore()
   const { loans, activeLoan, isLoading, loadMyLoans } = useLoanStore()
@@ -17,6 +41,8 @@ export default function DashboardPage() {
   const [showModal, setShowModal] = useState(false)
   const [kycApproved, setKycApproved] = useState(false)
   const [kycLoading, setKycLoading] = useState(true)
+  const [resendLoading, setResendLoading] = useState(false)
+  const [resendSent, setResendSent] = useState(false)
 
   useEffect(() => {
     loadMyLoans()
@@ -30,6 +56,25 @@ export default function DashboardPage() {
   const activeLoans = loans.filter(l => ['APPROVED', 'SIGNED', 'ACTIVE', 'OVERDUE'].includes(l.status))
   const pendingLoans = loans.filter(l => l.status === 'PENDING')
   const recentActivity = loans.slice(0, 3)
+
+  const emailVerified = user?.emailVerified ?? false
+  const hasLoan = loans.length > 0
+  const completedSteps = [emailVerified, kycApproved, hasLoan].filter(Boolean).length
+  const allStepsComplete = emailVerified && kycApproved && hasLoan
+  const activeStepId = !emailVerified ? 'email' : !kycApproved ? 'kyc' : !hasLoan ? 'loan' : null
+
+  const handleResendEmail = async () => {
+    if (!user?.email) return
+    setResendLoading(true)
+    try {
+      await authRepository.resendVerification(user.email)
+      setResendSent(true)
+    } catch {
+      toast.error('No se pudo enviar el correo. Intenta de nuevo.')
+    } finally {
+      setResendLoading(false)
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -67,10 +112,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Security + KYC Banners */}
-      {kycLoading ? (
+      {/* Banners + Onboarding */}
+      {kycLoading || isLoading ? (
         <div className="space-y-4">
-          {/* Security banner skeleton */}
           <div className={`${cardCls} p-4 flex items-center justify-between border-l-2 border-l-gray-200 dark:border-l-white/10`}>
             <div className="flex items-center gap-4">
               <Skeleton className="w-10 h-10 rounded-full shrink-0" />
@@ -81,16 +125,24 @@ export default function DashboardPage() {
             </div>
             <Skeleton className="h-4 w-20 shrink-0" />
           </div>
-          {/* KYC banner skeleton */}
-          <div className={`${cardCls} p-5 flex items-center justify-between border-l-2 border-l-gray-200 dark:border-l-white/10`}>
-            <div className="flex items-center gap-4">
-              <Skeleton className="w-10 h-10 rounded-full shrink-0" />
+          <div className={`${cardCls} p-6`}>
+            <div className="flex items-center gap-3 mb-6">
+              <Skeleton className="w-9 h-9 rounded-xl shrink-0" />
               <div className="space-y-2">
-                <Skeleton className="h-4 w-64" />
-                <Skeleton className="h-3 w-48" />
+                <Skeleton className="h-4 w-36" />
+                <Skeleton className="h-3 w-24" />
               </div>
             </div>
-            <Skeleton className="h-9 w-28 rounded-xl shrink-0" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="flex flex-col items-center gap-3 p-4">
+                  <Skeleton className="w-10 h-10 rounded-full" />
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-3 w-36" />
+                  <Skeleton className="h-7 w-24 rounded-lg" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       ) : (
@@ -115,28 +167,139 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {/* KYC Banner */}
-          {!kycApproved && (
-            <div className={`${cardCls} p-5 flex items-center justify-between border-l-2 border-l-amber-400`}>
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                  <i className="fa-solid fa-id-card text-xl" />
+          {/* Onboarding Stepper */}
+          {!allStepsComplete && (
+            <div className={`${cardCls} p-6`}>
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#00E5FF]/10 flex items-center justify-center">
+                    <i className="fa-solid fa-rocket text-[#00E5FF] text-sm" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-[#0A192F] dark:text-white">Primeros pasos</h3>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">{completedSteps} de 3 completados</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-[#0A192F] dark:text-white font-medium text-sm">
-                    Verifica tu identidad para solicitar préstamos
-                  </h4>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs">
-                    Es rápido — solo necesitas tu DNI y una selfie.
-                  </p>
+                <div className="hidden sm:flex items-center gap-2">
+                  <div className="w-28 h-1.5 bg-gray-100 dark:bg-[#0F172A] rounded-full overflow-hidden">
+                    <div
+                      className="h-1.5 bg-[#00E5FF] rounded-full transition-all duration-500"
+                      style={{ width: `${(completedSteps / 3) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
+                    {Math.round((completedSteps / 3) * 100)}%
+                  </span>
                 </div>
               </div>
-              <Link
-                href="/kyc"
-                className="bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold px-4 py-2 rounded-xl text-sm hover:opacity-90 transition-opacity shrink-0"
-              >
-                Verificar ahora
-              </Link>
+
+              {/* Steps */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 relative">
+                {/* Connector line (desktop) */}
+                <div className="hidden sm:block absolute top-5 left-[calc(33.33%-12px)] right-[calc(33.33%-12px)] h-px bg-gray-100 dark:bg-white/6 z-0" />
+
+                {ONBOARDING_STEPS.map((step) => {
+                  const isComplete =
+                    step.id === 'email' ? emailVerified :
+                    step.id === 'kyc' ? kycApproved :
+                    hasLoan
+                  const isActive = step.id === activeStepId
+
+                  return (
+                    <div
+                      key={step.id}
+                      className={`relative z-10 flex flex-col items-center text-center gap-2.5 p-4 rounded-xl transition-all ${
+                        isActive
+                          ? 'bg-[#00E5FF]/5 dark:bg-[#00E5FF]/5 border border-[#00E5FF]/20'
+                          : ''
+                      }`}
+                    >
+                      {/* Circle */}
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ring-4 transition-all ${
+                        isComplete
+                          ? 'bg-green-500 text-white ring-green-100 dark:ring-green-900/30'
+                          : isActive
+                            ? 'bg-[#00E5FF] text-[#0A192F] ring-[#00E5FF]/20'
+                            : 'bg-gray-100 dark:bg-[#0F172A] text-gray-400 dark:text-gray-500 ring-transparent'
+                      }`}>
+                        {isComplete
+                          ? <i className="fa-solid fa-check" />
+                          : <i className={`${step.icon}`} />
+                        }
+                      </div>
+
+                      {/* Label */}
+                      <div>
+                        <p className={`text-sm font-semibold leading-tight ${
+                          isComplete
+                            ? 'text-green-600 dark:text-green-400'
+                            : isActive
+                              ? 'text-[#0A192F] dark:text-white'
+                              : 'text-gray-400 dark:text-gray-500'
+                        }`}>
+                          {step.title}
+                        </p>
+                        <p className={`text-xs mt-0.5 leading-relaxed ${
+                          isActive
+                            ? 'text-gray-500 dark:text-gray-400'
+                            : 'text-gray-400 dark:text-gray-600'
+                        }`}>
+                          {step.desc}
+                        </p>
+                      </div>
+
+                      {/* CTA */}
+                      {isComplete && (
+                        <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                          <i className="fa-solid fa-circle-check text-[10px]" />
+                          Completado
+                        </span>
+                      )}
+
+                      {isActive && step.id === 'email' && (
+                        resendSent ? (
+                          <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                            <i className="fa-solid fa-circle-check text-[10px]" />
+                            Correo enviado — revisa tu bandeja
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={resendLoading}
+                            onClick={handleResendEmail}
+                            className="text-xs font-semibold bg-[#0A192F] dark:bg-[#00E5FF] text-white dark:text-[#0A192F] px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1.5"
+                          >
+                            {resendLoading
+                              ? <Loader2 className="h-3 w-3 animate-spin" />
+                              : <i className="fa-solid fa-paper-plane text-[10px]" />
+                            }
+                            Reenviar correo
+                          </button>
+                        )
+                      )}
+
+                      {isActive && step.id === 'kyc' && (
+                        <Link
+                          href="/kyc"
+                          className="text-xs font-semibold bg-[#0A192F] dark:bg-[#00E5FF] text-white dark:text-[#0A192F] px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
+                        >
+                          Verificar ahora
+                        </Link>
+                      )}
+
+                      {isActive && step.id === 'loan' && (
+                        <Link
+                          href="/request-loan"
+                          className="text-xs font-semibold bg-[#D4AF37] text-[#0A192F] px-4 py-1.5 rounded-lg hover:bg-[#B8941F] transition-colors"
+                        >
+                          Solicitar préstamo
+                        </Link>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -478,12 +641,18 @@ export default function DashboardPage() {
                 {[
                   { label: 'Titular', value: user ? `${user.firstName} ${user.lastName}` : '–' },
                   { label: 'Email', value: user?.email ?? '–' },
-                  { label: 'Verificado', value: user?.emailVerified ? '✓ Email verificado' : 'Pendiente' },
+                  { label: 'Email', value: user?.emailVerified ? '✓ Email verificado' : '⚠ Pendiente de verificación' },
                   { label: 'Estado KYC', value: kycApproved ? '✓ Identidad verificada' : 'Pendiente de verificación' },
                 ].map((item, i, arr) => (
-                  <div key={item.label} className={`flex justify-between items-center ${i < arr.length - 1 ? 'pb-3 border-b border-gray-100 dark:border-white/6' : ''}`}>
+                  <div key={`${item.label}-${i}`} className={`flex justify-between items-center ${i < arr.length - 1 ? 'pb-3 border-b border-gray-100 dark:border-white/6' : ''}`}>
                     <span className="text-sm text-gray-500 dark:text-gray-400">{item.label}</span>
-                    <span className="text-sm text-gray-800 dark:text-gray-200 font-medium text-right max-w-[55%] truncate">{item.value}</span>
+                    <span className={`text-sm font-medium text-right max-w-[55%] truncate ${
+                      item.value.startsWith('✓')
+                        ? 'text-green-600 dark:text-green-400'
+                        : item.value.startsWith('⚠')
+                          ? 'text-amber-500'
+                          : 'text-gray-800 dark:text-gray-200'
+                    }`}>{item.value}</span>
                   </div>
                 ))}
               </div>
