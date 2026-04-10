@@ -49,13 +49,15 @@ export interface LoanBalance {
   daysOverdue: number
 }
 
+export type PaymentStatus = 'PENDING' | 'CONFIRMED' | 'FAILED'
+
 export interface Payment {
   id: string
   loanId: string
   amount: number
   currency: string
   method: string
-  status: string
+  status: PaymentStatus
   reference?: string
   paidAt: string
 }

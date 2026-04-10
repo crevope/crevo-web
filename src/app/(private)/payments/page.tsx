@@ -228,7 +228,7 @@ export default function PaymentsPage() {
                 </thead>
                 <tbody>
                   {filteredHistory.map(({ payment: p, loanRef: ref }) => {
-                    const isOk     = p.status === 'COMPLETED' || p.status === 'PAID'
+                    const isOk     = p.status === 'CONFIRMED'
                     const isFailed = p.status === 'FAILED'
                     return (
                       <tr key={p.id} className="border-b border-gray-100 dark:border-white/6 last:border-0 hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors">
@@ -294,13 +294,13 @@ export default function PaymentsPage() {
                   <span className="text-xs text-gray-500 dark:text-gray-400">
                     {filteredHistory.length} transacción{filteredHistory.length !== 1 ? 'es' : ''}
                     {' · '}
-                    {filteredHistory.filter(e => e.payment.status === 'COMPLETED' || e.payment.status === 'PAID').length} exitosas
+                    {filteredHistory.filter(e => e.payment.status === 'CONFIRMED').length} exitosas
                   </span>
                   <span className="text-sm font-bold text-[#0A192F] dark:text-white">
                     Total pagado:{' '}
                     {formatCurrency(
                       filteredHistory
-                        .filter(e => e.payment.status === 'COMPLETED' || e.payment.status === 'PAID')
+                        .filter(e => e.payment.status === 'CONFIRMED')
                         .reduce((sum, e) => sum + e.payment.amount, 0)
                     )}
                   </span>
@@ -638,7 +638,7 @@ export default function PaymentsPage() {
             ) : (
               <div className="space-y-3">
                 {payments.slice(0, 5).map(payment => {
-                  const isOk = payment.status === 'COMPLETED' || payment.status === 'PAID'
+                  const isOk = payment.status === 'CONFIRMED'
                   const isFailed = payment.status === 'FAILED'
                   return (
                     <div
