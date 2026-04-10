@@ -11,7 +11,7 @@ import { Skeleton } from '@/shared/ui/skeleton'
 import { useTheme } from 'next-themes'
 import { useLoanStore, loanRepository, type SimulationResult } from '@/features/request-loan'
 import { kycRepository } from '@/features/upload-kyc'
-import { useAuthStore } from '@/features/auth'
+import { useAuthStore, authRepository } from '@/features/auth'
 import { formatCurrency, shortName } from '@/shared/lib/utils'
 import { InfoTooltip } from '@/shared/ui/info-tooltip'
 import {
@@ -107,6 +107,8 @@ export default function RequestLoanPage() {
   const [simulation, setSimulation] = useState<SimulationResult | null>(null)
   const [simLoading, setSimLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const [resendLoading, setResendLoading] = useState(false)
+  const [resendSent, setResendSent] = useState(false)
   const { resolvedTheme } = useTheme()
 
   // Loan config state
@@ -179,6 +181,19 @@ export default function RequestLoanPage() {
     }
   }
 
+  const handleResendEmail = async () => {
+    if (!user?.email) return
+    setResendLoading(true)
+    try {
+      await authRepository.resendVerification(user.email)
+      setResendSent(true)
+    } catch {
+      toast.error('No se pudo enviar el correo. Intenta de nuevo.')
+    } finally {
+      setResendLoading(false)
+    }
+  }
+
   const canSubmit = !form.formState.isSubmitting && !!simulation && kycApproved !== null && consentCredit && consentTerms
 
   // Slider fill style
@@ -187,6 +202,50 @@ export default function RequestLoanPage() {
   const safeAmount = Number.isNaN(amount) ? cfg.defaultAmount : amount
   const fillPct = ((safeAmount - cfg.minAmount) / (cfg.maxAmount - cfg.minAmount)) * 100
   const rangeStyle = { background: `linear-gradient(to right, ${fillColor} ${fillPct}%, ${trackColor} ${fillPct}%)` }
+
+  // Email not verified
+  if (user && !user.emailVerified) {
+    return (
+      <div className="space-y-6 max-w-xl">
+        <div>
+          <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-1">Solicitar Préstamo</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Primero necesitas verificar tu correo electrónico.</p>
+        </div>
+        <div className={`${cardCls} p-8 text-center`}>
+          <div className="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-5">
+            <i className="fa-solid fa-envelope text-2xl text-blue-500" />
+          </div>
+          <h2 className="text-base font-semibold text-[#0A192F] dark:text-white mb-2">Verifica tu correo electrónico</h2>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
+            Te enviamos un enlace de verificación a <strong className="text-[#0A192F] dark:text-white">{user.email}</strong>.
+            Revisa tu bandeja de entrada (y spam) y haz clic en el enlace.
+          </p>
+          <p className="text-gray-400 dark:text-gray-500 text-xs mb-6">
+            Una vez verificado, recarga la página para continuar.
+          </p>
+          {resendSent ? (
+            <p className="inline-flex items-center gap-2 text-sm text-green-600 dark:text-green-400 font-medium">
+              <i className="fa-solid fa-circle-check" />
+              Correo enviado — revisa tu bandeja
+            </p>
+          ) : (
+            <button
+              type="button"
+              disabled={resendLoading}
+              onClick={handleResendEmail}
+              className="inline-flex items-center gap-2 bg-[#0A192F] dark:bg-[#00E5FF] text-white dark:text-[#0A192F] font-medium px-6 py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 text-sm"
+            >
+              {resendLoading
+                ? <Loader2 className="h-4 w-4 animate-spin" />
+                : <i className="fa-solid fa-paper-plane" />
+              }
+              Reenviar correo de verificación
+            </button>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   // KYC not verified
   if (kycApproved === false) {
