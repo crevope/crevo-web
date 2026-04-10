@@ -168,8 +168,8 @@ export default function LandingPage() {
               <div className="absolute top-5 right-5 glass-effect rounded-lg px-3 py-2.5 shadow-lg flex items-center gap-2.5 animate-[bounce_4s_ease-in-out_infinite]">
                 <i className="fa-solid fa-shield-halved text-[#00E5FF]" />
                 <div>
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wide">Seguridad SBS</p>
-                  <p className="text-xs font-semibold text-gray-900">Cifrado 256-bit</p>
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wide">Seguridad bancaria</p>
+                  <p className="text-xs font-semibold text-gray-900">Cifrado AES-256</p>
                 </div>
               </div>
 
@@ -214,8 +214,8 @@ export default function LandingPage() {
               <div className="absolute top-5 right-5 glass-effect-dark rounded-lg px-3 py-2.5 shadow-lg border border-white/10 flex items-center gap-2.5 animate-[bounce_4s_ease-in-out_infinite]">
                 <i className="fa-solid fa-shield-halved text-[#00E5FF]" />
                 <div>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide">Seguridad SBS</p>
-                  <p className="text-xs font-semibold text-white">Cifrado 256-bit</p>
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wide">Seguridad bancaria</p>
+                  <p className="text-xs font-semibold text-white">Cifrado AES-256</p>
                 </div>
               </div>
 

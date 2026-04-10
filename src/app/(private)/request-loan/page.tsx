@@ -868,7 +868,7 @@ export default function RequestLoanPage() {
 
                 <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
                   <i className="fa-solid fa-shield-halved mr-1" />
-                  Datos cifrados · Regulado por SBS · Ley N° 29733
+                  Datos cifrados con AES-256 · Supervisado por SBS · Ley N° 29733
                 </p>
               </div>
             </div>

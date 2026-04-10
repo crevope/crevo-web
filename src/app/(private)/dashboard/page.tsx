@@ -158,7 +158,7 @@ export default function DashboardPage() {
                   Protección de cuenta activada
                 </h4>
                 <p className="text-gray-500 dark:text-gray-400 text-xs">
-                  Tu cuenta está protegida con cifrado 256-bits regulado por SBS.
+                  Tu información financiera está protegida con cifrado AES-256 de nivel bancario.
                 </p>
               </div>
             </div>
