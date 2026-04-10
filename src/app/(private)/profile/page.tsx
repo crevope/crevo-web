@@ -5,10 +5,12 @@ import { useAuthStore } from '@/features/auth'
 import { authRepository } from '@/features/auth'
 import { apiClient } from '@/shared/api/client'
 import { bankAccountRepository, type BankAccount } from '@/features/request-loan/api/bankAccountRepository'
+import { loanRepository } from '@/features/request-loan'
 import { catalogRepository, type BankEntry } from '@/shared/api/catalogRepository'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 import { Input } from '@/shared/ui/input'
 import type { AuthUser } from '@/entities/user'
+import type { LoanLimits } from '@/entities/loan'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
 
@@ -29,16 +31,17 @@ const RISK_CONFIG: Record<string, { label: string; color: string; bg: string }> 
 }
 
 const TIER_CONFIG: Record<string, { label: string; desc: string; color: string }> = {
-  TIER_A:  { label: 'Tier A', desc: 'Aprobación automática', color: 'text-green-600 dark:text-green-400' },
-  TIER_B:  { label: 'Tier B', desc: 'Revisión estándar',     color: 'text-[#D4AF37]' },
-  TIER_C:  { label: 'Tier C', desc: 'Revisión detallada',    color: 'text-orange-500' },
-  UNKNOWN: { label: '—',      desc: 'Sin evaluación',        color: 'text-gray-400' },
+  TIER_A:  { label: 'Tier A', desc: 'Aprobación automática',  color: 'text-green-600 dark:text-green-400' },
+  TIER_B:  { label: 'Tier B', desc: 'Revisión estándar',      color: 'text-[#D4AF37]' },
+  TIER_C:  { label: 'Tier C', desc: 'Revisión detallada',     color: 'text-orange-500' },
+  TIER_D:  { label: 'Tier D', desc: 'Revisión restrictiva',   color: 'text-red-500' },
+  UNKNOWN: { label: '—',      desc: 'Sin evaluación',         color: 'text-gray-400' },
 }
 
 interface CreditScoreData {
   internalScore: number
+  tier: string | null
   riskLevel: string
-  maxLoanAmount: number
   isEligibleForAutoApproval: boolean
   paidLoansCount?: number
 }
@@ -75,6 +78,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<AuthUser | null>(null)
   const [score, setScore] = useState<CreditScoreData | null>(null)
   const [scoreLoading, setScoreLoading] = useState(false)
+  const [loanLimits, setLoanLimits] = useState<LoanLimits | null>(null)
 
   // 6-B: inline change-password state
   const [showPwForm, setShowPwForm] = useState(false)
@@ -135,6 +139,10 @@ export default function ProfilePage() {
       .then(res => setScore(res.data.data))
       .catch(() => setScore(null))
       .finally(() => setScoreLoading(false))
+
+    loanRepository.getMyLimits()
+      .then(setLoanLimits)
+      .catch(() => setLoanLimits(null))
 
     setNotifsLoading(true)
     apiClient.get('/users/me/preferences')
@@ -229,11 +237,7 @@ export default function ProfilePage() {
     }
   }
 
-  const tierKey = score?.isEligibleForAutoApproval ? 'TIER_A'
-    : score?.riskLevel === 'LOW' ? 'TIER_B'
-    : score?.riskLevel === 'MEDIUM' ? 'TIER_B'
-    : score?.riskLevel === 'HIGH' ? 'TIER_C'
-    : 'UNKNOWN'
+  const tierKey = score?.tier ?? 'UNKNOWN'
 
   return (
     <div className="space-y-8">
@@ -394,17 +398,25 @@ export default function ProfilePage() {
                       {/* Limits */}
                       <div className="flex flex-col gap-4 justify-center">
                         <div>
-                          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">Monto máximo</p>
+                          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">Tope aprobado</p>
+                          {loanLimits ? (
+                            <p className="text-lg font-bold text-[#0A192F] dark:text-white">
+                              S/ {Math.max(
+                                loanLimits.limits.EXPRESS.available ? loanLimits.limits.EXPRESS.maxAmount : 0,
+                                loanLimits.limits.FLEX.available    ? loanLimits.limits.FLEX.maxAmount    : 0,
+                                loanLimits.limits.PLUS.available    ? loanLimits.limits.PLUS.maxAmount    : 0,
+                              ).toLocaleString('es-PE')}
+                            </p>
+                          ) : (
+                            <p className="text-lg font-bold text-gray-400">—</p>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">Préstamos pagados</p>
                           <p className="text-lg font-bold text-[#0A192F] dark:text-white">
-                            S/ {score.maxLoanAmount.toLocaleString('es-PE')}
+                            {loanLimits?.paidLoansCount ?? '—'}
                           </p>
                         </div>
-                        {typeof score.paidLoansCount === 'number' && (
-                          <div>
-                            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">Préstamos pagados</p>
-                            <p className="text-lg font-bold text-[#0A192F] dark:text-white">{score.paidLoansCount}</p>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
