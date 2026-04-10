@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Fragment } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { CheckCircle2, Clock, AlertCircle, RefreshCw } from 'lucide-react'
@@ -219,45 +219,28 @@ export default function LoanDetailPage() {
       {!['REJECTED', 'CANCELLED'].includes(loan.status) && (
         <div className={`${cardCls} px-6 py-5`}>
           <div className="overflow-x-auto">
-            <div className="flex flex-col gap-2 min-w-max sm:min-w-0">
-
-              {/* Row 1: circles + connectors */}
-              <div className="flex items-center justify-center">
-                {TIMELINE_STEPS.map((step, i) => {
-                  const state = getStepState(step.id, loan.status)
-                  const isLast = i === TIMELINE_STEPS.length - 1
-                  return (
-                    <div key={step.id} className="flex items-center flex-1">
-                      <div className="flex justify-center flex-1">
-                        <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${
-                          state === 'complete'
-                            ? 'bg-green-500 text-white'
-                            : state === 'current'
-                              ? 'bg-[#00E5FF] text-[#0A192F] ring-4 ring-[#00E5FF]/20'
-                              : 'bg-gray-100 dark:bg-[#0F172A] text-gray-400 dark:text-gray-500'
-                        }`}>
-                          {state === 'complete'
-                            ? <i className="fa-solid fa-check text-xs" />
-                            : <i className={`${step.icon} text-xs`} />
-                          }
-                        </div>
+            <div className="flex items-start min-w-[480px] sm:min-w-0">
+              {TIMELINE_STEPS.map((step, i) => {
+                const state = getStepState(step.id, loan.status)
+                const isLast = i === TIMELINE_STEPS.length - 1
+                const nextState = !isLast ? getStepState(TIMELINE_STEPS[i + 1].id, loan.status) : null
+                const connectorGreen = state === 'complete' && (nextState === 'complete' || nextState === 'current')
+                return (
+                  <Fragment key={step.id}>
+                    {/* Step: fixed width, shrink-0 */}
+                    <div className="flex flex-col items-center gap-1.5 shrink-0 w-[72px]">
+                      <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                        state === 'complete'
+                          ? 'bg-green-500 text-white'
+                          : state === 'current'
+                            ? 'bg-[#00E5FF] text-[#0A192F] ring-4 ring-[#00E5FF]/20'
+                            : 'bg-gray-100 dark:bg-[#0F172A] text-gray-400 dark:text-gray-500'
+                      }`}>
+                        {state === 'complete'
+                          ? <i className="fa-solid fa-check text-xs" />
+                          : <i className={`${step.icon} text-xs`} />
+                        }
                       </div>
-                      {!isLast && (
-                        <div className={`h-0.5 flex-1 transition-colors ${
-                          state === 'complete' ? 'bg-green-400' : 'bg-gray-100 dark:bg-white/8'
-                        }`} />
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Row 2: labels */}
-              <div className="flex items-start justify-center">
-                {TIMELINE_STEPS.map((step) => {
-                  const state = getStepState(step.id, loan.status)
-                  return (
-                    <div key={step.id} className="flex-1 flex flex-col items-center gap-0.5 px-1">
                       <p className={`text-[10px] font-medium text-center whitespace-nowrap ${
                         state === 'complete'
                           ? 'text-green-600 dark:text-green-400'
@@ -268,16 +251,21 @@ export default function LoanDetailPage() {
                         {step.label}
                       </p>
                       {step.id === 'requested' && (
-                        <p className="text-[9px] text-gray-400 dark:text-gray-500 text-center">{formatDate(loan.createdAt)}</p>
+                        <p className="text-[9px] text-gray-400 dark:text-gray-500 text-center leading-tight">{formatDate(loan.createdAt)}</p>
                       )}
                       {step.id === 'disbursed' && state === 'complete' && loan.disbursedAt && (
-                        <p className="text-[9px] text-gray-400 dark:text-gray-500 text-center">{formatDate(loan.disbursedAt)}</p>
+                        <p className="text-[9px] text-gray-400 dark:text-gray-500 text-center leading-tight">{formatDate(loan.disbursedAt)}</p>
                       )}
                     </div>
-                  )
-                })}
-              </div>
-
+                    {/* Connector: flex-1, aligned to circle center (mt-[18px] = half of 36px circle) */}
+                    {!isLast && (
+                      <div className={`flex-1 h-0.5 mt-[18px] shrink-0 min-w-[8px] transition-colors ${
+                        connectorGreen ? 'bg-green-400' : 'bg-gray-100 dark:bg-white/8'
+                      }`} />
+                    )}
+                  </Fragment>
+                )
+              })}
             </div>
           </div>
         </div>
