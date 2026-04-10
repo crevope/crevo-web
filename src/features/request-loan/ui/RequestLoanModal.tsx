@@ -7,6 +7,7 @@ import { Loader2, ArrowRight } from 'lucide-react'
 import { useEffect, useState, useCallback } from 'react'
 import { useLoanStore } from '../model/useLoanStore'
 import { loanRepository, type SimulationResult } from '../api/loanRepository'
+import { bankAccountRepository, type BankAccount } from '../api/bankAccountRepository'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form'
@@ -45,6 +46,8 @@ export function RequestLoanModal({ open, onClose }: Props) {
   const { requestLoan } = useLoanStore()
   const [simulation, setSimulation] = useState<SimulationResult | null>(null)
   const [simLoading, setSimLoading] = useState(false)
+  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([])
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null)
 
   const form = useForm<RequestLoanInput>({
     resolver: zodResolver(requestLoanSchema),
@@ -79,9 +82,26 @@ export function RequestLoanModal({ open, onClose }: Props) {
     return () => clearTimeout(timeout)
   }, [amount, productType, runSimulation])
 
+  useEffect(() => {
+    if (!open) return
+    bankAccountRepository.getMyAccounts()
+      .then(result => {
+        setBankAccounts(result.accounts)
+        const defaultAccount = result.accounts.find(a => a.isDefault)
+        setSelectedAccountId(defaultAccount?.id ?? result.accounts[0]?.id ?? null)
+      })
+      .catch(() => setBankAccounts([]))
+  }, [open])
+
   const onSubmit = async (values: RequestLoanInput) => {
     try {
-      await requestLoan({ amount: values.amount, productType: values.productType, paymentFrequency: 'MENSUAL', numInstallments: values.productType === 'FLEX' ? 2 : 1 })
+      await requestLoan({
+        amount: values.amount,
+        productType: values.productType,
+        paymentFrequency: 'MENSUAL',
+        numInstallments: values.productType === 'FLEX' ? 2 : 1,
+        bankAccountId: selectedAccountId ?? undefined,
+      })
       toast.success('¡Solicitud enviada! Te notificaremos cuando sea aprobada.')
       form.reset()
       onClose()
@@ -247,6 +267,38 @@ export function RequestLoanModal({ open, onClose }: Props) {
                 </p>
               )}
             </div>
+
+            {/* Selección de cuenta bancaria */}
+            {bankAccounts.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-foreground">¿A qué cuenta quieres recibir el préstamo?</p>
+                <div className="space-y-2">
+                  {bankAccounts.map(account => (
+                    <button
+                      key={account.id}
+                      type="button"
+                      onClick={() => setSelectedAccountId(account.id)}
+                      className={`w-full flex items-center justify-between rounded-lg border px-3 py-2.5 text-sm text-left transition-colors
+                        ${selectedAccountId === account.id
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-input bg-background hover:bg-accent text-foreground'
+                        }`}
+                    >
+                      <div>
+                        <span className="font-semibold block">{account.bankName}</span>
+                        <span className="text-xs opacity-70">
+                          ****{account.cci.slice(-4)}
+                          {account.alias ? ` · ${account.alias}` : ''}
+                        </span>
+                      </div>
+                      {account.isDefault && (
+                        <span className="text-[10px] font-semibold uppercase tracking-wide opacity-60">Predeterminada</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || !simulation}>
               {form.formState.isSubmitting

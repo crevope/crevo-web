@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/features/auth'
+import { useNotificationStore } from '@/features/notifications'
 import { shortName } from '@/shared/lib/utils'
 
 interface NavItem {
@@ -14,11 +15,12 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard', icon: 'fa-solid fa-house', label: 'Dashboard' },
-  { href: '/loans', icon: 'fa-solid fa-wallet', label: 'Mis Préstamos', matchPrefix: '/loans' },
-  { href: '/payments', icon: 'fa-solid fa-money-bill-transfer', label: 'Pagos' },
-  { href: '/request-loan', icon: 'fa-solid fa-hand-holding-dollar', label: 'Solicitar Préstamo' },
-  { href: '/profile', icon: 'fa-solid fa-user', label: 'Mi Perfil' },
+  { href: '/dashboard',    icon: 'fa-solid fa-house',                label: 'Dashboard' },
+  { href: '/request-loan', icon: 'fa-solid fa-hand-holding-dollar',  label: 'Solicitar Préstamo' },
+  { href: '/loans',        icon: 'fa-solid fa-wallet',               label: 'Mis Préstamos', matchPrefix: '/loans' },
+  { href: '/payments',     icon: 'fa-solid fa-money-bill-transfer',  label: 'Pagos' },
+  { href: '/notifications',icon: 'fa-regular fa-bell',               label: 'Notificaciones' },
+  { href: '/profile',      icon: 'fa-solid fa-user',                 label: 'Mi Perfil' },
 ]
 
 interface Props {
@@ -31,6 +33,7 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
   const router = useRouter()
   const { user, logout } = useAuthStore()
   const { resolvedTheme, setTheme } = useTheme()
+  const { unreadCount } = useNotificationStore()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
@@ -114,6 +117,11 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
               >
                 <i className={`${item.icon} w-4 text-center text-sm`} />
                 {item.label}
+                {item.href === '/notifications' && unreadCount > 0 && (
+                  <span className="ml-auto min-w-[18px] h-[18px] rounded-full bg-[#00E5FF] text-[#0A192F] text-[10px] font-bold flex items-center justify-center px-1">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </Link>
             )
           })}

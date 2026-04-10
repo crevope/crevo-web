@@ -49,6 +49,25 @@ export const authRepository = {
     await apiClient.post('/auth/reset-password', { token, newPassword })
   },
 
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    await apiClient.post('/auth/change-password', { currentPassword, newPassword })
+  },
+
+  async getMyProfile(): Promise<AuthUser> {
+    const { data } = await apiClient.get('/auth/me')
+    const u = data.data
+    return {
+      id: u.id,
+      email: u.email,
+      firstName: u.firstName,
+      lastName: u.lastName,
+      emailVerified: u.emailVerified ?? false,
+      isIdentityVerified: u.isIdentityVerified ?? false,
+      phone: u.phone,
+      dni: u.dni,
+    }
+  },
+
   saveToken(token: string) { localStorage.setItem(TOKEN_KEY, token) },
   clearToken() { localStorage.removeItem(TOKEN_KEY) },
   getToken(): string | null {

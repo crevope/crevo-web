@@ -241,7 +241,7 @@ export function LoanSimulator() {
                   onValueChange={(val) => setFrequency(val as PaymentFrequency)}
                 >
                   <SelectTrigger className="w-full h-10 rounded-md border-gray-200 dark:border-white/10 bg-white dark:bg-[#0F172A] text-gray-700 dark:text-white px-3 text-sm">
-                    <SelectValue />
+                    <SelectValue>{{ MENSUAL: 'Mensual', QUINCENAL: 'Quincenal' }[frequency]}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="QUINCENAL">Quincenal</SelectItem>
@@ -265,7 +265,7 @@ export function LoanSimulator() {
                   onValueChange={(val) => setInstallments(Number(val))}
                 >
                   <SelectTrigger className="w-full h-10 rounded-md border-gray-200 dark:border-white/10 bg-white dark:bg-[#0F172A] text-gray-700 dark:text-white px-3 text-sm">
-                    <SelectValue />
+                    <SelectValue>{installments} cuota{installments > 1 ? 's' : ''}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {range(cfg.minInstallments, cfg.maxInstallments).map((n) => (

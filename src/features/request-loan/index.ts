@@ -1,4 +1,6 @@
 export { RequestLoanModal } from './ui/RequestLoanModal'
 export { useLoanStore } from './model/useLoanStore'
 export { loanRepository } from './api/loanRepository'
-export type { SimulationResult } from './api/loanRepository'
+export type { SimulationResult, RestructureResult } from './api/loanRepository'
+export { bankAccountRepository } from './api/bankAccountRepository'
+export type { BankAccount, BankAccountListResult } from './api/bankAccountRepository'

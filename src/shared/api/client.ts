@@ -22,6 +22,10 @@ apiClient.interceptors.response.use(
       localStorage.removeItem(TOKEN_KEY)
       globalThis.location.href = '/login'
     }
-    return Promise.reject(error)
+    const message: string =
+      error.response?.data?.message ||
+      error.message ||
+      'Error inesperado. Intenta de nuevo.'
+    return Promise.reject(new Error(message))
   }
 )

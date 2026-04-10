@@ -5,4 +5,6 @@ export interface AuthUser {
   lastName: string
   emailVerified: boolean
   isIdentityVerified: boolean
+  phone?: string
+  dni?: string
 }

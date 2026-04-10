@@ -1,16 +1,20 @@
 'use client'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { DashboardSidebar } from '@/widgets/dashboard-sidebar'
 import { useAuthStore } from '@/features/auth'
+import { useNotificationStore } from '@/features/notifications'
 import { Skeleton } from '@/shared/ui/skeleton'
 
 export default function PrivateLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const router = useRouter()
   const { isAuthenticated, isLoading, loadUser } = useAuthStore()
+  const { unreadCount, load: loadNotifications } = useNotificationStore()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => { loadUser() }, [loadUser])
+  useEffect(() => { loadNotifications() }, [loadNotifications])
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace('/login')
   }, [isLoading, isAuthenticated, router])
@@ -39,13 +43,23 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
           </div>
           <span className="text-base font-semibold text-white tracking-tight">Solvo</span>
         </div>
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="text-gray-300 hover:text-white text-lg focus:outline-none p-1 transition-colors"
-          aria-label="Abrir menú"
-        >
-          <i className="fa-solid fa-bars" />
-        </button>
+        <div className="flex items-center gap-1">
+          <Link href="/notifications" className="relative p-1 text-gray-300 hover:text-white transition-colors">
+            <i className="fa-regular fa-bell text-lg" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full bg-[#00E5FF] text-[#0A192F] text-[9px] font-bold flex items-center justify-center px-1">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </Link>
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="text-gray-300 hover:text-white text-lg focus:outline-none p-1 transition-colors"
+            aria-label="Abrir menú"
+          >
+            <i className="fa-solid fa-bars" />
+          </button>
+        </div>
       </header>
 
       {/* Main content */}

@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from '@/shared/ui/select'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { Input } from '@/shared/ui/input'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
 
@@ -255,7 +256,7 @@ export default function LoansPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`pb-3 lg:pb-0 font-medium text-sm transition-all border-b-2 ${activeTab === tab.id
+                className={`pb-3 lg:pb-2 font-medium text-sm transition-all border-b-[1.5px] ${activeTab === tab.id
                   ? 'text-[#0A192F] dark:text-[#D4AF37] border-[#0A192F] dark:border-[#D4AF37]'
                   : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
                   }`}
@@ -271,19 +272,21 @@ export default function LoansPage() {
           {/* Search + Sort */}
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             <div className="relative w-full sm:w-64">
-              <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
-              <input
+              <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm z-10" />
+              <Input
                 type="text"
                 placeholder="Buscar préstamo..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full bg-gray-50 dark:bg-[#0F172A] border border-gray-100 dark:border-white/6 rounded-xl py-2.5 pl-10 pr-4 text-gray-800 dark:text-gray-200 focus:outline-none focus:border-[#D4AF37] transition-colors text-sm placeholder-gray-400 dark:placeholder-gray-500"
+                className="pl-9"
               />
             </div>
             <div className="w-full sm:w-48">
               <Select value={sort} onValueChange={(val) => setSort(val as Sort)}>
                 <SelectTrigger className="w-full py-2.5">
-                  <SelectValue />
+                  <SelectValue>
+                    {{ recent: 'Más recientes', amount_high: 'Monto mayor', amount_low: 'Monto menor', due_soon: 'Próximo a vencer' }[sort]}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="recent">Más recientes</SelectItem>
