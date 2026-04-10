@@ -10,6 +10,7 @@ import { Checkbox } from '@/shared/ui/checkbox'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { useTheme } from 'next-themes'
 import { useLoanStore, loanRepository, type SimulationResult } from '@/features/request-loan'
+import type { LoanLimits } from '@/entities/loan'
 import { bankAccountRepository, type BankAccount } from '@/features/request-loan/api/bankAccountRepository'
 import { catalogRepository, type BankEntry } from '@/shared/api/catalogRepository'
 import { kycRepository } from '@/features/upload-kyc'
@@ -126,6 +127,10 @@ export default function RequestLoanPage() {
   // Loan config state
   const [productType, setProductType] = useState<ProductKey>('EXPRESS')
 
+  // Límites personalizados
+  const [loanLimits, setLoanLimits] = useState<LoanLimits | null>(null)
+  const [limitsLoading, setLimitsLoading] = useState(true)
+
   // Bank account selector
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([])
   const [bankMaxAccounts, setBankMaxAccounts] = useState(1)
@@ -141,6 +146,13 @@ export default function RequestLoanPage() {
     kycRepository.getStatus()
       .then(s => setKycApproved(s.isIdentityVerified))
       .catch(() => setKycApproved(false))
+  }, [])
+
+  useEffect(() => {
+    loanRepository.getMyLimits()
+      .then(setLoanLimits)
+      .catch(() => setLoanLimits(null))
+      .finally(() => setLimitsLoading(false))
   }, [])
 
   useEffect(() => {
@@ -195,11 +207,22 @@ export default function RequestLoanPage() {
   const amount = form.watch('amount')
   const cfg = PRODUCT_CONFIG[productType]
 
+  // Topes efectivos: límite aprobado del usuario si existe, o absoluteMaxAmount por defecto
+  const effectiveMax = (p: ProductKey): number => {
+    if (loanLimits?.limits[p]) return loanLimits.limits[p].maxAmount
+    return PRODUCT_CONFIG[p].maxAmount
+  }
+  const isProductLocked = (p: ProductKey): boolean => {
+    if (!loanLimits) return false
+    return !loanLimits.limits[p].available && !!loanLimits.limits[p].requiredPaidLoans
+  }
+
   const handleProductChange = (p: ProductKey) => {
     const c = PRODUCT_CONFIG[p]
+    const maxAmt = effectiveMax(p)
     setProductType(p)
     form.setValue('productType', p)
-    form.setValue('amount', c.defaultAmount)
+    form.setValue('amount', Math.min(c.defaultAmount, maxAmt))
     form.setValue('frequency', c.defaultFrequency)
     form.setValue('installments', c.defaultInstallments)
   }
@@ -273,8 +296,9 @@ export default function RequestLoanPage() {
   const fillColor = mounted && resolvedTheme === 'dark' ? '#D4AF37' : '#0A192F'
   const trackColor = mounted && resolvedTheme === 'dark' ? 'rgba(255,255,255,0.12)' : '#E5E7EB'
   const safeAmount = Number.isNaN(amount) ? cfg.defaultAmount : amount
-  const fillPct = ((safeAmount - cfg.minAmount) / (cfg.maxAmount - cfg.minAmount)) * 100
-  const rangeStyle = { background: `linear-gradient(to right, ${fillColor} ${fillPct}%, ${trackColor} ${fillPct}%)` }
+  const currentMax = effectiveMax(productType)
+  const fillPct = ((safeAmount - cfg.minAmount) / (currentMax - cfg.minAmount)) * 100
+  const rangeStyle = { background: `linear-gradient(to right, ${fillColor} ${Math.max(0, Math.min(100, fillPct))}%, ${trackColor} ${Math.max(0, Math.min(100, fillPct))}%)` }
 
   // Email not verified
   if (user && !user.emailVerified) {
@@ -380,17 +404,29 @@ export default function RequestLoanPage() {
 
                 {/* Amount slider */}
                 <div>
-                  <div className="flex justify-between items-end mb-4">
+                  <div className="flex justify-between items-end mb-1">
                     <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">¿Cuánto necesitas?</p>
                     <span className="text-2xl font-bold text-[#0A192F] dark:text-white">
                       S/ {fmtAmt(safeAmount)}
                     </span>
                   </div>
+                  {/* Máximo aprobado */}
+                  {!limitsLoading && loanLimits?.score && (
+                    <div className="flex items-center gap-1.5 mb-3">
+                      <i className="fa-solid fa-circle-check text-[10px] text-emerald-500" />
+                      <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+                        Tu máximo aprobado: S/ {currentMax.toLocaleString('es-PE')}
+                      </span>
+                    </div>
+                  )}
+                  {limitsLoading && (
+                    <div className="h-4 mb-3 w-44 rounded bg-gray-100 dark:bg-white/10 animate-pulse" />
+                  )}
                   <input
                     type="range"
                     title="Slider de monto"
                     min={cfg.minAmount}
-                    max={cfg.maxAmount}
+                    max={currentMax}
                     step={STEP}
                     value={safeAmount}
                     onChange={(e) => form.setValue('amount', Number(e.target.value), { shouldValidate: true })}
@@ -419,7 +455,7 @@ export default function RequestLoanPage() {
                   />
                   <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
                     <span>S/ {cfg.minAmount}</span>
-                    <span>S/ {cfg.maxAmount.toLocaleString('es-PE')}</span>
+                    <span>S/ {currentMax.toLocaleString('es-PE')}</span>
                   </div>
                   {form.formState.errors.amount && (
                     <p className="text-red-500 text-xs mt-1">{form.formState.errors.amount.message}</p>
@@ -433,29 +469,36 @@ export default function RequestLoanPage() {
                     {(Object.keys(PRODUCT_CONFIG) as ProductKey[]).map((key) => {
                       const p = PRODUCT_CONFIG[key]
                       const selected = productType === key
+                      const locked = isProductLocked(key)
                       return (
                         <button
                           key={key}
                           type="button"
                           onClick={() => handleProductChange(key)}
-                          className={`flex-1 py-2.5 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex flex-col items-center justify-center gap-1 ${selected
-                            ? `${p.borderActive} ${p.accentBg} text-[#0A192F] dark:text-white`
-                            : 'border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/20'
+                          disabled={locked}
+                          title={locked ? `Requiere ${loanLimits?.limits[key]?.requiredPaidLoans}+ préstamos pagados` : undefined}
+                          className={`flex-1 py-2.5 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex flex-col items-center justify-center gap-1 ${locked
+                            ? 'border-gray-200 dark:border-white/6 opacity-50 cursor-not-allowed bg-gray-50 dark:bg-white/3'
+                            : selected
+                              ? `${p.borderActive} ${p.accentBg} text-[#0A192F] dark:text-white`
+                              : 'border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/20'
                             }`}
                         >
-                          <i className={`${p.icon} text-sm ${selected ? p.textActive : ''}`} />
+                          <i className={`${locked ? 'fa-solid fa-lock' : p.icon} text-sm ${selected && !locked ? p.textActive : ''}`} />
                           <span className="text-xs font-semibold">{p.label}</span>
-                          <span className={`text-[10px] font-normal ${selected ? 'opacity-80' : 'text-gray-400 dark:text-gray-500'}`}>{p.sublabel}</span>
+                          <span className={`text-[10px] font-normal ${selected && !locked ? 'opacity-80' : 'text-gray-400 dark:text-gray-500'}`}>
+                            {locked ? `${loanLimits?.limits[key]?.requiredPaidLoans}+ pagados` : p.sublabel}
+                          </span>
                         </button>
                       )
                     })}
                   </div>
-                  {/* PLUS badge */}
-                  {productType === 'PLUS' && (
+                  {/* Mensaje de producto bloqueado */}
+                  {productType === 'PLUS' && isProductLocked('PLUS') && (
                     <p className="text-xs text-purple-400 dark:text-purple-300 mt-2 flex items-center gap-1.5">
                       <i className="fa-solid fa-lock text-[10px]" />
                       {' '}
-                      Disponible para clientes con 10+ préstamos pagados
+                      Disponible para clientes con {loanLimits?.limits.PLUS?.requiredPaidLoans ?? 10}+ préstamos pagados
                     </p>
                   )}
                 </div>

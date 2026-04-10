@@ -76,6 +76,24 @@ export interface Installment {
   status: InstallmentStatus
 }
 
+export interface ProductLimitInfo {
+  minAmount: number
+  maxAmount: number
+  available: boolean
+  requiredPaidLoans?: number
+}
+
+export interface LoanLimits {
+  tier: string | null
+  score: number | null
+  paidLoansCount: number
+  limits: {
+    EXPRESS: ProductLimitInfo
+    FLEX: ProductLimitInfo
+    PLUS: ProductLimitInfo
+  }
+}
+
 export interface EarlyPayoffQuote {
   loanId: string
   // Desglose

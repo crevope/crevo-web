@@ -1,6 +1,6 @@
 import { apiClient } from '@/shared/api/client'
 import { TOKEN_KEY } from '@/shared/api/client'
-import type { Loan, LoanBalance, Payment, Installment, EarlyPayoffQuote } from '@/entities/loan'
+import type { Loan, LoanBalance, Payment, Installment, EarlyPayoffQuote, LoanLimits } from '@/entities/loan'
 
 export interface SimulateDTO {
   amount: number
@@ -28,6 +28,10 @@ export interface SimulationResult {
 }
 
 export const loanRepository = {
+  async getMyLimits(): Promise<LoanLimits> {
+    const { data } = await apiClient.get('/loans/my-limits')
+    return data.data
+  },
   async simulate(dto: SimulateDTO): Promise<SimulationResult> {
     const { data } = await apiClient.post('/loans/simulate', dto)
     return data.data
