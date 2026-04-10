@@ -21,6 +21,7 @@ export interface Loan {
   tcea: number
   tier: string
   status: LoanStatus
+  restructureCount: number
   dueDate?: string
   contractUrl?: string
   rejectionReason?: string
@@ -42,6 +43,10 @@ export interface LoanBalance {
   currency: string
   dueDate?: string
   isOverdue: boolean
+  moraLevel: number
+  moraAccrued: number
+  collectionFeesAccrued: number
+  daysOverdue: number
 }
 
 export interface Payment {
@@ -73,6 +78,7 @@ export interface EarlyPayoffQuote {
   loanId: string
   payoffAmount: number
   interestSaved: number
-  totalPending: number
-  installmentsCount: number
+  originalTotal: number
+  currency: string
+  installmentsRemaining: number
 }

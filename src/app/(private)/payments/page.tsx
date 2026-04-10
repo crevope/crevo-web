@@ -1,72 +1,54 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
+import { toast } from 'sonner'
 import { loanRepository, useLoanStore } from '@/features/request-loan'
-import { formatCurrency, formatDate, loanRef } from '@/shared/lib/utils'
+import { formatCurrency, formatDate, formatDateTime, loanRef } from '@/shared/lib/utils'
 import type { Loan, LoanBalance, Payment } from '@/entities/loan'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
+import { Input } from '@/shared/ui/input'
 
 const ACTIVE_STATUSES = ['APPROVED', 'SIGNED', 'ACTIVE', 'OVERDUE']
 
-type AmountType = 'full' | 'custom'
-type MethodId = 'card' | 'transfer' | 'yape' | 'plin' | 'bbva'
+type PageTab = 'pay' | 'history'
 
-const PAYMENT_METHODS: { id: MethodId; logo: React.ReactNode; label: string; desc: string }[] = [
-  {
-    id: 'card',
-    logo: <i className="fa-brands fa-cc-visa text-blue-600 dark:text-blue-400 text-2xl" />,
-    label: 'Tarjeta Débito / Crédito',
-    desc: 'Pago seguro con tarjeta',
-  },
-  {
-    id: 'transfer',
-    logo: <i className="fa-solid fa-building-columns text-white text-sm" />,
-    label: 'Transferencia CCI (BCP/Interbank)',
-    desc: 'Generar código para pago',
-  },
-  {
-    id: 'yape',
-    logo: <span className="text-white font-bold text-xs">Yape</span>,
-    label: 'Yape',
-    desc: 'Pago instantáneo desde la app',
-  },
-  {
-    id: 'plin',
-    logo: <span className="text-white font-bold text-xs">Plin</span>,
-    label: 'Plin',
-    desc: 'Pago rápido con tu celular',
-  },
-  {
-    id: 'bbva',
-    logo: <span className="text-white font-bold text-[10px]">BBVA</span>,
-    label: 'BBVA Perú',
-    desc: 'Transferencia directa desde BBVA',
-  },
-]
-
-const METHOD_LOGO_BG: Record<MethodId, string> = {
-  card: 'bg-gray-100 dark:bg-[#334155]',
-  transfer: 'bg-[#0A192F] dark:bg-[#0A192F]',
-  yape: 'bg-purple-600',
-  plin: 'bg-cyan-500',
-  bbva: 'bg-blue-900',
+const METHOD_LABELS: Record<string, string> = {
+  CARD:          'Tarjeta',
+  TRANSFER:      'Transferencia',
+  YAPE:          'Yape',
+  PLIN:          'Plin',
+  BBVA:          'BBVA',
+  CASH:          'Efectivo',
 }
+
+interface HistoryEntry {
+  payment: Payment
+  loanRef: string
+  loanId: string
+}
+
+type AmountType = 'full' | 'custom'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
 
 export default function PaymentsPage() {
   const { loans, isLoading, loadMyLoans } = useLoanStore()
 
+  const [pageTab, setPageTab] = useState<PageTab>('pay')
   const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null)
   const [amountType, setAmountType] = useState<AmountType>('full')
   const [customAmount, setCustomAmount] = useState('')
-  const [selectedMethod, setSelectedMethod] = useState<MethodId>('card')
   const [balance, setBalance] = useState<LoanBalance | null>(null)
   const [payments, setPayments] = useState<Payment[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoadingBalance, setIsLoadingBalance] = useState(true)
-  const [success, setSuccess] = useState<Payment | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  // History tab state
+  const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>([])
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [historyLoanFilter, setHistoryLoanFilter] = useState<string>('all')
 
   useEffect(() => { loadMyLoans() }, [loadMyLoans])
 
@@ -95,6 +77,25 @@ export default function PaymentsPage() {
     }
   }, [activeLoans, selectedLoanId])
 
+  // Load full history across all loans when switching to history tab
+  useEffect(() => {
+    if (pageTab !== 'history' || loans.length === 0) return
+    setHistoryLoading(true)
+    Promise.all(
+      loans.map(async (loan) => {
+        const pays = await loanRepository.getLoanPayments(loan.id).catch(() => [] as Payment[])
+        return pays.map(p => ({ payment: p, loanRef: loanRef(loan.id), loanId: loan.id }))
+      })
+    )
+      .then(results => {
+        const all = results.flat().sort(
+          (a, b) => new Date(b.payment.paidAt).getTime() - new Date(a.payment.paidAt).getTime()
+        )
+        setHistoryEntries(all)
+      })
+      .finally(() => setHistoryLoading(false))
+  }, [pageTab, loans])
+
   useEffect(() => {
     if (selectedLoanId) loadLoanData(selectedLoanId)
   }, [selectedLoanId, loadLoanData])
@@ -110,28 +111,22 @@ export default function PaymentsPage() {
     setIsSubmitting(true)
     setError(null)
     try {
-      let result: Payment
-      if (amountType === 'full') {
-        // TODO: for 'card' method, integrate Culqi to get a token first, then use loanRepository.chargeCard
-        result = await loanRepository.payLoan(selectedLoanId, {
-          amount: paymentAmount,
-          method: selectedMethod.toUpperCase(),
-        })
-      } else {
-        result = await loanRepository.partialPayment(selectedLoanId, {
-          amount: paymentAmount,
-          method: selectedMethod.toUpperCase(),
-        })
-      }
-      setSuccess(result)
-      await loadLoanData(selectedLoanId)
+      const { checkoutUrl } = await loanRepository.createCheckout({
+        loanId: selectedLoanId,
+        amount: paymentAmount,
+        paymentType: 'regular',
+      })
+      window.location.href = checkoutUrl
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message
-      setError(msg ?? 'Ocurrió un error al procesar el pago. Inténtalo de nuevo.')
-    } finally {
+      setError(msg ?? 'Ocurrió un error al generar el link de pago. Inténtalo de nuevo.')
       setIsSubmitting(false)
     }
   }
+
+  const filteredHistory = historyLoanFilter === 'all'
+    ? historyEntries
+    : historyEntries.filter(e => e.loanId === historyLoanFilter)
 
   return (
     <div className="space-y-6">
@@ -151,7 +146,173 @@ export default function PaymentsPage() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Page tabs */}
+      <div className="flex gap-1 bg-gray-100 dark:bg-white/5 p-1 rounded-xl w-fit">
+        {([
+          { id: 'pay'     as PageTab, label: 'Realizar Pago',    icon: 'fa-solid fa-credit-card' },
+          { id: 'history' as PageTab, label: 'Historial',        icon: 'fa-solid fa-clock-rotate-left' },
+        ]).map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setPageTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              pageTab === tab.id
+                ? 'bg-white dark:bg-[#1E293B] text-[#0A192F] dark:text-white shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+            }`}
+          >
+            <i className={`${tab.icon} text-xs`} />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── History tab ───────────────────────────────────────────────── */}
+      {pageTab === 'history' && (
+        <div className={`${cardCls}`}>
+          {/* Filters */}
+          <div className="flex flex-wrap items-center justify-between gap-3 p-5 border-b border-gray-100 dark:border-white/6">
+            <h2 className="text-base font-semibold text-[#0A192F] dark:text-white">Historial de Transacciones</h2>
+            {loans.length > 1 && (
+              <Select value={historyLoanFilter} onValueChange={v => setHistoryLoanFilter(v ?? 'all')}>
+                <SelectTrigger className="w-52 text-sm">
+                  <SelectValue>
+                    {historyLoanFilter === 'all' ? 'Todos los préstamos' : `Préstamo #${loanRef(historyLoanFilter)}`}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los préstamos</SelectItem>
+                  {loans.map(l => (
+                    <SelectItem key={l.id} value={l.id}>Préstamo #{loanRef(l.id)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+
+          {historyLoading ? (
+            <div className="p-6 space-y-3">
+              {[1,2,3,4,5].map(i => (
+                <div key={i} className="flex items-center gap-4 py-3">
+                  <Skeleton className="w-8 h-8 rounded-lg shrink-0" />
+                  <div className="flex-1 space-y-1.5">
+                    <Skeleton className="h-3.5 w-40" />
+                    <Skeleton className="h-3 w-28" />
+                  </div>
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              ))}
+            </div>
+          ) : filteredHistory.length === 0 ? (
+            <div className="flex flex-col items-center py-16 text-center">
+              <div className="w-14 h-14 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mb-4">
+                <i className="fa-solid fa-receipt text-gray-400 text-xl" />
+              </div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Sin transacciones registradas</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Los pagos que realices aparecerán aquí.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 dark:border-white/6">
+                    <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Fecha</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Referencia</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Préstamo</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Método</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Estado</th>
+                    <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400">Monto</th>
+                    <th className="px-5 py-3" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredHistory.map(({ payment: p, loanRef: ref }) => {
+                    const isOk     = p.status === 'COMPLETED' || p.status === 'PAID'
+                    const isFailed = p.status === 'FAILED'
+                    return (
+                      <tr key={p.id} className="border-b border-gray-100 dark:border-white/6 last:border-0 hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors">
+                        <td className="px-5 py-3.5 text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                          {formatDateTime(p.paidAt)}
+                        </td>
+                        <td className="px-5 py-3.5 font-mono text-xs text-gray-500 dark:text-gray-400">
+                          {p.reference ? `#${p.reference.slice(0, 10)}` : `#${loanRef(p.id)}`}
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <Link
+                            href={`/loans/${p.loanId}`}
+                            className="text-[#0A192F] dark:text-[#D4AF37] hover:underline text-xs font-medium"
+                          >
+                            #{ref}
+                          </Link>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <span className="inline-flex items-center gap-1 text-xs bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full">
+                            {METHOD_LABELS[p.method] ?? p.method}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          {isFailed ? (
+                            <span className="inline-flex items-center gap-1 text-xs font-medium bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">
+                              <i className="fa-solid fa-xmark" />Fallido
+                            </span>
+                          ) : isOk ? (
+                            <span className="inline-flex items-center gap-1 text-xs font-medium bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-2 py-0.5 rounded-full">
+                              <i className="fa-solid fa-check" />Exitoso
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-xs font-medium bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 px-2 py-0.5 rounded-full">
+                              <i className="fa-solid fa-clock" />Pendiente
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-5 py-3.5 text-right">
+                          <span className={`font-semibold ${isFailed ? 'text-red-500 dark:text-red-400 line-through' : 'text-[#0A192F] dark:text-white'}`}>
+                            {formatCurrency(p.amount)}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5 text-right">
+                          {isOk && (
+                            <button
+                              onClick={() => loanRepository.downloadReceipt(p.id).catch(() => toast.error('No se pudo descargar el comprobante'))}
+                              title="Descargar comprobante PDF"
+                              className="text-gray-400 hover:text-[#0A192F] dark:hover:text-white transition-colors"
+                            >
+                              <i className="fa-solid fa-file-arrow-down text-sm" />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+
+              {/* Summary row */}
+              {filteredHistory.length > 0 && (
+                <div className="px-5 py-3 bg-gray-50 dark:bg-[#0F172A] border-t border-gray-100 dark:border-white/6 flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {filteredHistory.length} transacción{filteredHistory.length !== 1 ? 'es' : ''}
+                    {' · '}
+                    {filteredHistory.filter(e => e.payment.status === 'COMPLETED' || e.payment.status === 'PAID').length} exitosas
+                  </span>
+                  <span className="text-sm font-bold text-[#0A192F] dark:text-white">
+                    Total pagado:{' '}
+                    {formatCurrency(
+                      filteredHistory
+                        .filter(e => e.payment.status === 'COMPLETED' || e.payment.status === 'PAID')
+                        .reduce((sum, e) => sum + e.payment.amount, 0)
+                    )}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Pay tab ───────────────────────────────────────────────────── */}
+      {pageTab === 'pay' && <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* ── Left column (steps) ── */}
         <div className="lg:col-span-2 space-y-5">
@@ -332,13 +493,13 @@ export default function PaymentsPage() {
                       Ingresa el monto a pagar
                     </label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold">S/</span>
-                      <input
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold z-10">S/</span>
+                      <Input
                         type="number"
                         placeholder="0.00"
                         value={customAmount}
                         onChange={e => setCustomAmount(e.target.value)}
-                        className="w-full bg-white dark:bg-[#0F172A] border border-gray-100 dark:border-white/6 rounded-lg py-3 pl-10 pr-4 text-gray-900 dark:text-white focus:outline-none focus:border-[#0A192F] dark:focus:border-[#D4AF37] transition-colors text-lg"
+                        className="pl-9 text-lg"
                       />
                     </div>
                     <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-2 flex items-center gap-1">
@@ -351,56 +512,6 @@ export default function PaymentsPage() {
             )}
           </section>
 
-          {/* Step 3 – Payment method */}
-          <section className={`${cardCls} p-5`}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-[#0A192F] dark:text-white flex items-center gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-[#0A192F]/10 dark:bg-[#D4AF37]/20 text-[#0A192F] dark:text-[#D4AF37] flex items-center justify-center text-[10px] font-semibold shrink-0">3</span>
-                Método de Pago
-              </h2>
-              {/* TODO: implement "add new card" flow */}
-              <button className="text-[#0A192F] dark:text-[#D4AF37] text-xs font-medium hover:underline transition-colors">
-                + Agregar nuevo
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {PAYMENT_METHODS.map(method => (
-                <label key={method.id} className="cursor-pointer block">
-                  <input
-                    type="radio"
-                    name="payment-method"
-                    className="sr-only peer"
-                    checked={selectedMethod === method.id}
-                    onChange={() => setSelectedMethod(method.id)}
-                  />
-                  <div className={`p-3.5 rounded-lg border-2 transition-all flex items-center justify-between
-                    ${selectedMethod === method.id
-                      ? 'border-[#0A192F] dark:border-[#D4AF37] bg-[#0A192F]/5 dark:bg-[#D4AF37]/5'
-                      : 'border-gray-100 dark:border-white/6 bg-white dark:bg-[#0F172A] hover:bg-gray-50 dark:hover:bg-[#334155]/30'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-7 rounded flex items-center justify-center shrink-0 ${METHOD_LOGO_BG[method.id]}`}>
-                        {method.logo}
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-[#0A192F] dark:text-white">{method.label}</h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{method.desc}</p>
-                      </div>
-                    </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors
-                      ${selectedMethod === method.id ? 'border-[#0A192F] dark:border-[#D4AF37]' : 'border-gray-300 dark:border-gray-500'}`}
-                    >
-                      {selectedMethod === method.id && (
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#0A192F] dark:bg-[#D4AF37]" />
-                      )}
-                    </div>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </section>
         </div>
 
         {/* ── Right column ── */}
@@ -473,18 +584,19 @@ export default function PaymentsPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitting || !selectedLoanId || paymentAmount <= 0}
-                  className="w-full bg-[#0A192F] hover:bg-[#0A192F]/90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded-lg flex justify-center items-center gap-2 mb-3 font-medium transition-all text-sm"
+                  className="w-full bg-[#0A192F] dark:bg-[#D4AF37] hover:opacity-90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-[#0A192F] py-2.5 rounded-lg flex justify-center items-center gap-2 mb-3 font-semibold transition-all text-sm"
                 >
                   {isSubmitting ? (
-                    <><i className="fa-solid fa-circle-notch fa-spin" /> Procesando...</>
+                    <><i className="fa-solid fa-circle-notch fa-spin" />Procesando...</>
                   ) : (
-                    <><i className="fa-solid fa-lock" /> Confirmar Pago</>
+                    <><i className="fa-solid fa-lock" />Pagar {paymentAmount > 0 ? formatCurrency(paymentAmount) : ''}</>
+
                   )}
                 </button>
 
                 <p className="text-xs text-gray-400 dark:text-gray-500 text-center flex items-center justify-center gap-1">
                   <i className="fa-solid fa-shield-halved" />
-                  Protegido por SBS · Cifrado 256-bit
+                  Pago seguro procesado por Culqi · Cifrado 256-bit
                 </p>
               </>
             )}
@@ -577,59 +689,8 @@ export default function PaymentsPage() {
             )}
           </section>
         </div>
-      </div>
+      </div>}
 
-      {/* Success modal */}
-      {success && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className={`${cardCls} max-w-md w-full p-7 text-center relative`}>
-            <button
-              type="button"
-              onClick={() => setSuccess(null)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-              title="Cerrar"
-            >
-              <i className="fa-solid fa-xmark" />
-            </button>
-
-            <div className="w-14 h-14 rounded-xl bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center mx-auto mb-5 text-2xl border border-green-200 dark:border-green-800/40">
-              <i className="fa-solid fa-check" />
-            </div>
-
-            <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-1.5">¡Pago Exitoso!</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
-              Tu pago ha sido procesado correctamente y aplicado a tu préstamo.
-            </p>
-
-            <div className="bg-gray-50 dark:bg-[#0F172A] rounded-lg p-4 mb-6 text-left space-y-2.5 border border-gray-100 dark:border-white/6">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Referencia</span>
-                <span className="text-[#0A192F] dark:text-white font-medium">#{loanRef(success.id)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Fecha</span>
-                <span className="text-[#0A192F] dark:text-white font-medium">{formatDate(success.paidAt)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500 dark:text-gray-400">Monto</span>
-                <span className="text-[#0A192F] dark:text-[#D4AF37] font-semibold">{formatCurrency(success.amount)}</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2.5">
-              <Link
-                href="/dashboard"
-                className="w-full bg-[#0A192F] text-white py-2.5 rounded-lg text-center text-sm font-medium hover:bg-[#0A192F]/90 transition-colors"
-              >
-                Ir al Dashboard
-              </Link>
-              <button className="w-full bg-transparent border border-gray-100 dark:border-white/6 text-gray-600 dark:text-gray-300 py-2.5 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors flex justify-center items-center gap-2 font-medium">
-                <i className="fa-solid fa-download text-xs" /> Descargar Recibo
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

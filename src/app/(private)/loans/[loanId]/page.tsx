@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { CheckCircle2, Clock, AlertCircle, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { useLoanStore, loanRepository } from '@/features/request-loan'
+import type { RestructureResult } from '@/features/request-loan'
 import { canSign, isActiveLoan, canPay, LoanStatusBadge } from '@/entities/loan'
-import type { InstallmentStatus } from '@/entities/loan'
+import type { InstallmentStatus, EarlyPayoffQuote } from '@/entities/loan'
 import { formatCurrency, formatDate, formatDateTime, loanRef } from '@/shared/lib/utils'
 import { Skeleton } from '@/shared/ui/skeleton'
 
@@ -65,6 +66,17 @@ export default function LoanDetailPage() {
   const { loanId } = useParams<{ loanId: string }>()
   const { selectedLoan: loan, balance, payments, installments, isLoading, loadLoanDetails, signLoan } = useLoanStore()
   const [activeTab, setActiveTab] = useState<TabId>('calendario')
+  const [restructureOpen, setRestructureOpen] = useState(false)
+  const [restructureStep, setRestructureStep] = useState<'confirm' | 'done'>('confirm')
+  const [restructureResult, setRestructureResult] = useState<RestructureResult | null>(null)
+  const [restructureLoading, setRestructureLoading] = useState(false)
+  const [restructureInstallments, setRestructureInstallments] = useState(3)
+
+  const [earlyPayoffOpen, setEarlyPayoffOpen] = useState(false)
+  const [earlyPayoffStep, setEarlyPayoffStep] = useState<'quote' | 'done'>('quote')
+  const [earlyPayoffQuote, setEarlyPayoffQuote] = useState<EarlyPayoffQuote | null>(null)
+  const [earlyPayoffLoading, setEarlyPayoffLoading] = useState(false)
+  const [earlyPayoffQuoteLoading, setEarlyPayoffQuoteLoading] = useState(false)
 
   useEffect(() => { loadLoanDetails(loanId) }, [loanId, loadLoanDetails])
 
@@ -84,6 +96,52 @@ export default function LoanDetailPage() {
       loadLoanDetails(loanId)
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Error al firmar')
+    }
+  }
+
+  const handleOpenEarlyPayoff = async () => {
+    setEarlyPayoffStep('quote')
+    setEarlyPayoffQuote(null)
+    setEarlyPayoffOpen(true)
+    setEarlyPayoffQuoteLoading(true)
+    try {
+      const quote = await loanRepository.getEarlyPayoffQuote(loanId)
+      setEarlyPayoffQuote(quote)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Error al obtener la cotización')
+      setEarlyPayoffOpen(false)
+    } finally {
+      setEarlyPayoffQuoteLoading(false)
+    }
+  }
+
+  const handleEarlyPayoff = async () => {
+    if (!earlyPayoffQuote) return
+    setEarlyPayoffLoading(true)
+    try {
+      const { checkoutUrl } = await loanRepository.createCheckout({
+        loanId,
+        amount: earlyPayoffQuote.payoffAmount,
+        paymentType: 'early_payoff',
+      })
+      window.location.href = checkoutUrl
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Error al generar el link de pago')
+      setEarlyPayoffLoading(false)
+    }
+  }
+
+  const handleRestructure = async () => {
+    setRestructureLoading(true)
+    try {
+      const result = await loanRepository.restructureLoan(loanId, restructureInstallments)
+      setRestructureResult(result)
+      setRestructureStep('done')
+      loadLoanDetails(loanId)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Error al reestructurar')
+    } finally {
+      setRestructureLoading(false)
     }
   }
 
@@ -320,19 +378,77 @@ export default function LoanDetailPage() {
         </div>
       )}
 
-      {/* ── Overdue alert banner ────────────────────────────────────────── */}
+      {/* ── Mora breakdown card ─────────────────────────────────────────── */}
       {balance?.isOverdue && (
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700/30 rounded-lg p-4 flex items-start gap-3">
-          <div className="w-9 h-9 rounded-full bg-yellow-100 dark:bg-yellow-700/30 text-yellow-600 dark:text-yellow-400 flex items-center justify-center shrink-0">
-            <i className="fa-solid fa-triangle-exclamation text-sm" />
+        <div className="rounded-lg border-2 border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/30 overflow-hidden">
+          {/* Header */}
+          <div className="px-5 py-3 bg-red-100 dark:bg-red-900/30 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <i className="fa-solid fa-triangle-exclamation text-red-600 dark:text-red-400" />
+              <span className="font-semibold text-red-700 dark:text-red-300 text-sm">Préstamo en Mora</span>
+              {balance.daysOverdue > 0 && (
+                <span className="text-xs bg-red-200 dark:bg-red-800/50 text-red-700 dark:text-red-300 px-2 py-0.5 rounded-full font-medium">
+                  {balance.daysOverdue} días vencido
+                </span>
+              )}
+            </div>
+            {balance.moraLevel > 0 && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-red-500 dark:text-red-400 font-medium">Nivel de mora:</span>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4].map(lvl => (
+                    <div
+                      key={lvl}
+                      className={`w-4 h-4 rounded-sm ${lvl <= balance.moraLevel ? 'bg-red-500 dark:bg-red-400' : 'bg-red-200 dark:bg-red-800/40'}`}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs text-red-500 dark:text-red-400">{balance.moraLevel}/4</span>
+              </div>
+            )}
           </div>
-          <div>
-            <h4 className="text-yellow-700 dark:text-yellow-400 font-semibold text-sm mb-1">Aviso de Mora Leve</h4>
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-              Tu cuota actual presenta un retraso. Se ha realizado un intento de cobro automático fallido al CCI registrado.
-              Por favor, regulariza tu pago para evitar cargos adicionales por mora según regulación SBS (Superintendencia de Banca, Seguros y AFP).
-            </p>
+
+          {/* Breakdown rows */}
+          <div className="px-5 py-4 space-y-2.5">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600 dark:text-gray-400">Capital e intereses pendientes</span>
+              <span className="font-medium text-gray-800 dark:text-gray-200">{formatCurrency(balance.remaining)}</span>
+            </div>
+            {balance.moraAccrued > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400">Mora acumulada</span>
+                <span className="font-medium text-red-600 dark:text-red-400">+{formatCurrency(balance.moraAccrued)}</span>
+              </div>
+            )}
+            {balance.collectionFeesAccrued > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400">Comisión de cobranza</span>
+                <span className="font-medium text-red-600 dark:text-red-400">+{formatCurrency(balance.collectionFeesAccrued)}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-sm pt-2 border-t border-red-200 dark:border-red-800/40">
+              <span className="font-semibold text-gray-800 dark:text-gray-100">Total a regularizar hoy</span>
+              <span className="font-bold text-red-600 dark:text-red-400 text-base">
+                {formatCurrency(balance.remaining + balance.moraAccrued + balance.collectionFeesAccrued)}
+              </span>
+            </div>
           </div>
+
+          {/* CTA row */}
+          {loan.restructureCount < 3 && (
+            <div className="px-5 pb-4 flex flex-wrap gap-3">
+              <button
+                onClick={() => { setRestructureStep('confirm'); setRestructureOpen(true) }}
+                className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg bg-white dark:bg-[#1E293B] border border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
+              >
+                <i className="fa-solid fa-arrows-rotate" />
+                Solicitar Reestructura
+              </button>
+              <span className="text-xs text-gray-500 dark:text-gray-400 self-center">
+                {3 - loan.restructureCount} de 3 disponibles
+              </span>
+            </div>
+          )}
         </div>
       )}
 
@@ -393,13 +509,13 @@ export default function LoanDetailPage() {
                 </Link>
               )}
               {(isActiveLoan(loan) || canPay(loan)) && (
-                <Link
-                  href={`/loans/${loan.id}/pay`}
+                <button
+                  onClick={handleOpenEarlyPayoff}
                   className="w-full bg-white dark:bg-[#0F172A] text-[#0A192F] dark:text-gray-200 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 border border-gray-100 dark:border-white/6 hover:bg-gray-50 dark:hover:bg-[#334155] transition-colors text-sm"
                 >
                   <i className="fa-solid fa-forward-fast text-sm" />
-                  Adelantar Pago
-                </Link>
+                  Pago Anticipado
+                </button>
               )}
               {canSign(loan) && (
                 <button
@@ -720,6 +836,306 @@ export default function LoanDetailPage() {
           </button>
         </div>
       </div>
+
+      {/* ── Restructure modal ───────────────────────────────────────────── */}
+      {restructureOpen && balance && loan && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className={`${cardCls} w-full max-w-md shadow-2xl`}>
+
+            {restructureStep === 'confirm' && (
+              <>
+                {/* Header */}
+                <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center text-orange-600 dark:text-orange-400 shrink-0">
+                      <i className="fa-solid fa-arrows-rotate" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">Reestructuración de Deuda</h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Genera un nuevo plan de pagos</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setRestructureOpen(false)}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 transition-colors"
+                  >
+                    <i className="fa-solid fa-xmark text-sm" />
+                  </button>
+                </div>
+
+                {/* Body */}
+                <div className="p-5 space-y-4">
+                  {/* Debt capitalization summary */}
+                  <div className="bg-orange-50 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-700/30 rounded-lg p-4 space-y-2">
+                    <p className="text-xs font-medium text-orange-700 dark:text-orange-300 mb-3">Lo siguiente se capitalizará en tu nuevo préstamo:</p>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600 dark:text-gray-400">Capital e intereses pendientes</span>
+                      <span className="font-medium text-gray-800 dark:text-gray-200">{formatCurrency(balance.remaining)}</span>
+                    </div>
+                    {balance.moraAccrued > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">Mora capitalizada</span>
+                        <span className="font-medium text-red-600 dark:text-red-400">+{formatCurrency(balance.moraAccrued)}</span>
+                      </div>
+                    )}
+                    {balance.collectionFeesAccrued > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">Cargos de cobranza</span>
+                        <span className="font-medium text-red-600 dark:text-red-400">+{formatCurrency(balance.collectionFeesAccrued)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-sm pt-2 border-t border-orange-200 dark:border-orange-700/30">
+                      <span className="font-semibold text-gray-800 dark:text-gray-100">Nuevo capital estimado</span>
+                      <span className="font-bold text-[#0A192F] dark:text-white">
+                        {formatCurrency(balance.remaining + balance.moraAccrued + balance.collectionFeesAccrued)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Installments selector */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                      Número de nuevas cuotas
+                    </label>
+                    <div className="flex gap-2 flex-wrap">
+                      {[1, 2, 3, 4, 5, 6].map(n => (
+                        <button
+                          key={n}
+                          onClick={() => setRestructureInstallments(n)}
+                          className={`w-10 h-10 rounded-lg text-sm font-medium border transition-colors ${
+                            restructureInstallments === n
+                              ? 'bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] border-transparent'
+                              : 'border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/20'
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Warning */}
+                  <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/4 rounded-lg p-3">
+                    <i className="fa-solid fa-circle-info text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
+                    <p>
+                      Esta acción es <strong className="text-gray-700 dark:text-gray-300">irreversible</strong>. Contará como{' '}
+                      <strong className="text-gray-700 dark:text-gray-300">reestructuración {loan.restructureCount + 1} de 3</strong>.
+                      Las cuotas anteriores quedarán marcadas como reestructuradas.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="flex gap-3 p-5 pt-0">
+                  <button
+                    onClick={() => setRestructureOpen(false)}
+                    className="flex-1 py-2.5 rounded-lg border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-white/4 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleRestructure}
+                    disabled={restructureLoading}
+                    className="flex-1 py-2.5 rounded-lg bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] text-sm font-semibold hover:bg-[#0A192F]/90 dark:hover:bg-[#B8941F] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                  >
+                    {restructureLoading ? (
+                      <>
+                        <i className="fa-solid fa-spinner animate-spin text-xs" />
+                        Procesando...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fa-solid fa-arrows-rotate text-xs" />
+                        Confirmar reestructura
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
+
+            {restructureStep === 'done' && restructureResult && (
+              <>
+                {/* Header */}
+                <div className="p-5 border-b border-gray-100 dark:border-white/6 text-center">
+                  <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 mx-auto mb-3">
+                    <i className="fa-solid fa-check text-lg" />
+                  </div>
+                  <h3 className="font-semibold text-[#0A192F] dark:text-white">¡Reestructuración completada!</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Tu nuevo plan de pagos está activo</p>
+                </div>
+
+                {/* New plan summary */}
+                <div className="p-5 space-y-2.5">
+                  {[
+                    { label: 'Nuevo capital', value: formatCurrency(restructureResult.newPrincipal) },
+                    { label: 'Mora capitalizada', value: formatCurrency(restructureResult.capitalizedDebt) },
+                    { label: 'Cuota mensual', value: formatCurrency(restructureResult.newInstallmentAmount) },
+                    { label: 'Nº de cuotas', value: `${restructureResult.newNumInstallments}` },
+                    { label: 'Nuevo vencimiento', value: formatDate(restructureResult.newDueDate) },
+                  ].map(row => (
+                    <div key={row.label} className="flex justify-between text-sm">
+                      <span className="text-gray-500 dark:text-gray-400">{row.label}</span>
+                      <span className="font-medium text-gray-800 dark:text-gray-200">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="p-5 pt-0">
+                  <button
+                    onClick={() => { setRestructureOpen(false); setRestructureResult(null); setRestructureStep('confirm') }}
+                    className="w-full py-2.5 rounded-lg bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] text-sm font-semibold hover:bg-[#0A192F]/90 dark:hover:bg-[#B8941F] transition-colors"
+                  >
+                    Ver nuevo calendario
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Early Payoff modal ──────────────────────────────────────────── */}
+      {earlyPayoffOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className={`${cardCls} w-full max-w-md shadow-2xl`}>
+
+            {earlyPayoffStep === 'quote' && (
+              <>
+                {/* Header */}
+                <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 shrink-0">
+                      <i className="fa-solid fa-forward-fast" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">Pago Anticipado Total</h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Liquida tu préstamo hoy y ahorra intereses</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setEarlyPayoffOpen(false)}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 transition-colors"
+                  >
+                    <i className="fa-solid fa-xmark text-sm" />
+                  </button>
+                </div>
+
+                {/* Body */}
+                <div className="p-5 space-y-4">
+                  {earlyPayoffQuoteLoading ? (
+                    <div className="flex flex-col items-center justify-center py-8 gap-3">
+                      <i className="fa-solid fa-spinner animate-spin text-2xl text-[#0A192F] dark:text-[#D4AF37]" />
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Calculando tu cotización...</p>
+                    </div>
+                  ) : earlyPayoffQuote && (
+                    <>
+                      {/* Quote summary */}
+                      <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-700/30 rounded-lg p-4 space-y-2.5">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-400">Cuotas pendientes</span>
+                          <span className="font-medium text-gray-800 dark:text-gray-200">{earlyPayoffQuote.installmentsRemaining}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-400">Capital e intereses pendientes</span>
+                          <span className="font-medium text-gray-800 dark:text-gray-200">{formatCurrency(earlyPayoffQuote.originalTotal)}</span>
+                        </div>
+                        {earlyPayoffQuote.interestSaved > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">Ahorro de intereses</span>
+                            <span className="font-medium text-green-600 dark:text-green-400">−{formatCurrency(earlyPayoffQuote.interestSaved)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-sm pt-2 border-t border-green-200 dark:border-green-700/30">
+                          <span className="font-semibold text-gray-800 dark:text-gray-100">Total a pagar hoy</span>
+                          <span className="font-bold text-[#0A192F] dark:text-[#D4AF37] text-base">{formatCurrency(earlyPayoffQuote.payoffAmount)}</span>
+                        </div>
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/4 rounded-lg p-3">
+                        <i className="fa-solid fa-circle-info text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
+                        <p>Al confirmar, tu préstamo quedará <strong className="text-gray-700 dark:text-gray-300">completamente liquidado</strong>. Esta acción es irreversible.</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Footer */}
+                {!earlyPayoffQuoteLoading && earlyPayoffQuote && (
+                  <div className="p-5 pt-0 space-y-3">
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setEarlyPayoffOpen(false)}
+                        className="flex-1 py-2.5 rounded-lg border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-white/4 transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        onClick={handleEarlyPayoff}
+                        disabled={earlyPayoffLoading}
+                        className="flex-1 py-2.5 rounded-lg bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2"
+                      >
+                        {earlyPayoffLoading ? (
+                          <>
+                            <i className="fa-solid fa-spinner animate-spin text-xs shrink-0" />
+                            <span className="text-sm">Procesando...</span>
+                          </>
+                        ) : (
+                          <>
+                            <i className="fa-solid fa-lock text-xs shrink-0" />
+                            <span className="flex flex-col items-start leading-tight">
+                              <span className="text-[11px] opacity-80 font-medium">Pagar anticipado</span>
+                              <span className="text-sm">{formatCurrency(earlyPayoffQuote.payoffAmount)}</span>
+                            </span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-center text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-1">
+                      <i className="fa-solid fa-shield-halved" />
+                      Pago seguro procesado por Culqi · Cifrado 256-bit
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+
+            {earlyPayoffStep === 'done' && (
+              <>
+                <div className="p-8 text-center space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 mx-auto">
+                    <i className="fa-solid fa-circle-check text-3xl" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-[#0A192F] dark:text-white text-lg">¡Préstamo liquidado!</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5">
+                      Tu pago anticipado fue procesado exitosamente. El préstamo está completamente saldado.
+                    </p>
+                  </div>
+                  {earlyPayoffQuote && earlyPayoffQuote.interestSaved > 0 && (
+                    <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-700/30 rounded-lg p-3">
+                      <p className="text-sm text-green-700 dark:text-green-400 font-medium">
+                        <i className="fa-solid fa-piggy-bank mr-1.5" />
+                        Ahorraste {formatCurrency(earlyPayoffQuote.interestSaved)} en intereses
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="px-5 pb-5">
+                  <button
+                    onClick={() => { setEarlyPayoffOpen(false); setEarlyPayoffStep('quote'); setEarlyPayoffQuote(null) }}
+                    className="w-full py-2.5 rounded-lg bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] text-sm font-semibold hover:bg-[#0A192F]/90 dark:hover:bg-[#B8941F] transition-colors"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              </>
+            )}
+
+          </div>
+        </div>
+      )}
 
     </div>
   )

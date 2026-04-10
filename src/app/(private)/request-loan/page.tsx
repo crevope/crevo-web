@@ -10,6 +10,8 @@ import { Checkbox } from '@/shared/ui/checkbox'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { useTheme } from 'next-themes'
 import { useLoanStore, loanRepository, type SimulationResult } from '@/features/request-loan'
+import { bankAccountRepository, type BankAccount } from '@/features/request-loan/api/bankAccountRepository'
+import { catalogRepository, type BankEntry } from '@/shared/api/catalogRepository'
 import { kycRepository } from '@/features/upload-kyc'
 import { useAuthStore, authRepository } from '@/features/auth'
 import { formatCurrency, shortName } from '@/shared/lib/utils'
@@ -72,7 +74,6 @@ function range(min: number, max: number): number[] {
   return r
 }
 
-const BANKS = ['BCP', 'Interbank', 'BBVA Perú', 'Scotiabank', 'BanBif', 'Banco de la Nación', 'Otro']
 
 const requestSchema = z.object({
   amount: z
@@ -80,8 +81,19 @@ const requestSchema = z.object({
     .min(100, 'El monto mínimo es S/ 100')
     .max(2000, 'El monto máximo es S/ 2,000'),
   productType: z.enum(['EXPRESS', 'FLEX', 'PLUS']),
+  frequency: z.enum(['QUINCENAL', 'MENSUAL']),
+  installments: z.number().min(1).max(12),
+  bankAccountId: z.string().min(1, 'Selecciona una cuenta bancaria para recibir tu préstamo'),
+  consentCredit: z.boolean().refine(v => v, { message: 'Debes autorizar la consulta crediticia' }),
+  consentTerms: z.boolean().refine(v => v, { message: 'Debes aceptar los términos y condiciones' }),
 })
 type RequestInput = z.infer<typeof requestSchema>
+
+const addAccountSchema = z.object({
+  bank: z.string().min(1, 'Selecciona un banco'),
+  cci: z.string().regex(/^\d{20}$/, 'El CCI debe tener exactamente 20 dígitos'),
+})
+type AddAccountInput = z.infer<typeof addAccountSchema>
 
 function StepHeader({ step, title, subtitle }: Readonly<{ step: number; title: string; subtitle: string }>) {
   return (
@@ -113,14 +125,15 @@ export default function RequestLoanPage() {
 
   // Loan config state
   const [productType, setProductType] = useState<ProductKey>('EXPRESS')
-  const [frequency, setFrequency] = useState<'QUINCENAL' | 'MENSUAL'>('MENSUAL')
-  const [installments, setInstallments] = useState(1)
 
-  // TODO: connect bank/CCI fields to API submission
-  const [bank, setBank] = useState('')
-  const [cci, setCci] = useState('')
-  const [consentCredit, setConsentCredit] = useState(false)
-  const [consentTerms, setConsentTerms] = useState(false)
+  // Bank account selector
+  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([])
+  const [bankMaxAccounts, setBankMaxAccounts] = useState(1)
+  const [bankPaidLoans, setBankPaidLoans] = useState(0)
+  const [bankAccountsLoading, setBankAccountsLoading] = useState(true)
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [addingAccount, setAddingAccount] = useState(false)
+  const [bankCatalog, setBankCatalog] = useState<BankEntry[]>([])
 
   useEffect(() => { setMounted(true) }, [])
 
@@ -130,9 +143,53 @@ export default function RequestLoanPage() {
       .catch(() => setKycApproved(false))
   }, [])
 
+  useEffect(() => {
+    bankAccountRepository.getMyAccounts()
+      .then(result => {
+        setBankAccounts(result.accounts)
+        setBankMaxAccounts(result.maxAccounts)
+        setBankPaidLoans(result.paidLoansCount)
+        const def = result.accounts.find(a => a.isDefault) ?? result.accounts[0]
+        if (def) form.setValue('bankAccountId', def.id)
+        else setShowAddForm(true)
+      })
+      .catch(() => setShowAddForm(true))
+      .finally(() => setBankAccountsLoading(false))
+  }, [])
+
+  useEffect(() => {
+    catalogRepository.getBanks()
+      .then(banks => {
+        setBankCatalog(banks)
+        if (banks[0]) addAccountForm.setValue('bank', banks[0].id)
+      })
+      .catch(() => {})
+  }, [])
+
   const form = useForm<RequestInput>({
     resolver: zodResolver(requestSchema),
-    defaultValues: { amount: PRODUCT_CONFIG.EXPRESS.defaultAmount, productType: 'EXPRESS' },
+    mode: 'onSubmit',
+    defaultValues: {
+      amount: PRODUCT_CONFIG.EXPRESS.defaultAmount,
+      productType: 'EXPRESS',
+      frequency: 'MENSUAL',
+      installments: 1,
+      bankAccountId: '',
+      consentCredit: false,
+      consentTerms: false,
+    },
+  })
+
+  const frequency = form.watch('frequency')
+  const installments = form.watch('installments')
+  const selectedAccountId = form.watch('bankAccountId')
+  const consentCredit = form.watch('consentCredit')
+  const consentTerms = form.watch('consentTerms')
+
+  const addAccountForm = useForm<AddAccountInput>({
+    resolver: zodResolver(addAccountSchema),
+    mode: 'onChange',
+    defaultValues: { bank: '', cci: '' },
   })
 
   const amount = form.watch('amount')
@@ -143,9 +200,24 @@ export default function RequestLoanPage() {
     setProductType(p)
     form.setValue('productType', p)
     form.setValue('amount', c.defaultAmount)
-    setFrequency(c.defaultFrequency)
-    setInstallments(c.defaultInstallments)
+    form.setValue('frequency', c.defaultFrequency)
+    form.setValue('installments', c.defaultInstallments)
   }
+
+  const handleAddAccount = addAccountForm.handleSubmit(async (values) => {
+    setAddingAccount(true)
+    try {
+      const account = await bankAccountRepository.addAccount({ bankName: values.bank, cci: values.cci })
+      setBankAccounts(prev => [...prev, account])
+      form.setValue('bankAccountId', account.id)
+      setShowAddForm(false)
+      addAccountForm.reset()
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Error al agregar la cuenta')
+    } finally {
+      setAddingAccount(false)
+    }
+  })
 
   const runSimulation = useCallback(async (amt: number, prod: ProductKey, freq: string, inst: number) => {
     const c = PRODUCT_CONFIG[prod]
@@ -171,8 +243,9 @@ export default function RequestLoanPage() {
       await requestLoan({
         amount: values.amount,
         productType: values.productType,
-        paymentFrequency: frequency,
-        numInstallments: installments,
+        paymentFrequency: values.frequency,
+        numInstallments: values.installments,
+        bankAccountId: values.bankAccountId || undefined,
       })
       toast.success('¡Solicitud enviada! Te notificaremos cuando sea aprobada.')
       router.push('/loans')
@@ -194,7 +267,7 @@ export default function RequestLoanPage() {
     }
   }
 
-  const canSubmit = !form.formState.isSubmitting && !!simulation && kycApproved !== null && consentCredit && consentTerms
+  const canSubmit = form.formState.isValid && !!simulation && kycApproved === true
 
   // Slider fill style
   const fillColor = mounted && resolvedTheme === 'dark' ? '#D4AF37' : '#0A192F'
@@ -396,9 +469,9 @@ export default function RequestLoanPage() {
                     {productType === 'PLUS' ? (
                       <div className={`${inputCls} opacity-60 cursor-default w-full h-11.5 flex items-center`}>Mensual</div>
                     ) : (
-                      <Select id="frequency" value={frequency} onValueChange={(v) => setFrequency(v as 'QUINCENAL' | 'MENSUAL')}>
+                      <Select id="frequency" value={frequency} onValueChange={(v) => form.setValue('frequency', v as 'QUINCENAL' | 'MENSUAL')}>
                         <SelectTrigger className="w-full h-11.5 rounded-lg border-gray-100 dark:border-white/6 bg-[#F9FAFB] dark:bg-[#0F172A] text-gray-800 dark:text-gray-200 px-4 text-sm">
-                          <SelectValue />
+                          <SelectValue>{{ MENSUAL: 'Mensual', QUINCENAL: 'Quincenal' }[frequency]}</SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="MENSUAL">Mensual</SelectItem>
@@ -414,9 +487,9 @@ export default function RequestLoanPage() {
                     {productType === 'EXPRESS' ? (
                       <div className={`${inputCls} opacity-60 cursor-default w-full h-11.5 flex items-center`}>1 cuota</div>
                     ) : (
-                      <Select id="installments" value={String(installments)} onValueChange={(v) => setInstallments(Number(v))}>
+                      <Select id="installments" value={String(installments)} onValueChange={(v) => form.setValue('installments', Number(v))}>
                         <SelectTrigger className="w-full h-11.5 rounded-lg border-gray-100 dark:border-white/6 bg-[#F9FAFB] dark:bg-[#0F172A] text-gray-800 dark:text-gray-200 px-4 text-sm">
-                          <SelectValue />
+                          <SelectValue>{installments} cuota{installments > 1 ? 's' : ''}</SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {range(cfg.minInstallments, cfg.maxInstallments).map(n => (
@@ -430,43 +503,154 @@ export default function RequestLoanPage() {
               </div>
             </div>
 
-            {/* Section 2 — Cuenta de Depósito (CCI) */}
+            {/* Section 2 — Cuenta de Depósito */}
             <div className={cardCls}>
-              <StepHeader step={2} title="Cuenta de Depósito (CCI)" subtitle="Ingresa la cuenta donde recibirás el préstamo" />
+              <StepHeader step={2} title="Cuenta de Depósito" subtitle="Selecciona la cuenta donde recibirás el préstamo" />
               <div className="p-6">
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/40 rounded-lg p-3 mb-5 flex items-start gap-3">
-                  <i className="fa-solid fa-circle-info text-blue-500 dark:text-blue-400 mt-0.5 shrink-0 text-sm" />
-                  <p className="text-sm text-blue-800 dark:text-blue-300 leading-relaxed">
-                    Esta es la cuenta donde depositaremos tu préstamo una vez aprobado. Asegúrate de que esté a tu nombre y sea válida en Perú.
+                {bankAccountsLoading ? (
+                  <div className="space-y-3">
+                    <div className="h-16 rounded-lg bg-gray-100 dark:bg-white/5 animate-pulse" />
+                    <div className="h-16 rounded-lg bg-gray-100 dark:bg-white/5 animate-pulse" />
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {/* Saved accounts */}
+                    {bankAccounts.map(account => (
+                      <button
+                        key={account.id}
+                        type="button"
+                        onClick={() => { form.setValue('bankAccountId', account.id); setShowAddForm(false) }}
+                        className={`w-full flex items-center gap-4 p-4 rounded-lg border transition-all text-left ${
+                          selectedAccountId === account.id
+                            ? 'border-[#0A192F] dark:border-[#D4AF37] bg-[#0A192F]/4 dark:bg-[#D4AF37]/8'
+                            : 'border-gray-100 dark:border-white/8 hover:border-gray-200 dark:hover:border-white/15'
+                        }`}
+                      >
+                        {/* Radio dot */}
+                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                          selectedAccountId === account.id
+                            ? 'border-[#0A192F] dark:border-[#D4AF37]'
+                            : 'border-gray-300 dark:border-white/25'
+                        }`}>
+                          {selectedAccountId === account.id && (
+                            <div className="w-2 h-2 rounded-full bg-[#0A192F] dark:bg-[#D4AF37]" />
+                          )}
+                        </div>
+                        {/* Bank icon */}
+                        <div className="w-9 h-9 rounded-lg bg-[#0A192F]/8 dark:bg-white/6 flex items-center justify-center shrink-0">
+                          <i className="fa-solid fa-building-columns text-[#0A192F] dark:text-gray-300 text-sm" />
+                        </div>
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-medium text-[#0A192F] dark:text-white">{account.bankName}</p>
+                            {account.isDefault && (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[#D4AF37]/20 text-yellow-700 dark:text-[#D4AF37]">Principal</span>
+                            )}
+                            {account.alias && (
+                              <span className="text-[10px] text-gray-400 dark:text-gray-500">{account.alias}</span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-mono">
+                            ••••&nbsp;••••&nbsp;••••&nbsp;{account.cci.slice(-4)}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+
+                    {/* Add new account toggle */}
+                    {!showAddForm && (
+                      bankAccounts.length >= bankMaxAccounts ? (
+                        <div className="flex items-start gap-3 p-3.5 rounded-lg border border-amber-200 dark:border-amber-700/40 bg-amber-50 dark:bg-amber-900/10 text-sm">
+                          <i className="fa-solid fa-lock text-amber-500 dark:text-amber-400 mt-0.5 shrink-0 text-xs" />
+                          <div>
+                            <p className="font-medium text-amber-700 dark:text-amber-300">Límite de cuentas alcanzado</p>
+                            <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+                              Con {bankPaidLoans} préstamo{bankPaidLoans !== 1 ? 's' : ''} pagado{bankPaidLoans !== 1 ? 's' : ''} puedes tener hasta {bankMaxAccounts} cuenta{bankMaxAccounts !== 1 ? 's' : ''}.
+                              {bankMaxAccounts < 3 && (
+                                <> Alcanza {bankMaxAccounts === 1 ? '3' : '10'} préstamos pagados para desbloquear {bankMaxAccounts === 1 ? 'una más' : 'una tercera'}.</>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => { setShowAddForm(true); form.setValue('bankAccountId', '') }}
+                          className="w-full flex items-center gap-3 p-4 rounded-lg border border-dashed border-gray-200 dark:border-white/12 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/25 hover:text-gray-700 dark:hover:text-gray-200 transition-all text-sm"
+                        >
+                          <i className="fa-solid fa-plus text-xs" />
+                          {bankAccounts.length === 0 ? 'Agregar una cuenta bancaria' : 'Usar una cuenta diferente'}
+                        </button>
+                      )
+                    )}
+
+                    {/* Inline add form */}
+                    {showAddForm && (
+                      <div className="border border-gray-100 dark:border-white/8 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-[#0F172A]">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium text-[#0A192F] dark:text-white">Nueva cuenta bancaria</p>
+                          {bankAccounts.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => { setShowAddForm(false); form.setValue('bankAccountId', bankAccounts.find(a => a.isDefault)?.id ?? bankAccounts[0]?.id ?? '') }}
+                              className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                            >
+                              Cancelar
+                            </button>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">Banco</label>
+                            <Select value={addAccountForm.watch('bank')} onValueChange={v => addAccountForm.setValue('bank', v ?? '')}>
+                              <SelectTrigger className="w-full">
+                                <SelectValue>{addAccountForm.watch('bank') || <span className="text-muted-foreground">Seleccione su banco</span>}</SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {bankCatalog.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
+                              </SelectContent>
+                            </Select>
+                            {addAccountForm.formState.errors.bank && (
+                              <p className="text-xs text-red-500 mt-1">{addAccountForm.formState.errors.bank.message}</p>
+                            )}
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">CCI (20 dígitos)</label>
+                            <input
+                              type="text"
+                              {...addAccountForm.register('cci', { onChange: e => addAccountForm.setValue('cci', e.target.value.replaceAll(/\D/g, '').slice(0, 20)) })}
+                              placeholder="00000000000000000000"
+                              maxLength={20}
+                              className={inputCls}
+                            />
+                            {addAccountForm.formState.errors.cci && (
+                              <p className="text-xs text-red-500 mt-1">{addAccountForm.formState.errors.cci.message}</p>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleAddAccount}
+                          disabled={addingAccount}
+                          className="w-full py-2.5 rounded-lg bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] text-sm font-semibold hover:bg-[#0A192F]/90 dark:hover:bg-[#B8941F] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          {addingAccount ? (
+                            <><i className="fa-solid fa-spinner animate-spin text-xs" />Guardando...</>
+                          ) : (
+                            <><i className="fa-solid fa-floppy-disk text-xs" />Guardar y usar esta cuenta</>
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {form.formState.errors.bankAccountId && (
+                  <p className="text-xs text-red-500 mt-2 flex items-center gap-1">
+                    <i className="fa-solid fa-circle-exclamation" />
+                    {form.formState.errors.bankAccountId.message}
                   </p>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="bank" className="block text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Banco</label>
-                    {/* TODO: connect bank to API submission */}
-                    <Select id="bank" value={bank} onValueChange={v => setBank(v ?? '')}>
-                      <SelectTrigger className="w-full py-2.5">
-                        <SelectValue placeholder="Seleccione su banco" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {BANKS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label htmlFor="cci" className="block text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">CCI (20 dígitos)</label>
-                    {/* TODO: connect CCI to API submission */}
-                    <input
-                      type="text"
-                      id="cci"
-                      value={cci}
-                      onChange={e => setCci(e.target.value.replaceAll(/\D/g, '').slice(0, 20))}
-                      placeholder="00000000000000000000"
-                      maxLength={20}
-                      className={inputCls}
-                    />
-                  </div>
-                </div>
+                )}
               </div>
             </div>
 
@@ -478,17 +662,20 @@ export default function RequestLoanPage() {
                   <label className="flex items-start gap-3 cursor-pointer group">
                     <Checkbox
                       checked={consentCredit}
-                      onCheckedChange={checked => setConsentCredit(checked)}
+                      onCheckedChange={checked => form.setValue('consentCredit', checked === true, { shouldValidate: true })}
                       className="mt-0.5"
                     />
                     <span className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                       Autorizo a Solvo a consultar mi historial crediticio en las Centrales de Riesgo (Equifax/Sentinel) conforme a la normativa SBS para evaluar esta solicitud.
                     </span>
                   </label>
+                  {form.formState.errors.consentCredit && (
+                    <p className="text-xs text-red-500 mt-1 ml-7">{form.formState.errors.consentCredit.message}</p>
+                  )}
                   <label className="flex items-start gap-3 cursor-pointer group">
                     <Checkbox
                       checked={consentTerms}
-                      onCheckedChange={checked => setConsentTerms(checked)}
+                      onCheckedChange={checked => form.setValue('consentTerms', checked === true, { shouldValidate: true })}
                       className="mt-0.5"
                     />
                     <span className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -499,6 +686,9 @@ export default function RequestLoanPage() {
                       {' '}de Solvo.
                     </span>
                   </label>
+                  {form.formState.errors.consentTerms && (
+                    <p className="text-xs text-red-500 mt-1 ml-7">{form.formState.errors.consentTerms.message}</p>
+                  )}
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-100 dark:border-white/6 pt-5">
