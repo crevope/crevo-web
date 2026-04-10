@@ -153,35 +153,68 @@ export default function PayLoanPage() {
       {/* Early payoff confirm */}
       {showEarlyPayoff && earlyPayoffQuote && (
         <div className={`${cardCls} p-6 border border-emerald-200 dark:border-emerald-800`}>
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-4">
             <Sparkles className="h-5 w-5 text-emerald-500" />
             <h3 className="text-base font-semibold text-emerald-700 dark:text-emerald-300">
-              Pago Anticipado
+              Pago Anticipado Total
             </h3>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-5">
-            Pagarás{' '}
-            <strong className="text-[#0A192F] dark:text-white">
-              {formatCurrency(earlyPayoffQuote.payoffAmount)}
-            </strong>{' '}
-            y tu préstamo quedará cancelado.
-            {earlyPayoffQuote.interestSaved > 0 && (
-              <>
-                {' '}Ahorras{' '}
-                <strong className="text-emerald-600 dark:text-emerald-400">
-                  {formatCurrency(earlyPayoffQuote.interestSaved)}
-                </strong>{' '}
-                en intereses.
-              </>
-            )}
-          </p>
 
-          <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/30 flex justify-between items-center mb-5">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Total a pagar</span>
-            <span className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
-              {formatCurrency(earlyPayoffQuote.payoffAmount)}
-            </span>
+          {/* Desglose */}
+          <div className="bg-gray-50 dark:bg-white/4 border border-gray-200 dark:border-white/8 rounded-lg p-4 space-y-2 mb-4">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Desglose</p>
+
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600 dark:text-gray-400">Capital pendiente</span>
+              <span className="font-medium text-gray-800 dark:text-gray-200">{formatCurrency(earlyPayoffQuote.outstandingPrincipal)}</span>
+            </div>
+
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600 dark:text-gray-400">
+                Interés devengado
+                <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">({earlyPayoffQuote.daysElapsed} días)</span>
+              </span>
+              <span className="font-medium text-gray-800 dark:text-gray-200">{formatCurrency(earlyPayoffQuote.accruedInterest)}</span>
+            </div>
+
+            {earlyPayoffQuote.accruedMaintenanceFee > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400">Com. mantenimiento (proporcional)</span>
+                <span className="font-medium text-gray-800 dark:text-gray-200">{formatCurrency(earlyPayoffQuote.accruedMaintenanceFee)}</span>
+              </div>
+            )}
+
+            {earlyPayoffQuote.moraAccrued > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-orange-600 dark:text-orange-400">Intereses moratorios</span>
+                <span className="font-medium text-orange-600 dark:text-orange-400">{formatCurrency(earlyPayoffQuote.moraAccrued)}</span>
+              </div>
+            )}
+
+            {earlyPayoffQuote.collectionFeesAccrued > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-orange-600 dark:text-orange-400">Gastos de cobranza</span>
+                <span className="font-medium text-orange-600 dark:text-orange-400">{formatCurrency(earlyPayoffQuote.collectionFeesAccrued)}</span>
+              </div>
+            )}
+
+            <div className="flex justify-between text-sm pt-2 border-t border-gray-200 dark:border-white/10">
+              <span className="font-bold text-gray-800 dark:text-gray-100">Total a pagar hoy</span>
+              <span className="font-bold text-emerald-700 dark:text-emerald-300 text-base">{formatCurrency(earlyPayoffQuote.payoffAmount)}</span>
+            </div>
           </div>
+
+          {earlyPayoffQuote.interestSaved > 0 && (
+            <div className="flex items-center justify-between bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-700/30 rounded-lg px-4 py-2.5 mb-4">
+              <div className="flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-400">
+                <i className="fa-solid fa-piggy-bank" />
+                <span>Ahorro en intereses futuros</span>
+              </div>
+              <span className="font-semibold text-emerald-700 dark:text-emerald-400 text-sm">
+                −{formatCurrency(earlyPayoffQuote.interestSaved)}
+              </span>
+            </div>
+          )}
 
           <div className="flex gap-3">
             <button
@@ -198,7 +231,7 @@ export default function PayLoanPage() {
             >
               {isEarlyPaying
                 ? <><Loader2 className="h-4 w-4 animate-spin" />Procesando...</>
-                : <><i className="fa-solid fa-lock" />Pagar anticipado {formatCurrency(earlyPayoffQuote.payoffAmount)}</>}
+                : <><i className="fa-solid fa-lock" />Pagar {formatCurrency(earlyPayoffQuote.payoffAmount)}</>}
             </button>
           </div>
           <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-3">

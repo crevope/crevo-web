@@ -76,6 +76,14 @@ export interface Installment {
 
 export interface EarlyPayoffQuote {
   loanId: string
+  // Desglose
+  outstandingPrincipal: number
+  accruedInterest: number
+  accruedMaintenanceFee: number
+  moraAccrued: number
+  collectionFeesAccrued: number
+  daysElapsed: number
+  // Totales
   payoffAmount: number
   interestSaved: number
   originalTotal: number
