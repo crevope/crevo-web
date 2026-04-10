@@ -27,6 +27,40 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'documentos', label: 'Documentos' },
 ]
 
+const TIMELINE_STEPS = [
+  { id: 'requested',  label: 'Solicitado',   icon: 'fa-solid fa-file-pen' },
+  { id: 'approved',   label: 'Aprobado',     icon: 'fa-solid fa-clipboard-check' },
+  { id: 'signed',     label: 'Firmado',      icon: 'fa-solid fa-signature' },
+  { id: 'disbursed',  label: 'Desembolsado', icon: 'fa-solid fa-paper-plane' },
+  { id: 'active',     label: 'Activo',       icon: 'fa-solid fa-wallet' },
+  { id: 'paid',       label: 'Pagado',       icon: 'fa-solid fa-circle-check' },
+] as const
+
+type TimelineStepId = typeof TIMELINE_STEPS[number]['id']
+
+function getStepState(
+  stepId: TimelineStepId,
+  loanStatus: string,
+): 'complete' | 'current' | 'pending' {
+  const ORDER: TimelineStepId[] = ['requested', 'approved', 'signed', 'disbursed', 'active', 'paid']
+  const statusToCurrentStep: Record<string, TimelineStepId> = {
+    PENDING:   'approved',
+    APPROVED:  'signed',
+    SIGNED:    'disbursed',
+    DISBURSED: 'active',
+    ACTIVE:    'paid',
+    OVERDUE:   'paid',
+    PAID:      'paid',
+  }
+  if (loanStatus === 'PAID') return 'complete'
+  const currentStep = statusToCurrentStep[loanStatus] ?? 'approved'
+  const stepIdx = ORDER.indexOf(stepId)
+  const currentIdx = ORDER.indexOf(currentStep)
+  if (stepIdx < currentIdx) return 'complete'
+  if (stepId === currentStep) return 'current'
+  return 'pending'
+}
+
 export default function LoanDetailPage() {
   const { loanId } = useParams<{ loanId: string }>()
   const { selectedLoan: loan, balance, payments, installments, isLoading, loadLoanDetails, signLoan } = useLoanStore()
@@ -181,23 +215,108 @@ export default function LoanDetailPage() {
         </div>
       </div>
 
-      {/* ── Sign contract banner ────────────────────────────────────────── */}
-      {canSign(loan) && (
-        <div className={`${cardCls} p-4 border-l-2 border-l-[#D4AF37] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
+      {/* ── Loan lifecycle timeline ────────────────────────────────────── */}
+      {!['REJECTED', 'CANCELLED'].includes(loan.status) && (
+        <div className={`${cardCls} px-5 py-4`}>
+          <div className="overflow-x-auto">
+            <div className="flex items-start min-w-max sm:min-w-0">
+              {TIMELINE_STEPS.map((step, i) => {
+                const state = getStepState(step.id, loan.status)
+                const isLast = i === TIMELINE_STEPS.length - 1
+                return (
+                  <div key={step.id} className="flex items-start flex-1">
+                    <div className="flex flex-col items-center gap-1.5 px-2 sm:px-3 min-w-[60px]">
+                      {/* Circle */}
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                        state === 'complete'
+                          ? 'bg-green-500 text-white'
+                          : state === 'current'
+                            ? 'bg-[#00E5FF] text-[#0A192F] ring-4 ring-[#00E5FF]/20'
+                            : 'bg-gray-100 dark:bg-[#0F172A] text-gray-400 dark:text-gray-500'
+                      }`}>
+                        {state === 'complete'
+                          ? <i className="fa-solid fa-check text-xs" />
+                          : <i className={`${step.icon} text-xs`} />
+                        }
+                      </div>
+                      {/* Label */}
+                      <p className={`text-[10px] font-medium text-center whitespace-nowrap ${
+                        state === 'complete'
+                          ? 'text-green-600 dark:text-green-400'
+                          : state === 'current'
+                            ? 'text-[#0A192F] dark:text-white'
+                            : 'text-gray-400 dark:text-gray-500'
+                      }`}>
+                        {step.label}
+                      </p>
+                      {/* Date hint */}
+                      {step.id === 'requested' && (
+                        <p className="text-[9px] text-gray-400 dark:text-gray-500 text-center">{formatDate(loan.createdAt)}</p>
+                      )}
+                      {step.id === 'disbursed' && state === 'complete' && loan.disbursedAt && (
+                        <p className="text-[9px] text-gray-400 dark:text-gray-500 text-center">{formatDate(loan.disbursedAt)}</p>
+                      )}
+                    </div>
+                    {/* Connector */}
+                    {!isLast && (
+                      <div className="flex-1 mt-4 mx-0.5">
+                        <div className={`h-0.5 w-full transition-colors ${
+                          state === 'complete' ? 'bg-green-400' : 'bg-gray-100 dark:bg-white/8'
+                        }`} />
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Disbursement in progress banner ─────────────────────────────── */}
+      {loan.status === 'SIGNED' && (
+        <div className={`${cardCls} p-4 border-l-2 border-l-[#00E5FF] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] shrink-0">
-              <i className="fa-solid fa-file-signature" />
+            <div className="w-9 h-9 rounded-lg bg-[#00E5FF]/10 flex items-center justify-center text-[#00E5FF] shrink-0">
+              <i className="fa-solid fa-paper-plane" />
             </div>
             <div>
-              <p className="font-semibold text-[#0A192F] dark:text-white text-sm">Firma el contrato</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Tu préstamo fue aprobado. Firma para recibir el dinero.</p>
+              <p className="font-semibold text-[#0A192F] dark:text-white text-sm">Tu dinero está en camino</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Estamos procesando la transferencia de{' '}
+                <strong className="text-[#0A192F] dark:text-white">{formatCurrency(loan.netDisbursed)}</strong>{' '}
+                a tu cuenta registrada. Puede demorar hasta 24 horas hábiles.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-[#00E5FF] font-medium shrink-0">
+            <span className="w-2 h-2 bg-[#00E5FF] rounded-full animate-pulse inline-block" />
+            En proceso
+          </div>
+        </div>
+      )}
+
+      {/* ── Sign contract banner ────────────────────────────────────────── */}
+      {canSign(loan) && (
+        <div className="rounded-lg p-5 border-2 border-[#D4AF37]/60 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-[#D4AF37]/10 dark:to-[#D4AF37]/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-11 h-11 rounded-xl bg-[#D4AF37] flex items-center justify-center text-[#0A192F] shrink-0">
+              <i className="fa-solid fa-file-signature text-lg" />
+            </div>
+            <div>
+              <p className="font-bold text-[#0A192F] dark:text-white text-base">¡Tu préstamo fue aprobado!</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-0.5">
+                Firma el contrato ahora para recibir{' '}
+                <strong className="text-[#0A192F] dark:text-[#D4AF37]">{formatCurrency(loan.netDisbursed)}</strong>{' '}
+                en tu cuenta.
+              </p>
             </div>
           </div>
           <button
             onClick={handleSign}
-            className="bg-[#D4AF37] text-[#0A192F] font-medium px-5 py-2 rounded-lg text-sm hover:bg-[#B8941F] transition-colors shrink-0"
+            className="bg-[#D4AF37] text-[#0A192F] font-semibold px-6 py-2.5 rounded-lg text-sm hover:bg-[#B8941F] transition-colors shrink-0 flex items-center gap-2"
           >
-            <i className="fa-solid fa-signature mr-2" />
+            <i className="fa-solid fa-signature" />
             Firmar contrato
           </button>
         </div>
