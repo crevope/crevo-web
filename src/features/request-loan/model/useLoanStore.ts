@@ -15,7 +15,7 @@ interface LoanState {
   loadLoanDetails: (loanId: string) => Promise<void>
   loadEarlyPayoffQuote: (loanId: string) => Promise<void>
   requestLoan: (dto: { amount: number; productType: string; paymentFrequency: string; numInstallments: number; bankAccountId?: string }) => Promise<Loan>
-  signLoan: (loanId: string) => Promise<void>
+  signLoan: (loanId: string, otp: string) => Promise<void>
   payLoan: (loanId: string, dto: { amount: number; method: string; reference?: string }) => Promise<void>
   partialPayLoan: (loanId: string, dto: { amount: number; method: string; reference?: string }) => Promise<void>
   earlyPayoff: (loanId: string, dto: { method: string; reference?: string }) => Promise<void>
@@ -51,7 +51,7 @@ export const useLoanStore = create<LoanState>((set, get) => ({
         loanRepository.getLoanPayments(loanId),
       ])
       let installments: Installment[] = []
-      if (['ACTIVE', 'OVERDUE', 'DISBURSED'].includes(loan.status)) {
+      if (['ACTIVE', 'OVERDUE', 'DISBURSED', 'PAID'].includes(loan.status)) {
         installments = await loanRepository.getSchedule(loanId).catch(() => [])
       }
       set({ selectedLoan: loan, balance, payments, installments })
@@ -75,8 +75,8 @@ export const useLoanStore = create<LoanState>((set, get) => ({
     return loan
   },
 
-  signLoan: async (loanId) => {
-    await loanRepository.signLoan(loanId)
+  signLoan: async (loanId, otp) => {
+    await loanRepository.signLoan(loanId, otp)
     await get().loadMyLoans()
   },
 

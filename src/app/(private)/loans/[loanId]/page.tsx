@@ -72,6 +72,13 @@ export default function LoanDetailPage() {
   const [restructureLoading, setRestructureLoading] = useState(false)
   const [restructureInstallments, setRestructureInstallments] = useState(3)
 
+  // ── OTP firma electrónica ─────────────────────────────────────────────────
+  const [otpModalOpen, setOtpModalOpen]     = useState(false)
+  const [otpValue, setOtpValue]             = useState('')
+  const [otpSending, setOtpSending]         = useState(false)
+  const [otpConfirming, setOtpConfirming]   = useState(false)
+  const [contractAccepted, setContractAccepted] = useState(false)
+
   const [earlyPayoffOpen, setEarlyPayoffOpen] = useState(false)
   const [earlyPayoffStep, setEarlyPayoffStep] = useState<'quote' | 'done'>('quote')
   const [earlyPayoffQuote, setEarlyPayoffQuote] = useState<EarlyPayoffQuote | null>(null)
@@ -89,13 +96,46 @@ export default function LoanDetailPage() {
     }
   }
 
-  const handleSign = async () => {
+  const handleDownloadSummary = async () => {
     try {
-      await signLoan(loanId)
-      toast.success('¡Contrato firmado! Recibirás el dinero en breve.')
+      const url = await loanRepository.getSummaryUrl(loanId)
+      window.open(url, '_blank')
+    } catch {
+      toast.error('La hoja resumen aún no está disponible.')
+    }
+  }
+
+  // Paso 1 — solicitar OTP
+  const handleSign = async () => {
+    setOtpSending(true)
+    try {
+      await loanRepository.requestSignatureOtp(loanId)
+      setOtpValue('')
+      setContractAccepted(false)
+      setOtpModalOpen(true)
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Error al enviar el código')
+    } finally {
+      setOtpSending(false)
+    }
+  }
+
+  // Paso 2 — confirmar con OTP
+  const handleConfirmSign = async () => {
+    if (otpValue.trim().length !== 6) {
+      toast.error('Ingresa el código de 6 dígitos')
+      return
+    }
+    setOtpConfirming(true)
+    try {
+      await signLoan(loanId, otpValue.trim())
+      setOtpModalOpen(false)
+      toast.success('¡Contrato firmado digitalmente! Recibirás el dinero en breve.')
       loadLoanDetails(loanId)
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Error al firmar')
+      toast.error(err instanceof Error ? err.message : 'Código incorrecto. Inténtalo de nuevo.')
+    } finally {
+      setOtpConfirming(false)
     }
   }
 
@@ -252,15 +292,6 @@ export default function LoanDetailPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {loan.contractUrl && (
-            <button
-              onClick={handleDownloadContract}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-100 dark:border-white/6 bg-white dark:bg-[#1E293B] text-gray-700 dark:text-gray-200 text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors"
-            >
-              <i className="fa-solid fa-download text-sm" />
-              Descargar Comprobante
-            </button>
-          )}
           {(isActiveLoan(loan) || canPay(loan)) && (
             <Link
               href={`/loans/${loan.id}/pay`}
@@ -276,8 +307,8 @@ export default function LoanDetailPage() {
       {/* ── Loan lifecycle timeline ────────────────────────────────────── */}
       {!['REJECTED', 'CANCELLED'].includes(loan.status) && (
         <div className={`${cardCls} px-6 py-5`}>
-          <div className="overflow-x-auto">
-            <div className="flex items-start min-w-[480px] sm:min-w-0">
+          <div className="overflow-x-auto overflow-y-visible">
+            <div className="flex items-start min-w-[480px] sm:min-w-0 pt-1.5 pb-0.5">
               {TIMELINE_STEPS.map((step, i) => {
                 const state = getStepState(step.id, loan.status)
                 const isLast = i === TIMELINE_STEPS.length - 1
@@ -292,7 +323,7 @@ export default function LoanDetailPage() {
                           ? 'bg-green-500 text-white'
                           : state === 'current'
                             ? 'bg-[#00E5FF] text-[#0A192F] ring-4 ring-[#00E5FF]/20'
-                            : 'bg-gray-100 dark:bg-[#0F172A] text-gray-400 dark:text-gray-500'
+                            : 'bg-gray-100 dark:bg-[#1E293B] border border-gray-200 dark:border-white/10 text-gray-400 dark:text-gray-500'
                       }`}>
                         {state === 'complete'
                           ? <i className="fa-solid fa-check text-xs" />
@@ -370,10 +401,13 @@ export default function LoanDetailPage() {
           </div>
           <button
             onClick={handleSign}
-            className="bg-[#D4AF37] text-[#0A192F] font-semibold px-6 py-2.5 rounded-lg text-sm hover:bg-[#B8941F] transition-colors shrink-0 flex items-center gap-2"
+            disabled={otpSending}
+            className="bg-[#D4AF37] text-[#0A192F] font-semibold px-6 py-2.5 rounded-lg text-sm hover:bg-[#B8941F] transition-colors shrink-0 flex items-center gap-2 disabled:opacity-60"
           >
-            <i className="fa-solid fa-signature" />
-            Firmar contrato
+            {otpSending
+              ? <><i className="fa-solid fa-circle-notch fa-spin" /> Enviando código...</>
+              : <><i className="fa-solid fa-signature" /> Firmar contrato</>
+            }
           </button>
         </div>
       )}
@@ -520,10 +554,13 @@ export default function LoanDetailPage() {
               {canSign(loan) && (
                 <button
                   onClick={handleSign}
-                  className="w-full bg-white dark:bg-[#0F172A] text-[#0A192F] dark:text-gray-200 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 border border-gray-100 dark:border-white/6 hover:bg-gray-50 dark:hover:bg-[#334155] transition-colors text-sm"
+                  disabled={otpSending}
+                  className="w-full bg-white dark:bg-[#0F172A] text-[#0A192F] dark:text-gray-200 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 border border-gray-100 dark:border-white/6 hover:bg-gray-50 dark:hover:bg-[#334155] transition-colors text-sm disabled:opacity-60"
                 >
-                  <i className="fa-solid fa-signature text-sm" />
-                  Firmar Contrato
+                  {otpSending
+                    ? <><i className="fa-solid fa-circle-notch fa-spin text-sm" /> Enviando...</>
+                    : <><i className="fa-solid fa-signature text-sm" /> Firmar Contrato</>
+                  }
                 </button>
               )}
               {loan.contractUrl && (
@@ -647,7 +684,15 @@ export default function LoanDetailPage() {
                           </td>
                           <td className="py-4 px-3 text-right">
                             {inst.status === 'PAID' ? (
-                              <button className="text-gray-300 dark:text-gray-600" title="Ver recibo">
+                              <button
+                                onClick={() =>
+                                  loanRepository.downloadInstallmentReceipt(inst.id).catch(() =>
+                                    toast.error('No se pudo descargar el comprobante')
+                                  )
+                                }
+                                className="text-[#0A192F] dark:text-[#D4AF37] hover:opacity-70 transition-opacity"
+                                title="Descargar comprobante de cuota"
+                              >
                                 <i className="fa-solid fa-file-invoice" />
                               </button>
                             ) : inst.status === 'OVERDUE' ? (
@@ -694,9 +739,18 @@ export default function LoanDetailPage() {
                           </p>
                         </div>
                       </div>
-                      <p className="text-green-600 dark:text-green-400 font-semibold text-sm">
-                        +{formatCurrency(p.amount)}
-                      </p>
+                      <div className="flex items-center gap-3">
+                        <p className="text-green-600 dark:text-green-400 font-semibold text-sm">
+                          +{formatCurrency(p.amount)}
+                        </p>
+                        <button
+                          onClick={() => loanRepository.downloadReceipt(p.id)}
+                          className="text-gray-400 hover:text-[#0A192F] dark:hover:text-white transition-colors"
+                          title="Descargar comprobante"
+                        >
+                          <i className="fa-solid fa-file-arrow-down text-sm" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -716,8 +770,8 @@ export default function LoanDetailPage() {
                   {([
                     { label: 'Monto solicitado', value: formatCurrency(loan.amount), highlight: true },
                     { label: 'Monto neto recibido', value: formatCurrency(loan.netDisbursed), highlight: true },
-                    { label: 'Tasa de Interés (TEA)', value: `${loan.interestRate * 100}%` },
-                    { label: 'TCEA', value: `${loan.tcea * 100}%` },
+                    { label: 'Tasa de Interés (TEA)', value: `${(loan.interestRate * 100).toFixed(2)}%` },
+                    { label: 'TCEA', value: `${(loan.tcea * 100).toFixed(2)}%` },
                     { label: 'Total de interés', value: formatCurrency(loan.totalInterest) },
                     { label: 'Plazo', value: `${loan.termDays} días` },
                     { label: 'Nº cuotas', value: `${loan.numInstallments} cuota${loan.numInstallments > 1 ? 's' : ''}` },
@@ -776,39 +830,89 @@ export default function LoanDetailPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
               {/* Contrato de Préstamo */}
-              <button
-                onClick={loan.contractUrl ? handleDownloadContract : undefined}
-                disabled={!loan.contractUrl}
-                className="bg-gray-50 dark:bg-[#0F172A] border border-gray-100 dark:border-white/6 p-4 rounded-lg flex items-center justify-between hover:bg-gray-100 dark:hover:bg-[#0F172A]/80 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-red-100 dark:bg-red-900/30 text-red-500 dark:text-red-400 rounded-lg flex items-center justify-center shrink-0">
-                    <i className="fa-solid fa-file-pdf text-sm" />
-                  </div>
-                  <div>
-                    <h4 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Contrato de Préstamo</h4>
-                    <p className="text-xs text-gray-500">
-                      {loan.contractUrl ? `Firmado el ${formatDate(loan.createdAt)}` : 'Pendiente de firma'}
-                    </p>
-                  </div>
-                </div>
-                <i className="fa-solid fa-download text-gray-400 dark:text-gray-500 text-sm" />
-              </button>
+              {(() => {
+                const isSigned = ['SIGNED', 'DISBURSED', 'ACTIVE', 'OVERDUE', 'PAID'].includes(loan.status)
+                const subtitle = !loan.contractUrl
+                  ? 'Pendiente de generación'
+                  : isSigned
+                    ? `Firmado el ${formatDate(loan.updatedAt)}`
+                    : 'Disponible para revisar — pendiente de firma'
+                return (
+                  <button
+                    onClick={loan.contractUrl ? handleDownloadContract : undefined}
+                    disabled={!loan.contractUrl}
+                    className="bg-gray-50 dark:bg-[#0F172A] border border-gray-100 dark:border-white/6 p-4 rounded-lg flex items-center justify-between hover:bg-gray-100 dark:hover:bg-[#0F172A]/80 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isSigned ? 'bg-green-100 dark:bg-green-900/30 text-green-500 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-500 dark:text-red-400'}`}>
+                        <i className={`fa-solid ${isSigned ? 'fa-file-circle-check' : 'fa-file-pdf'} text-sm`} />
+                      </div>
+                      <div>
+                        <h4 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Contrato de Préstamo</h4>
+                        <p className={`text-xs ${isSigned ? 'text-green-500 dark:text-green-400' : 'text-gray-500'}`}>
+                          {subtitle}
+                        </p>
+                      </div>
+                    </div>
+                    <i className="fa-solid fa-download text-gray-400 dark:text-gray-500 text-sm" />
+                  </button>
+                )
+              })()}
 
-              {/* Tabla de Amortización — TODO: endpoint not yet available */}
-              <div className="bg-gray-50 dark:bg-[#0F172A] border border-gray-100 dark:border-white/6 p-4 rounded-lg flex items-center justify-between opacity-50 cursor-not-allowed">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-green-100 dark:bg-green-900/30 text-green-500 dark:text-green-400 rounded-lg flex items-center justify-center shrink-0">
-                    <i className="fa-solid fa-file-invoice-dollar text-sm" />
-                  </div>
-                  <div>
-                    <h4 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Tabla de Amortización</h4>
-                    {/* TODO: connect to amortization download endpoint */}
-                    <p className="text-xs text-gray-500">Próximamente disponible</p>
-                  </div>
-                </div>
-                <i className="fa-solid fa-download text-gray-400 dark:text-gray-500 text-sm" />
-              </div>
+              {/* Hoja Resumen SBS */}
+              {(() => {
+                const available = ['APPROVED', 'SIGNED', 'DISBURSED', 'ACTIVE', 'OVERDUE', 'PAID'].includes(loan.status)
+                return (
+                  <button
+                    onClick={available ? handleDownloadSummary : undefined}
+                    disabled={!available}
+                    className="bg-gray-50 dark:bg-[#0F172A] border border-gray-100 dark:border-white/6 p-4 rounded-lg flex items-center justify-between hover:bg-gray-100 dark:hover:bg-[#0F172A]/80 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 bg-amber-100 dark:bg-amber-900/30 text-amber-500 dark:text-amber-400 rounded-lg flex items-center justify-center shrink-0">
+                        <i className="fa-solid fa-file-lines text-sm" />
+                      </div>
+                      <div>
+                        <h4 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Hoja Resumen SBS</h4>
+                        <p className="text-xs text-gray-500">
+                          {available ? 'Res. SBS N° 8181-2012 — costos y condiciones' : 'Disponible al aprobar el préstamo'}
+                        </p>
+                      </div>
+                    </div>
+                    <i className="fa-solid fa-download text-gray-400 dark:text-gray-500 text-sm" />
+                  </button>
+                )
+              })()}
+
+              {/* Cronograma de Pagos */}
+              {(() => {
+                const available = ['DISBURSED', 'ACTIVE', 'OVERDUE', 'PAID'].includes(loan.status)
+                return (
+                  <button
+                    onClick={available ? async () => {
+                      try {
+                        const url = await loanRepository.getScheduleDocumentUrl(loan.id)
+                        window.open(url, '_blank')
+                      } catch { toast.error('No se pudo obtener el cronograma') }
+                    } : undefined}
+                    disabled={!available}
+                    className="bg-gray-50 dark:bg-[#0F172A] border border-gray-100 dark:border-white/6 p-4 rounded-lg flex items-center justify-between hover:bg-gray-100 dark:hover:bg-[#0F172A]/80 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 bg-green-100 dark:bg-green-900/30 text-green-500 dark:text-green-400 rounded-lg flex items-center justify-center shrink-0">
+                        <i className="fa-solid fa-file-invoice-dollar text-sm" />
+                      </div>
+                      <div>
+                        <h4 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Cronograma de Pagos</h4>
+                        <p className="text-xs text-gray-500">
+                          {available ? 'Cuotas con fechas reales de vencimiento' : 'Disponible al desembolsar el préstamo'}
+                        </p>
+                      </div>
+                    </div>
+                    <i className="fa-solid fa-download text-gray-400 dark:text-gray-500 text-sm" />
+                  </button>
+                )
+              })()}
 
             </div>
           </div>
@@ -1168,6 +1272,138 @@ export default function LoanDetailPage() {
               </>
             )}
 
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal OTP — Firma Electrónica ──────────────────────────────── */}
+      {otpModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#1E293B] rounded-2xl shadow-2xl w-full max-w-md">
+
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[#1A56FF] to-[#0A40CC] rounded-t-2xl px-6 py-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                  <i className="fa-solid fa-file-signature text-white text-xl" />
+                </div>
+                <div>
+                  <p className="font-bold text-white text-base">Firma Electrónica</p>
+                  <p className="text-white/70 text-xs">Ley N° 27269 — Firma Simple</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setOtpModalOpen(false)}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <i className="fa-solid fa-xmark text-xl" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-5">
+              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                Enviamos un código de <strong>6 dígitos</strong> a tu correo electrónico.
+                Ingrésalo a continuación para firmar digitalmente tu contrato de préstamo.
+              </p>
+
+              {/* OTP Input */}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                  Código de verificación
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={otpValue}
+                  onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, '').substring(0, 6))}
+                  placeholder="000000"
+                  className="w-full text-center text-3xl font-bold tracking-[0.5em] bg-[#F0F4FF] dark:bg-[#0F172A] border-2 border-[#1A56FF]/30 focus:border-[#1A56FF] rounded-xl py-4 outline-none text-[#1A1A2E] dark:text-white placeholder-gray-200 dark:placeholder-gray-600 transition-colors"
+                  autoFocus
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmSign() }}
+                />
+              </div>
+
+              {/* Contract acceptance checkbox */}
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={contractAccepted}
+                  onChange={(e) => setContractAccepted(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-[#1A56FF] cursor-pointer shrink-0"
+                />
+                <span className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                  He leído y acepto el{' '}
+                  <button
+                    type="button"
+                    onClick={handleDownloadContract}
+                    className="text-[#1A56FF] dark:text-blue-400 font-semibold underline underline-offset-2 hover:no-underline"
+                  >
+                    Contrato de Préstamo
+                  </button>
+                  {' '}y la{' '}
+                  <button
+                    type="button"
+                    onClick={handleDownloadSummary}
+                    className="text-[#1A56FF] dark:text-blue-400 font-semibold underline underline-offset-2 hover:no-underline"
+                  >
+                    Hoja Resumen SBS
+                  </button>
+                </span>
+              </label>
+
+              {/* Legal notice */}
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl p-3">
+                <p className="text-amber-800 dark:text-amber-300 text-xs leading-relaxed">
+                  <i className="fa-solid fa-triangle-exclamation mr-1.5" />
+                  Al confirmar este código, <strong>aceptas los términos del contrato</strong> y autorizas
+                  la firma electrónica equivalente a una firma manuscrita.
+                </p>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-1">
+                <button
+                  onClick={() => setOtpModalOpen(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleConfirmSign}
+                  disabled={otpConfirming || otpValue.length !== 6 || !contractAccepted}
+                  className="flex-1 py-2.5 rounded-xl bg-[#1A56FF] text-white text-sm font-bold hover:bg-[#0A40CC] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {otpConfirming
+                    ? <><i className="fa-solid fa-circle-notch fa-spin" /> Firmando...</>
+                    : <><i className="fa-solid fa-check" /> Confirmar firma</>
+                  }
+                </button>
+              </div>
+
+              {/* Resend OTP */}
+              <p className="text-center text-xs text-gray-400 dark:text-gray-500">
+                ¿No recibiste el código?{' '}
+                <button
+                  onClick={async () => {
+                    setOtpSending(true)
+                    try {
+                      await loanRepository.requestSignatureOtp(loanId)
+                      toast.info('Nuevo código enviado a tu correo.')
+                    } catch (err: unknown) {
+                      toast.error(err instanceof Error ? err.message : 'Error al reenviar')
+                    } finally {
+                      setOtpSending(false)
+                    }
+                  }}
+                  disabled={otpSending}
+                  className="text-[#1A56FF] font-semibold hover:underline disabled:opacity-50"
+                >
+                  Reenviar
+                </button>
+              </p>
+            </div>
           </div>
         </div>
       )}

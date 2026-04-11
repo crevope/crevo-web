@@ -83,24 +83,24 @@ export default function LandingPage() {
               {/* CTA buttons */}
               <div className="flex flex-col sm:flex-row gap-3 mb-10">
                 {/* Simular — light */}
-                <Link href="#simulador" className="px-7 py-3.5 bg-[#0A192F] text-white rounded-xl font-semibold text-base hover:bg-[#0A192F]/90 transition-all flex items-center justify-center gap-2.5 dark:hidden">
+                <Link href="#simulador" className="px-7 py-3 bg-[#0A192F] text-white rounded-lg font-semibold text-base hover:bg-[#0A192F]/90 transition-all flex items-center justify-center gap-2.5 dark:hidden">
                   <i className="fa-solid fa-calculator text-[#D4AF37]" />
                   Simular préstamo (S/)
                   <i className="fa-solid fa-arrow-right text-sm" />
                 </Link>
                 {/* Simular — dark */}
-                <Link href="#simulador" className="px-7 py-3.5 bg-[#0A192F] text-white rounded-xl font-semibold text-base hover:opacity-90 transition-all hidden dark:flex items-center justify-center gap-2.5">
+                <Link href="#simulador" className="px-7 py-3 bg-[#0A192F] text-white rounded-lg font-semibold text-base hover:opacity-90 transition-all hidden dark:flex items-center justify-center gap-2.5">
                   <i className="fa-solid fa-calculator text-[#D4AF37]" />
                   Simular préstamo (S/)
                   <i className="fa-solid fa-arrow-right text-sm" />
                 </Link>
 
                 {/* Registrarme — light */}
-                <Link href="/register" className="px-7 py-3.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium text-base hover:border-[#0A192F] hover:text-[#0A192F] transition-all flex items-center justify-center dark:hidden">
+                <Link href="/register" className="px-7 py-3 bg-white border border-gray-200 text-gray-700 rounded-lg font-medium text-base hover:border-[#0A192F] hover:text-[#0A192F] transition-all flex items-center justify-center dark:hidden">
                   Registrarme
                 </Link>
                 {/* Registrarme — dark */}
-                <Link href="/register" className="px-7 py-3.5 bg-[#1E293B] border border-[#334155] text-gray-300 rounded-xl font-medium text-base hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all hidden dark:flex items-center justify-center">
+                <Link href="/register" className="px-7 py-3 bg-[#1E293B] border border-[#334155] text-gray-300 rounded-lg font-medium text-base hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all hidden dark:flex items-center justify-center">
                   Registrarme
                 </Link>
               </div>
@@ -160,7 +160,7 @@ export default function LandingPage() {
           <div className="w-full lg:w-1/2 relative flex flex-col items-center justify-center p-6 sm:p-12 lg:p-16 overflow-hidden dark:hidden bg-linear-to-br from-gray-50 to-gray-100">
             <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-[#0A192F]/5 via-transparent to-[#00E5FF]/5 rounded-bl-[120px]" />
 
-            <div className="relative w-full max-w-xl aspect-4/5 rounded-2xl overflow-hidden shadow-xl z-10">
+            <div className="relative w-full max-w-xl aspect-4/5 rounded-lg overflow-hidden shadow-md border border-gray-200/80 z-10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/6bfffd2085-d403cbf49c2f84257448.png" alt="Solvo app en teléfono" />
 
@@ -207,7 +207,7 @@ export default function LandingPage() {
           <div className="w-full lg:w-1/2 relative flex-col items-center justify-center p-6 sm:p-12 lg:p-16 overflow-hidden hidden dark:flex bg-linear-to-br from-[#0F172A] to-[#1E293B]">
             <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-[#00E5FF]/10 via-transparent to-[#D4AF37]/5 rounded-bl-[120px]" />
 
-            <div className="relative w-full max-w-xl aspect-4/5 rounded-2xl overflow-hidden shadow-xl border border-white/8 z-10">
+            <div className="relative w-full max-w-xl aspect-4/5 rounded-lg overflow-hidden shadow-md border border-white/10 z-10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/6bfffd2085-100b02fa95aedfb56c0e.png" alt="Solvo app dark mode" />
 
@@ -416,15 +416,15 @@ export default function LandingPage() {
               <div className="flex items-center gap-6 flex-wrap justify-center">
                 <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#1E293B] rounded-lg border border-gray-200 dark:border-[#334155]">
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Cifrado SSL</p>
-                  <p className="text-sm font-bold text-[#0A192F] dark:text-white">256-bit</p>
+                  <p className="text-sm font-semibold text-[#0A192F] dark:text-white">256-bit</p>
                 </div>
                 <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#1E293B] rounded-lg border border-gray-200 dark:border-[#334155]">
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Cumplimiento</p>
-                  <p className="text-sm font-bold text-[#0A192F] dark:text-white">ISO 27001</p>
+                  <p className="text-sm font-semibold text-[#0A192F] dark:text-white">ISO 27001</p>
                 </div>
                 <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#1E293B] rounded-lg border border-gray-200 dark:border-[#334155]">
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Protección de Datos</p>
-                  <p className="text-sm font-bold text-[#0A192F] dark:text-white">Ley N° 29733</p>
+                  <p className="text-sm font-semibold text-[#0A192F] dark:text-white">Ley N° 29733</p>
                 </div>
               </div>
             </div>
@@ -443,7 +443,7 @@ export default function LandingPage() {
                 <div className="w-10 h-10 bg-linear-to-br from-[#D4AF37] to-[#D4AF37]/80 rounded-lg flex items-center justify-center">
                   <i className="fa-solid fa-bolt text-[#0A192F] text-lg" />
                 </div>
-                <span className="text-xl font-bold text-white">Solvo</span>
+                <span className="text-xl font-semibold text-white tracking-tight">Solvo</span>
               </div>
               <p className="text-gray-400 text-sm">Préstamos digitales rápidos y transparentes para todos los peruanos.</p>
             </div>

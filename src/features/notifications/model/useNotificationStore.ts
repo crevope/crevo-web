@@ -1,4 +1,6 @@
 import { create } from 'zustand'
+import type { RealtimeChannel } from '@supabase/supabase-js'
+import { supabase } from '@/shared/lib/supabase'
 import { notificationsRepository } from '../api/notificationsRepository'
 import type { Notification } from '@/entities/notification'
 
@@ -9,12 +11,16 @@ interface NotificationState {
   load: () => Promise<void>
   markAsRead: (id: string) => Promise<void>
   markAllAsRead: () => Promise<void>
+  subscribeRealtime: (userId: string) => void
+  unsubscribeRealtime: () => void
+  _channel: RealtimeChannel | null
 }
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
   notifications: [],
   unreadCount: 0,
   isLoading: false,
+  _channel: null,
 
   load: async () => {
     set({ isLoading: true })
@@ -41,5 +47,28 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       notifications: state.notifications.map(n => ({ ...n, isRead: true })),
       unreadCount: 0,
     }))
+  },
+
+  subscribeRealtime: (userId: string) => {
+    // Evitar duplicar la suscripción si ya existe
+    if (get()._channel) return
+
+    const channel = supabase
+      .channel(`notif:${userId}`)
+      .on('broadcast', { event: 'new_notification' }, () => {
+        // El backend envía un ping — refetcheamos desde la API autenticada
+        get().load()
+      })
+      .subscribe()
+
+    set({ _channel: channel })
+  },
+
+  unsubscribeRealtime: () => {
+    const channel = get()._channel
+    if (channel) {
+      supabase.removeChannel(channel)
+      set({ _channel: null })
+    }
   },
 }))

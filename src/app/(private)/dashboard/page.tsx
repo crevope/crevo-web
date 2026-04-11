@@ -81,7 +81,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#0A192F] dark:text-white mb-1">
+          <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-1 tracking-tight">
             Resumen de tu cuenta
           </h1>
           <p className="text-gray-500 dark:text-gray-400">
@@ -162,9 +162,9 @@ export default function DashboardPage() {
                 </p>
               </div>
             </div>
-            <button type="button" className="text-sm text-[#00E5FF] font-medium hover:text-[#0A192F] dark:hover:text-[#D4AF37] transition-colors shrink-0">
+            <Link href="/security-info" className="text-sm text-[#00E5FF] font-medium hover:text-[#0A192F] dark:hover:text-[#D4AF37] transition-colors shrink-0 whitespace-nowrap">
               Ver detalles
-            </button>
+            </Link>
           </div>
 
           {/* Onboarding Stepper */}
@@ -487,7 +487,7 @@ export default function DashboardPage() {
             </div>
             <h3 className="text-lg font-semibold text-[#0A192F] dark:text-white">Educación Financiera</h3>
           </div>
-          <button className="text-sm text-[#00E5FF] font-medium hover:underline">Ver más consejos</button>
+          <Link href="/learn" className="text-sm text-[#00E5FF] font-medium hover:underline">Ver más consejos</Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[

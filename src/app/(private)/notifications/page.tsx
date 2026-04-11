@@ -17,7 +17,7 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#0A192F] dark:text-white mb-1">Notificaciones</h1>
+          <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-1 tracking-tight">Notificaciones</h1>
           {unreadCount > 0 ? (
             <p className="text-gray-500 dark:text-gray-400">
               Tienes <strong className="text-[#0A192F] dark:text-[#D4AF37]">{unreadCount}</strong> sin leer

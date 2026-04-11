@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/features/auth'
 import { authRepository } from '@/features/auth'
@@ -74,7 +75,13 @@ function Toggle({ checked, onChange }: Readonly<{ checked: boolean; onChange: (v
 
 export default function ProfilePage() {
   const { user } = useAuthStore()
-  const [activeSection, setActiveSection] = useState<Section>('personal')
+  const searchParams = useSearchParams()
+  const initialSection = (searchParams.get('section') as Section | null)
+  const [activeSection, setActiveSection] = useState<Section>(
+    initialSection && ['personal', 'banking', 'security', 'notifications'].includes(initialSection)
+      ? initialSection
+      : 'personal'
+  )
   const [profile, setProfile] = useState<AuthUser | null>(null)
   const [score, setScore] = useState<CreditScoreData | null>(null)
   const [scoreLoading, setScoreLoading] = useState(false)
@@ -243,7 +250,7 @@ export default function ProfilePage() {
     <div className="space-y-8">
       {/* Header */}
       <div className="pb-6 border-b border-gray-100 dark:border-white/6">
-        <h1 className="text-3xl font-bold text-[#0A192F] dark:text-white mb-2">Mi Perfil</h1>
+        <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">Mi Perfil</h1>
         <p className="text-gray-500 dark:text-gray-400">
           Gestiona tu información personal, seguridad y preferencias.
         </p>
@@ -282,7 +289,7 @@ export default function ProfilePage() {
                 <div className="p-6">
                   {/* Avatar + name */}
                   <div className="flex items-center gap-6 mb-8 pb-8 border-b border-gray-100 dark:border-white/6">
-                    <div className="w-20 h-20 rounded-full bg-linear-to-br from-[#0A192F] to-[#00E5FF] flex items-center justify-center text-white text-3xl font-bold shadow-md shrink-0">
+                    <div className="w-20 h-20 rounded-full bg-linear-to-br from-[#0A192F] to-[#00E5FF] flex items-center justify-center text-white text-3xl font-semibold shadow-md shrink-0">
                       {initials}
                     </div>
                     <div>

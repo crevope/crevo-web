@@ -15,4 +15,8 @@ export const notificationsRepository = {
   async markAllAsRead(): Promise<void> {
     await apiClient.patch('/notifications/read-all')
   },
+
+  async saveFcmToken(token: string): Promise<void> {
+    await apiClient.post('/notifications/fcm-token', { token })
+  },
 }

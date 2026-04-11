@@ -24,6 +24,8 @@ export interface Loan {
   restructureCount: number
   dueDate?: string
   contractUrl?: string
+  summaryUrl?: string
+  scheduleUrl?: string
   rejectionReason?: string
   disbursedAt?: string
   createdAt: string
@@ -74,6 +76,7 @@ export interface Installment {
   amount: number
   paidAmount: number
   status: InstallmentStatus
+  paymentId?: string  // ID del pago que cubrió esta cuota (disponible si status === 'PAID')
 }
 
 export interface ProductLimitInfo {

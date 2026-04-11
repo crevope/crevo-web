@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { Loader2, RefreshCw } from 'lucide-react'
 import { kycRepository, type KycStatus } from '@/features/upload-kyc'
 
-const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/[0.06] rounded-lg'
+const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
 
 const DOC_FIELDS = [
   { key: 'dniFront' as const, label: 'DNI – Anverso (parte delantera)', hint: 'Sube la parte frontal de tu DNI', icon: 'fa-solid fa-id-card' },
@@ -18,21 +18,21 @@ function KycVerified() {
       <div className="w-24 h-24 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
         <i className="fa-solid fa-shield-halved text-4xl text-green-500" />
       </div>
-      <h2 className="text-2xl font-bold text-[#0A192F] dark:text-white mb-3">¡Identidad Verificada!</h2>
+      <h2 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-3 tracking-tight">¡Identidad Verificada!</h2>
       <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
         Tu cuenta está completamente verificada. Ya puedes solicitar préstamos de hasta S/ 2,000.
       </p>
       <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
         <a
           href="/request-loan"
-          className="bg-[#D4AF37] text-[#0A192F] font-semibold px-8 py-3.5 rounded-xl hover:bg-[#B8941F] transition-colors flex items-center justify-center gap-2"
+          className="bg-[#D4AF37] text-[#0A192F] font-semibold px-8 py-3 rounded-lg hover:bg-[#B8941F] transition-colors flex items-center justify-center gap-2"
         >
           <i className="fa-solid fa-hand-holding-dollar" />
           Solicitar préstamo
         </a>
         <a
           href="/dashboard"
-          className="bg-white dark:bg-[#0F172A] text-[#0A192F] dark:text-gray-200 font-medium px-8 py-3.5 rounded-xl border border-gray-100 dark:border-white/[0.06] hover:bg-gray-50 dark:hover:bg-[#334155] transition-colors flex items-center justify-center gap-2"
+          className="bg-white dark:bg-[#0F172A] text-[#0A192F] dark:text-gray-200 font-medium px-8 py-3 rounded-lg border border-gray-100 dark:border-white/6 hover:bg-gray-50 dark:hover:bg-[#334155] transition-colors flex items-center justify-center gap-2"
         >
           <i className="fa-solid fa-house" />
           Ir al dashboard
@@ -48,7 +48,7 @@ function KycUnderReview({ onRefresh }: { onRefresh: () => void }) {
       <div className="w-20 h-20 rounded-full bg-yellow-50 dark:bg-yellow-900/30 flex items-center justify-center mx-auto mb-5">
         <i className="fa-solid fa-clock text-3xl text-yellow-500" />
       </div>
-      <h2 className="text-xl font-bold text-[#0A192F] dark:text-white mb-2">Verificando tu identidad</h2>
+      <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">Verificando tu identidad</h2>
       <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
         Hemos recibido tus documentos. La verificación suele tardar entre 1 y 5 minutos.
         Te notificaremos cuando esté lista.
@@ -72,7 +72,7 @@ function KycUnderReview({ onRefresh }: { onRefresh: () => void }) {
       </div>
       <button
         onClick={onRefresh}
-        className="flex items-center gap-2 mx-auto px-5 py-2.5 rounded-xl border border-gray-100 dark:border-white/[0.06] text-gray-700 dark:text-gray-300 font-medium text-sm hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors"
+        className="flex items-center gap-2 mx-auto px-5 py-2.5 rounded-lg border border-gray-100 dark:border-white/6 text-gray-700 dark:text-gray-300 font-medium text-sm hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors"
       >
         <RefreshCw className="h-4 w-4" />
         Verificar estado
@@ -87,11 +87,11 @@ function KycRejected({ onRetry }: { onRetry: () => void }) {
       <div className="w-20 h-20 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-5">
         <i className="fa-solid fa-circle-xmark text-3xl text-red-500" />
       </div>
-      <h2 className="text-xl font-bold text-[#0A192F] dark:text-white mb-2">Verificación no aprobada</h2>
+      <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">Verificación no aprobada</h2>
       <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
         No pudimos verificar tu identidad. Asegúrate de que las fotos sean nítidas y vuelve a intentarlo.
       </p>
-      <div className="max-w-xs mx-auto text-left mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50">
+      <div className="max-w-xs mx-auto text-left mb-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50">
         <p className="text-sm font-semibold text-red-700 dark:text-red-400 mb-2">Consejos para el reintento:</p>
         <ul className="space-y-1.5 text-xs text-red-600 dark:text-red-400">
           <li><i className="fa-solid fa-circle mr-1 text-[4px] relative -top-1" />Foto del DNI en ambiente bien iluminado, sin reflejos</li>
@@ -101,7 +101,7 @@ function KycRejected({ onRetry }: { onRetry: () => void }) {
       </div>
       <button
         onClick={onRetry}
-        className="w-full max-w-xs mx-auto bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+        className="w-full max-w-xs mx-auto bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold py-3 rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
       >
         <RefreshCw className="h-4 w-4" />
         Volver a intentar
@@ -170,7 +170,7 @@ export default function KycPage() {
     <div className="space-y-8 max-w-2xl">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-[#0A192F] dark:text-white mb-1">Verificación de Identidad</h1>
+        <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-1 tracking-tight">Verificación de Identidad</h1>
         <p className="text-gray-500 dark:text-gray-400">Requerida para solicitar préstamos en Solvo</p>
       </div>
 
@@ -185,7 +185,7 @@ export default function KycPage() {
             ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800/50'
             : s.active
               ? 'bg-[#D4AF37]/10 dark:bg-[#D4AF37]/10 border-[#D4AF37]/30'
-              : 'bg-gray-50 dark:bg-[#0F172A] border-gray-100 dark:border-white/[0.06]'
+              : 'bg-gray-50 dark:bg-[#0F172A] border-gray-100 dark:border-white/6'
             }`}>
             <div className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold ${s.done ? 'bg-green-500 text-white' : s.active ? 'bg-[#D4AF37] text-[#0A192F]' : 'bg-gray-200 dark:bg-[#334155] text-gray-500 dark:text-gray-400'
               }`}>
@@ -210,7 +210,7 @@ export default function KycPage() {
       {/* Upload form */}
       {showUploadForm && (
         <div className={cardCls}>
-          <div className="p-6 border-b border-gray-100 dark:border-white/[0.06]">
+          <div className="p-6 border-b border-gray-100 dark:border-white/6">
             <h2 className="text-lg font-semibold text-[#0A192F] dark:text-white">Documentos Requeridos</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               DNI (anverso y reverso) + selfie sosteniéndolo · JPG o PNG · Máx. 5 MB
@@ -225,11 +225,11 @@ export default function KycPage() {
                   className={`flex items-center gap-4 rounded-lg border-2 border-dashed p-4 cursor-pointer transition-all
                     ${files[key]
                       ? 'border-green-400 bg-green-50 dark:bg-green-900/20'
-                      : 'border-gray-100 dark:border-white/[0.06] hover:border-[#00E5FF] hover:bg-[#00E5FF]/5'
+                      : 'border-gray-100 dark:border-white/6 hover:border-[#00E5FF] hover:bg-[#00E5FF]/5'
                     }`}
                   onClick={() => refs[key].current?.click()}
                 >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${files[key] ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400' : 'bg-gray-100 dark:bg-[#0F172A] text-gray-400 dark:text-gray-500'
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${files[key] ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400' : 'bg-gray-100 dark:bg-[#0F172A] text-gray-400 dark:text-gray-500'
                     }`}>
                     <i className={`${files[key] ? 'fa-solid fa-circle-check' : icon} text-xl`} />
                   </div>

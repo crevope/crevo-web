@@ -1,5 +1,4 @@
 import { apiClient } from '@/shared/api/client'
-import { TOKEN_KEY } from '@/shared/api/client'
 import type { Loan, LoanBalance, Payment, Installment, EarlyPayoffQuote, LoanLimits } from '@/entities/loan'
 
 export interface SimulateDTO {
@@ -60,8 +59,11 @@ export const loanRepository = {
     const { data } = await apiClient.get(`/loans/${loanId}/schedule`)
     return data.data
   },
-  async signLoan(loanId: string): Promise<Loan> {
-    const { data } = await apiClient.post(`/loans/${loanId}/sign`, { acceptedTerms: true })
+  async requestSignatureOtp(loanId: string): Promise<void> {
+    await apiClient.post(`/loans/${loanId}/request-signature-otp`, {})
+  },
+  async signLoan(loanId: string, otp: string): Promise<Loan> {
+    const { data } = await apiClient.post(`/loans/${loanId}/sign`, { acceptedTerms: true, otp })
     return data.data
   },
   async payLoan(loanId: string, dto: { amount: number; method: string; reference?: string }): Promise<Payment> {
@@ -84,6 +86,14 @@ export const loanRepository = {
     const { data } = await apiClient.get(`/loans/${loanId}/contract`)
     return data.data.url
   },
+  async getSummaryUrl(loanId: string): Promise<string> {
+    const { data } = await apiClient.get(`/loans/${loanId}/summary`)
+    return data.data.url
+  },
+  async getScheduleDocumentUrl(loanId: string): Promise<string> {
+    const { data } = await apiClient.get(`/loans/${loanId}/schedule-document`)
+    return data.data.url
+  },
   async chargeCard(dto: { loanId: string; amount: number; culqiToken: string }): Promise<Payment> {
     const { data } = await apiClient.post('/payments/charge', dto)
     return data.data
@@ -97,19 +107,15 @@ export const loanRepository = {
     return data.data
   },
   async downloadReceipt(paymentId: string): Promise<void> {
-    const token = localStorage.getItem(TOKEN_KEY)
-    const baseURL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api'
-    const response = await fetch(`${baseURL}/payments/${paymentId}/receipt`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    if (!response.ok) throw new Error('No se pudo descargar el comprobante')
-    const blob = await response.blob()
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `comprobante-${paymentId.substring(0, 8)}.pdf`
-    a.click()
-    URL.revokeObjectURL(url)
+    const { data } = await apiClient.get(`/payments/${paymentId}/receipt`)
+    const url: string = data.data.url
+    window.open(url, '_blank')
+  },
+
+  async downloadInstallmentReceipt(installmentId: string): Promise<void> {
+    const { data } = await apiClient.get(`/installments/${installmentId}/receipt`)
+    const url: string = data.data.url
+    window.open(url, '_blank')
   },
 }
 

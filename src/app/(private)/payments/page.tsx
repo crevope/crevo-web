@@ -525,7 +525,7 @@ export default function PaymentsPage() {
 
             {isLoadingBalance || !balance ? (
               <div className="space-y-3">
-                {[1, 2, 3, 4].map(i => (
+                {[1, 2, 3].map(i => (
                   <div key={i} className="flex justify-between items-center">
                     <Skeleton className="h-4 w-24" />
                     <Skeleton className="h-4 w-20" />
@@ -554,14 +554,10 @@ export default function PaymentsPage() {
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
+                    <span className="text-gray-500 dark:text-gray-400">Monto a pagar</span>
                     <span className="text-[#0A192F] dark:text-white font-medium">
                       {paymentAmount > 0 ? formatCurrency(paymentAmount) : '—'}
                     </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">IGV (18%)</span>
-                    <span className="text-[#0A192F] dark:text-white font-medium">S/ 0.00</span>
                   </div>
                 </div>
 

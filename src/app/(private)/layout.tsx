@@ -6,15 +6,22 @@ import { DashboardSidebar } from '@/widgets/dashboard-sidebar'
 import { useAuthStore } from '@/features/auth'
 import { useNotificationStore } from '@/features/notifications'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { usePushNotifications } from '@/shared/hooks/usePushNotifications'
 
 export default function PrivateLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const router = useRouter()
-  const { isAuthenticated, isLoading, loadUser } = useAuthStore()
-  const { unreadCount, load: loadNotifications } = useNotificationStore()
+  const { user, isAuthenticated, isLoading, loadUser } = useAuthStore()
+  const { unreadCount, load: loadNotifications, subscribeRealtime, unsubscribeRealtime } = useNotificationStore()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  usePushNotifications()
 
   useEffect(() => { loadUser() }, [loadUser])
   useEffect(() => { loadNotifications() }, [loadNotifications])
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return
+    subscribeRealtime(user.id)
+    return () => { unsubscribeRealtime() }
+  }, [isAuthenticated, user?.id, subscribeRealtime, unsubscribeRealtime])
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace('/login')
   }, [isLoading, isAuthenticated, router])

@@ -118,7 +118,7 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
                 <i className={`${item.icon} w-4 text-center text-sm`} />
                 {item.label}
                 {item.href === '/notifications' && unreadCount > 0 && (
-                  <span className="ml-auto min-w-[18px] h-[18px] rounded-full bg-[#00E5FF] text-[#0A192F] text-[10px] font-bold flex items-center justify-center px-1">
+                  <span className="ml-auto w-[18px] h-[18px] rounded-full bg-[#00E5FF] text-[#0A192F] text-[10px] font-bold inline-flex items-center justify-center leading-none shrink-0">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
