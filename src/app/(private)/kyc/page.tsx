@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Loader2, RefreshCw } from 'lucide-react'

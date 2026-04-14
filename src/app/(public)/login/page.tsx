@@ -1,4 +1,4 @@
-﻿import Link from 'next/link'
+import Link from 'next/link'
 import { LoginForm } from '@/features/auth'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'

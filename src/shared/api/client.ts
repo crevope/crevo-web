@@ -1,4 +1,4 @@
-﻿import axios, { AxiosError } from 'axios'
+import axios, { AxiosError } from 'axios'
 
 export const TOKEN_KEY         = 'crevo_token'
 export const REFRESH_TOKEN_KEY = 'crevo_refresh_token'

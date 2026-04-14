@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Sirve el Service Worker de Firebase Messaging con la config inyectada desde env vars.
  * El header Service-Worker-Allowed: / permite registrarlo con scope raíz aunque el script
  * esté en /api/firebase-messaging-sw.

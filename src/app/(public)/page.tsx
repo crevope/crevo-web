@@ -1,4 +1,4 @@
-﻿import Link from 'next/link'
+import Link from 'next/link'
 import { LoanSimulator } from '@/features/simulator/ui/LoanSimulator'
 import { LandingHeader } from '@/shared/ui/landing-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'

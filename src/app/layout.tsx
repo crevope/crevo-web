@@ -1,4 +1,5 @@
-﻿import type { Metadata } from 'next'
+import type { Metadata } from 'next'
+import { Analytics } from '@vercel/analytics/next';
 import { Plus_Jakarta_Sans, Geist } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/shared/ui/sonner'
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Toaster richColors position="top-right" />
         </ThemeProvider>
         <Script src="https://checkout.culqi.com/js/v4" strategy="lazyOnload" />
+        <Analytics />
       </body>
     </html>
   )
