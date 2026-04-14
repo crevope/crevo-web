@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -208,7 +208,7 @@ export default function VerifyEmailPage() {
 
       <footer className="w-full py-6 px-4 text-center">
         <p className="text-xs text-gray-400 dark:text-gray-500">
-          © {CURRENT_YEAR} Solvo. Regulado por la SBS. Conexión segura 256-bits.
+          © {CURRENT_YEAR} Crevo. Regulado por la SBS. Conexión segura 256-bits.
         </p>
       </footer>
     </div>

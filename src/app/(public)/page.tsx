@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { LoanSimulator } from '@/features/simulator/ui/LoanSimulator'
 import { LandingHeader } from '@/shared/ui/landing-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
@@ -58,25 +58,25 @@ export default function LandingPage() {
               {/* Product pills light */}
               <div className="flex flex-wrap gap-2 mb-9 dark:hidden">
                 <div className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600">
-                  <i className="fa-solid fa-bolt text-[#00E5FF] mr-1" /> Solvo Express
+                  <i className="fa-solid fa-bolt text-[#00E5FF] mr-1" /> Crevo Express
                 </div>
                 <div className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600">
-                  <i className="fa-solid fa-chart-line text-[#D4AF37] mr-1" /> Solvo Flex
+                  <i className="fa-solid fa-chart-line text-[#D4AF37] mr-1" /> Crevo Flex
                 </div>
                 <div className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600">
-                  <i className="fa-solid fa-crown text-[#D4AF37] mr-1" /> Solvo Plus
+                  <i className="fa-solid fa-crown text-[#D4AF37] mr-1" /> Crevo Plus
                 </div>
               </div>
               {/* Product pills dark */}
               <div className="hidden dark:flex flex-wrap gap-2 mb-9">
                 <div className="px-3 py-1.5 bg-[#1E293B] border border-[#334155] rounded-full text-xs font-medium text-gray-300">
-                  <i className="fa-solid fa-bolt text-[#00E5FF] mr-1" /> Solvo Express
+                  <i className="fa-solid fa-bolt text-[#00E5FF] mr-1" /> Crevo Express
                 </div>
                 <div className="px-3 py-1.5 bg-[#1E293B] border border-[#334155] rounded-full text-xs font-medium text-gray-300">
-                  <i className="fa-solid fa-chart-line text-[#D4AF37] mr-1" /> Solvo Flex
+                  <i className="fa-solid fa-chart-line text-[#D4AF37] mr-1" /> Crevo Flex
                 </div>
                 <div className="px-3 py-1.5 bg-[#1E293B] border border-[#334155] rounded-full text-xs font-medium text-gray-300">
-                  <i className="fa-solid fa-crown text-[#D4AF37] mr-1" /> Solvo Plus
+                  <i className="fa-solid fa-crown text-[#D4AF37] mr-1" /> Crevo Plus
                 </div>
               </div>
 
@@ -162,7 +162,7 @@ export default function LandingPage() {
 
             <div className="relative w-full max-w-xl aspect-4/5 rounded-lg overflow-hidden shadow-md border border-gray-200/80 z-10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/6bfffd2085-d403cbf49c2f84257448.png" alt="Solvo app en teléfono" />
+              <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/6bfffd2085-d403cbf49c2f84257448.png" alt="Crevo app en teléfono" />
 
               {/* Security badge */}
               <div className="absolute top-5 right-5 glass-effect rounded-lg px-3 py-2.5 shadow-lg flex items-center gap-2.5 animate-[bounce_4s_ease-in-out_infinite]">
@@ -178,7 +178,7 @@ export default function LandingPage() {
                 <div className="flex items-start gap-2.5">
                   <i className="fa-solid fa-quote-left text-[#D4AF37] text-xl mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-xs text-gray-700 leading-snug mb-2.5">&quot;Solicité S/ 5,000 con Solvo Express y en 15 minutos ya estaba en mi CCI del BCP.&quot;</p>
+                    <p className="text-xs text-gray-700 leading-snug mb-2.5">&quot;Solicité S/ 5,000 con Crevo Express y en 15 minutos ya estaba en mi CCI del BCP.&quot;</p>
                     <div className="flex items-center gap-1.5">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" className="w-6 h-6 rounded-full" alt="Reviewer" />
@@ -209,7 +209,7 @@ export default function LandingPage() {
 
             <div className="relative w-full max-w-xl aspect-4/5 rounded-lg overflow-hidden shadow-md border border-white/10 z-10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/6bfffd2085-100b02fa95aedfb56c0e.png" alt="Solvo app dark mode" />
+              <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/6bfffd2085-100b02fa95aedfb56c0e.png" alt="Crevo app dark mode" />
 
               <div className="absolute top-5 right-5 glass-effect-dark rounded-lg px-3 py-2.5 shadow-lg border border-white/10 flex items-center gap-2.5 animate-[bounce_4s_ease-in-out_infinite]">
                 <i className="fa-solid fa-shield-halved text-[#00E5FF]" />
@@ -223,7 +223,7 @@ export default function LandingPage() {
                 <div className="flex items-start gap-2.5">
                   <i className="fa-solid fa-quote-left text-[#D4AF37] text-xl mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-xs text-gray-200 leading-snug mb-2.5">&quot;Solicité S/ 5,000 con Solvo Express y en 15 minutos ya estaba en mi CCI del BCP.&quot;</p>
+                    <p className="text-xs text-gray-200 leading-snug mb-2.5">&quot;Solicité S/ 5,000 con Crevo Express y en 15 minutos ya estaba en mi CCI del BCP.&quot;</p>
                     <div className="flex items-center gap-1.5">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" className="w-6 h-6 rounded-full" alt="Reviewer" />
@@ -248,12 +248,12 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ─── ¿POR QUÉ SOLVO? ──────────────────────────────────────────────── */}
-        <section id="por-que-solvo" className="w-full py-20 px-6 sm:px-10 lg:px-16 xl:px-24 bg-white dark:bg-[#0F172A] relative">
+        {/* ─── ¿POR QUÉ CREVO? ──────────────────────────────────────────────── */}
+        <section id="por-que-crevo" className="w-full py-20 px-6 sm:px-10 lg:px-16 xl:px-24 bg-white dark:bg-[#0F172A] relative">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl font-semibold text-[#0A192F] dark:text-white mb-3">
-                ¿Por qué elegir <span className="text-gradient-gold">Solvo</span>?
+                ¿Por qué elegir <span className="text-gradient-gold">Crevo</span>?
               </h2>
               <p className="text-gray-500 dark:text-gray-400 max-w-xl mx-auto text-sm leading-relaxed">
                 Diseñado para peruanos que valoran su tiempo y buscan soluciones financieras transparentes.
@@ -281,7 +281,7 @@ export default function LandingPage() {
                 <div className="w-11 h-11 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center mb-5">
                   <i className="fa-solid fa-bolt text-lg text-[#D4AF37]" />
                 </div>
-                <h3 className="text-base font-semibold text-[#0A192F] dark:text-white mb-2">Velocidad Solvo</h3>
+                <h3 className="text-base font-semibold text-[#0A192F] dark:text-white mb-2">Velocidad Crevo</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Aprobación en minutos. El dinero se transfiere directamente a tu CCI registrado casi de inmediato.</p>
               </div>
             </div>
@@ -341,7 +341,7 @@ export default function LandingPage() {
                 Lo que dicen nuestros <span className="text-gradient-gold">clientes</span>
               </h2>
               <p className="text-sm text-gray-400 dark:text-gray-500 max-w-xl mx-auto">
-                Miles de peruanos ya han impulsado sus metas con Solvo.
+                Miles de peruanos ya han impulsado sus metas con Crevo.
               </p>
             </div>
 
@@ -352,7 +352,7 @@ export default function LandingPage() {
                 <div className="flex items-center gap-0.5 text-[#D4AF37] text-xs mb-3">
                   <i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" />
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 relative z-10 leading-relaxed">&quot;Necesitaba capital para mi bodega. Con Solvo Flex me aprobaron súper rápido y pude pagar en 3 meses. El proceso es muy transparente.&quot;</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 relative z-10 leading-relaxed">&quot;Necesitaba capital para mi bodega. Con Crevo Flex me aprobaron súper rápido y pude pagar en 3 meses. El proceso es muy transparente.&quot;</p>
                 <div className="flex items-center gap-3">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg" className="w-9 h-9 rounded-full border border-gray-100 dark:border-white/10" alt="Cliente" />
@@ -369,7 +369,7 @@ export default function LandingPage() {
                 <div className="flex items-center gap-0.5 text-[#D4AF37] text-xs mb-3">
                   <i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" />
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 relative z-10 leading-relaxed">&quot;Tuve una emergencia médica y necesitaba liquidez urgente. Solvo Express me salvó. En menos de media hora ya tenía la plata en mi banco.&quot;</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 relative z-10 leading-relaxed">&quot;Tuve una emergencia médica y necesitaba liquidez urgente. Crevo Express me salvó. En menos de media hora ya tenía la plata en mi banco.&quot;</p>
                 <div className="flex items-center gap-3">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" className="w-9 h-9 rounded-full border border-gray-100 dark:border-white/10" alt="Cliente" />
@@ -443,7 +443,7 @@ export default function LandingPage() {
                 <div className="w-10 h-10 bg-linear-to-br from-[#D4AF37] to-[#D4AF37]/80 rounded-lg flex items-center justify-center">
                   <i className="fa-solid fa-bolt text-[#0A192F] text-lg" />
                 </div>
-                <span className="text-xl font-semibold text-white tracking-tight">Solvo</span>
+                <span className="text-xl font-semibold text-white tracking-tight">Crevo</span>
               </div>
               <p className="text-gray-400 text-sm">Préstamos digitales rápidos y transparentes para todos los peruanos.</p>
             </div>
@@ -451,9 +451,9 @@ export default function LandingPage() {
             <div>
               <h4 className="text-white font-semibold mb-4 text-sm">Productos</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Solvo Express</Link></li>
-                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Solvo Flex</Link></li>
-                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Solvo Plus</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Crevo Express</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Crevo Flex</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Crevo Plus</Link></li>
               </ul>
             </div>
 
@@ -477,7 +477,7 @@ export default function LandingPage() {
           </div>
 
           <div className="pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">© {CURRENT_YEAR} Solvo. Todos los derechos reservados. Regulado por la SBS.</p>
+            <p className="text-gray-400 text-sm">© {CURRENT_YEAR} Crevo. Todos los derechos reservados. Regulado por la SBS.</p>
             <div className="flex items-center gap-4">
               <Link href="#" className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-[#D4AF37] hover:bg-gray-700 transition-all">
                 <i className="fa-brands fa-facebook-f" />

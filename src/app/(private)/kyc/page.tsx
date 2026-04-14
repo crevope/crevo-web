@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Loader2, RefreshCw } from 'lucide-react'
@@ -171,7 +171,7 @@ export default function KycPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-1 tracking-tight">Verificación de Identidad</h1>
-        <p className="text-gray-500 dark:text-gray-400">Requerida para solicitar préstamos en Solvo</p>
+        <p className="text-gray-500 dark:text-gray-400">Requerida para solicitar préstamos en Crevo</p>
       </div>
 
       {/* Progress indicator */}

@@ -286,7 +286,7 @@ export default function LoanDetailPage() {
             >
               <i className="fa-solid fa-arrow-left text-sm" />
             </Link>
-            <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white">Préstamo Solvo</h1>
+            <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white">Préstamo Crevo</h1>
             <LoanStatusBadge status={loan.status} />
           </div>
         </div>

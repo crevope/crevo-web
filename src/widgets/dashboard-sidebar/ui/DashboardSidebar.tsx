@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
@@ -84,7 +84,7 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
           <div className="w-7 h-7 bg-linear-to-br from-[#D4AF37] to-[#D4AF37]/80 rounded-lg flex items-center justify-center">
             <i className="fa-solid fa-bolt text-[#0A192F] text-xs" />
           </div>
-          <span className="text-base font-semibold text-white tracking-tight">Solvo</span>
+          <span className="text-base font-semibold text-white tracking-tight">Crevo</span>
         </div>
 
         {/* User card */}

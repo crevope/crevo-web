@@ -1,4 +1,4 @@
-export const LOAN_STATUS_LABELS: Record<string, string> = {
+﻿export const LOAN_STATUS_LABELS: Record<string, string> = {
   PENDING: 'Pendiente', APPROVED: 'Aprobado', REJECTED: 'Rechazado',
   SIGNED: 'Firmado', DISBURSED: 'Desembolsado', ACTIVE: 'Activo',
   OVERDUE: 'En mora', PAID: 'Pagado', CANCELLED: 'Cancelado',
@@ -12,6 +12,6 @@ export const PAYMENT_METHODS = [
   { value: 'CASH', label: 'Efectivo', icon: '💵' },
 ] as const
 
-export const TOKEN_KEY = 'solvo_token'
+export const TOKEN_KEY = 'crevo_token'
 
 export const CURRENT_YEAR = new Date().getFullYear()

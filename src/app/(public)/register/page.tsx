@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { RegisterForm } from '@/features/auth'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
@@ -27,7 +27,7 @@ export default function RegisterPage() {
                 <span className="bg-linear-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent">Soles</span>.
               </h1>
               <p className="text-gray-300 text-md mb-8 max-w-md">
-                Únete a miles de peruanos que confían en Solvo para alcanzar sus metas financieras con procesos rápidos y seguros.
+                Únete a miles de peruanos que confían en Crevo para alcanzar sus metas financieras con procesos rápidos y seguros.
               </p>
 
               <div className="space-y-4 mt-8">
@@ -92,7 +92,7 @@ export default function RegisterPage() {
       <footer className="w-full py-5 px-4 text-center">
         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-2">
           <i className="fa-solid fa-lock" />
-          © {CURRENT_YEAR} Solvo. Conexión segura 256-bits • Regulado por SBS
+          © {CURRENT_YEAR} Crevo. Conexión segura 256-bits • Regulado por SBS
         </p>
       </footer>
     </div>

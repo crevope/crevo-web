@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
@@ -106,7 +106,7 @@ export default function ForgotPasswordPage() {
                       ¿Olvidaste tu contraseña?
                     </h2>
                     <p className="text-gray-400 dark:text-gray-500 text-sm leading-relaxed">
-                      Ingresa tu correo Solvo y te enviaremos un enlace para restablecerla.
+                      Ingresa tu correo Crevo y te enviaremos un enlace para restablecerla.
                     </p>
                   </div>
 
@@ -150,7 +150,7 @@ export default function ForgotPasswordPage() {
 
       <footer className="w-full py-6 px-4 text-center">
         <p className="text-xs text-gray-400 dark:text-gray-500">
-          © {CURRENT_YEAR} Solvo. Regulado por la SBS. Conexión segura 256-bits.
+          © {CURRENT_YEAR} Crevo. Regulado por la SBS. Conexión segura 256-bits.
         </p>
       </footer>
     </div>

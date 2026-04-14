@@ -88,11 +88,11 @@ export const authRepository = {
     if (typeof window === 'undefined') return null
     return localStorage.getItem(REFRESH_TOKEN_KEY)
   },
-  saveUser(user: AuthUser) { localStorage.setItem('solvo_user', JSON.stringify(user)) },
-  clearUser() { localStorage.removeItem('solvo_user') },
+  saveUser(user: AuthUser) { localStorage.setItem('crevo_user', JSON.stringify(user)) },
+  clearUser() { localStorage.removeItem('crevo_user') },
   getStoredUser(): AuthUser | null {
     if (typeof window === 'undefined') return null
-    const raw = localStorage.getItem('solvo_user')
+    const raw = localStorage.getItem('crevo_user')
     if (!raw || raw === 'undefined') return null
     try { return JSON.parse(raw) } catch { return null }
   },

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { LoginForm } from '@/features/auth'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
@@ -22,25 +22,25 @@ export default function LoginPage() {
                 <img
                   className="w-full h-full object-contain"
                   src="https://storage.googleapis.com/uxpilot-auth.appspot.com/db7fc53ea7-e2114358354bbbf35766.png"
-                  alt="Solvo app"
+                  alt="Crevo app"
                 />
               </div>
 
               <h1 className="text-2xl font-semibold mb-3 leading-tight">Bienvenido de nuevo</h1>
               <p className="text-gray-300 text-sm max-w-sm mb-5 leading-relaxed">
                 Gestiona tus préstamos en Soles y alcanza tus metas financieras con{' '}
-                <span className="text-[#D4AF37] font-medium">Solvo</span>.
+                <span className="text-[#D4AF37] font-medium">Crevo</span>.
               </p>
 
               <div className="flex flex-wrap gap-2 justify-center mt-3">
                 <div className="px-3 py-1 bg-white/8 border border-white/15 rounded-full text-xs font-medium text-white/80">
-                  <i className="fa-solid fa-bolt text-[#00E5FF] mr-1" /> Solvo Express
+                  <i className="fa-solid fa-bolt text-[#00E5FF] mr-1" /> Crevo Express
                 </div>
                 <div className="px-3 py-1 bg-white/8 border border-white/15 rounded-full text-xs font-medium text-white/80">
-                  <i className="fa-solid fa-chart-line text-[#D4AF37] mr-1" /> Solvo Flex
+                  <i className="fa-solid fa-chart-line text-[#D4AF37] mr-1" /> Crevo Flex
                 </div>
                 <div className="px-3 py-1 bg-white/8 border border-white/15 rounded-full text-xs font-medium text-white/80">
-                  <i className="fa-solid fa-crown text-[#D4AF37] mr-1" /> Solvo Plus
+                  <i className="fa-solid fa-crown text-[#D4AF37] mr-1" /> Crevo Plus
                 </div>
               </div>
             </div>
@@ -84,7 +84,7 @@ export default function LoginPage() {
       <footer className="w-full py-6 px-4 text-center">
         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-2">
           <i className="fa-solid fa-lock" />
-          © {CURRENT_YEAR} Solvo. Conexión segura 256-bits • Regulado por SBS
+          © {CURRENT_YEAR} Crevo. Conexión segura 256-bits • Regulado por SBS
         </p>
       </footer>
     </div>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Sirve el Service Worker de Firebase Messaging con la config inyectada desde env vars.
  * El header Service-Worker-Allowed: / permite registrarlo con scope raíz aunque el script
  * esté en /api/firebase-messaging-sw.
@@ -22,7 +22,7 @@ export async function GET() {
     const messaging = firebase.messaging();
 
     messaging.onBackgroundMessage(function(payload) {
-      const title = payload.notification?.title || 'Solvo';
+      const title = payload.notification?.title || 'Crevo';
       const body  = payload.notification?.body  || '';
       self.registration.showNotification(title, {
         body,

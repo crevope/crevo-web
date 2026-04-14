@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import Link from 'next/link'
 import { LandingThemeToggle } from './landing-theme-toggle'
 
@@ -13,7 +13,7 @@ export function AuthHeader({ cta }: AuthHeaderProps) {
         <div className="w-8 h-8 bg-linear-to-br from-[#0A192F] to-[#0A192F]/80 rounded-lg flex items-center justify-center text-[#D4AF37]">
           <i className="fa-solid fa-bolt text-sm" />
         </div>
-        <span className="text-lg font-semibold text-[#0A192F] dark:text-white tracking-tight">Solvo</span>
+        <span className="text-lg font-semibold text-[#0A192F] dark:text-white tracking-tight">Crevo</span>
       </Link>
 
       <div className="flex items-center gap-4 sm:gap-5">

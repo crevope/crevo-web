@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans, Geist } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/shared/ui/sonner'
@@ -9,7 +9,7 @@ import { cn } from "@/shared/lib/utils";
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
 
 export const metadata: Metadata = {
-  title: 'Solvo — Mini préstamos para Perú',
+  title: 'Crevo — Mini préstamos para Perú',
   description: 'Préstamos rápidos y seguros de S/. 200 a S/. 2,000. Aprobación en minutos.',
   keywords: ['préstamos', 'fintech', 'Perú', 'mini préstamos', 'crédito rápido'],
 }

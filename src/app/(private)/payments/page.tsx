@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -376,7 +376,7 @@ export default function PaymentsPage() {
                           <i className="fa-solid fa-bolt text-sm" />
                         </div>
                         <div>
-                          <h4 className="text-[#0A192F] dark:text-white font-medium">Préstamo Solvo</h4>
+                          <h4 className="text-[#0A192F] dark:text-white font-medium">Préstamo Crevo</h4>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
                             Ref: #{loanRef(loan.id)}
                           </p>
@@ -544,7 +544,7 @@ export default function PaymentsPage() {
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500 dark:text-gray-400">Préstamo</span>
                     <span className="text-[#0A192F] dark:text-white font-medium text-right">
-                      <>Préstamo Solvo<br /><span className="text-xs text-gray-400">#{loanRef(selectedLoan!.id)}</span></>
+                      <>Préstamo Crevo<br /><span className="text-xs text-gray-400">#{loanRef(selectedLoan!.id)}</span></>
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">

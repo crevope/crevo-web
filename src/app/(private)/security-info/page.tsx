@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import Link from 'next/link'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ const SECTIONS: SecuritySection[] = [
     id: 'identity',
     icon: 'fa-solid fa-id-card',
     title: 'Verificación de identidad',
-    subtitle: 'Solo personas reales pueden acceder a crédito en Solvo.',
+    subtitle: 'Solo personas reales pueden acceder a crédito en Crevo.',
     color: 'text-green-600 dark:text-green-400',
     bg: 'bg-green-100 dark:bg-green-900/30',
     border: 'border-green-200 dark:border-green-700/40',
@@ -118,7 +118,7 @@ const SECTIONS: SecuritySection[] = [
       {
         icon: 'fa-solid fa-landmark',
         title: 'Supervisado por la SBS',
-        body: 'Solvo opera bajo la supervisión de la Superintendencia de Banca, Seguros y AFP (SBS), el organismo regulador del sistema financiero peruano. Puedes presentar reclamos ante la SBS al número 0-800-10840 (gratuito).',
+        body: 'Crevo opera bajo la supervisión de la Superintendencia de Banca, Seguros y AFP (SBS), el organismo regulador del sistema financiero peruano. Puedes presentar reclamos ante la SBS al número 0-800-10840 (gratuito).',
       },
       {
         icon: 'fa-solid fa-file-shield',
@@ -199,7 +199,7 @@ export default function SecurityInfoPage() {
               <h1 className="text-2xl font-semibold text-white mb-1 tracking-tight">Seguridad y privacidad</h1>
               <p className="text-white/60 text-sm leading-relaxed max-w-xl">
                 Aquí explicamos con transparencia qué medidas técnicas y regulatorias protegen
-                tu información financiera y personal en Solvo.
+                tu información financiera y personal en Crevo.
               </p>
             </div>
           </div>
@@ -262,7 +262,7 @@ export default function SecurityInfoPage() {
             <p className="font-semibold text-white text-sm">¿Tienes dudas sobre tu privacidad?</p>
             <p className="text-xs text-white/60 mt-0.5">
               Puedes solicitar la eliminación de tus datos o hacer consultas escribiéndonos a{' '}
-              <a href="mailto:privacidad@solvo.pe" className="text-[#00E5FF] hover:underline">privacidad@solvo.pe</a>
+              <a href="mailto:privacidad@crevo.pe" className="text-[#00E5FF] hover:underline">privacidad@crevo.pe</a>
             </p>
           </div>
         </div>

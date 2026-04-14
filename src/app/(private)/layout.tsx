@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -48,7 +48,7 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
           <div className="w-7 h-7 bg-linear-to-br from-[#D4AF37] to-[#D4AF37]/80 rounded-lg flex items-center justify-center">
             <i className="fa-solid fa-bolt text-[#0A192F] text-xs" />
           </div>
-          <span className="text-base font-semibold text-white tracking-tight">Solvo</span>
+          <span className="text-base font-semibold text-white tracking-tight">Crevo</span>
         </div>
         <div className="flex items-center gap-1">
           <Link href="/notifications" className="relative p-1 text-gray-300 hover:text-white transition-colors">

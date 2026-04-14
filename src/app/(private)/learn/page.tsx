@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState } from 'react'
 import Link from 'next/link'
 
@@ -173,7 +173,7 @@ const CATEGORIES: Category[] = [
       {
         icon: 'fa-solid fa-calculator',
         title: 'Calcula el costo real antes de pedir',
-        body: 'Usa el simulador de Solvo para ver el monto total a devolver antes de aceptar. Un préstamo de S/ 500 puede costarte S/ 620 en total. Asegúrate de poder asumir esa diferencia.',
+        body: 'Usa el simulador de Crevo para ver el monto total a devolver antes de aceptar. Un préstamo de S/ 500 puede costarte S/ 620 en total. Asegúrate de poder asumir esa diferencia.',
       },
       {
         icon: 'fa-solid fa-forward',
@@ -199,7 +199,7 @@ const CATEGORIES: Category[] = [
       {
         icon: 'fa-solid fa-user-secret',
         title: 'Nadie legítimo te pedirá tu contraseña',
-        body: 'Ni Solvo, ni ningún banco, te pedirá tu contraseña, PIN o código OTP por teléfono, WhatsApp o correo. Si alguien lo hace, es un intento de fraude. Corta la comunicación de inmediato.',
+        body: 'Ni Crevo, ni ningún banco, te pedirá tu contraseña, PIN o código OTP por teléfono, WhatsApp o correo. Si alguien lo hace, es un intento de fraude. Corta la comunicación de inmediato.',
         tag: 'Importante',
       },
       {

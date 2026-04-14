@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { useAuthStore } from '@/features/auth'
@@ -20,8 +20,8 @@ export function LandingHeader() {
         <div className="w-8 h-8 bg-linear-to-br from-[#0A192F] to-[#0A192F]/80 rounded-lg flex items-center justify-center text-[#D4AF37]">
           <i className="fa-solid fa-bolt text-sm" />
         </div>
-        <span className="text-lg font-semibold text-[#0A192F] dark:hidden tracking-tight">Solvo</span>
-        <span className="text-lg font-semibold text-white hidden dark:block tracking-tight">Solvo</span>
+        <span className="text-lg font-semibold text-[#0A192F] dark:hidden tracking-tight">Crevo</span>
+        <span className="text-lg font-semibold text-white hidden dark:block tracking-tight">Crevo</span>
       </Link>
 
       {/* Nav */}

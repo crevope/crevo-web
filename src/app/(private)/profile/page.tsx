@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
@@ -333,7 +333,7 @@ export default function ProfilePage() {
               <div className={cardCls}>
                 <div className="p-6 border-b border-gray-100 dark:border-white/6">
                   <h2 className="text-xl font-bold text-[#0A192F] dark:text-white">Perfil Crediticio</h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Basado en tu historial con Solvo y fuentes externas</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Basado en tu historial con Crevo y fuentes externas</p>
                 </div>
 
                 {scoreLoading ? (

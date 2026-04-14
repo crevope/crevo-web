@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -709,7 +709,7 @@ export default function RequestLoanPage() {
                       className="mt-0.5"
                     />
                     <span className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                      Autorizo a Solvo a consultar mi historial crediticio en las Centrales de Riesgo (Equifax/Sentinel) conforme a la normativa SBS para evaluar esta solicitud.
+                      Autorizo a Crevo a consultar mi historial crediticio en las Centrales de Riesgo (Equifax/Sentinel) conforme a la normativa SBS para evaluar esta solicitud.
                     </span>
                   </label>
                   {form.formState.errors.consentCredit && (
@@ -726,7 +726,7 @@ export default function RequestLoanPage() {
                       <Link href="#" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline">Términos y Condiciones</Link>
                       {' '}y la{' '}
                       <Link href="#" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline">Política de Privacidad</Link>
-                      {' '}de Solvo.
+                      {' '}de Crevo.
                     </span>
                   </label>
                   {form.formState.errors.consentTerms && (

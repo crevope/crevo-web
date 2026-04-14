@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Bell, LayoutDashboard, CreditCard, FileText, User } from 'lucide-react'
@@ -25,7 +25,7 @@ export function Navbar() {
 
           {/* Logo */}
           <Link href="/dashboard" className="text-xl font-extrabold tracking-tight text-gradient-brand">
-            SOLVO
+            CREVO
           </Link>
 
           {/* Desktop nav links */}

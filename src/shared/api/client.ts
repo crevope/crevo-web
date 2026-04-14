@@ -1,7 +1,7 @@
-import axios, { AxiosError } from 'axios'
+﻿import axios, { AxiosError } from 'axios'
 
-export const TOKEN_KEY         = 'solvo_token'
-export const REFRESH_TOKEN_KEY = 'solvo_refresh_token'
+export const TOKEN_KEY         = 'crevo_token'
+export const REFRESH_TOKEN_KEY = 'crevo_refresh_token'
 
 export const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api',
@@ -89,7 +89,7 @@ apiClient.interceptors.response.use(
           refreshSubscribers = []
           localStorage.removeItem(TOKEN_KEY)
           localStorage.removeItem(REFRESH_TOKEN_KEY)
-          localStorage.removeItem('solvo_user')
+          localStorage.removeItem('crevo_user')
           window.location.href = '/login'
           return Promise.reject(new Error('Sesión expirada. Por favor inicia sesión de nuevo.'))
         }
@@ -97,7 +97,7 @@ apiClient.interceptors.response.use(
         // No hay refresh token → redirect directo
         if (typeof window !== 'undefined') {
           localStorage.removeItem(TOKEN_KEY)
-          localStorage.removeItem('solvo_user')
+          localStorage.removeItem('crevo_user')
           window.location.href = '/login'
         }
       }

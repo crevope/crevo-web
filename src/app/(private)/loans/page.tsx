@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useLoanStore } from '@/features/request-loan'
@@ -56,7 +56,7 @@ function LoanCard({ loan }: Readonly<{ loan: Loan }>) {
             <div>
               <div className="flex items-center gap-3 mb-1">
                 <h3 className="text-base font-semibold text-[#0A192F] dark:text-white">
-                  Préstamo Solvo
+                  Préstamo Crevo
                 </h3>
                 {statusBadge(loan.status)}
               </div>
