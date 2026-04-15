@@ -472,7 +472,7 @@ export default function LandingPage() {
               <ul className="space-y-2 text-sm">
                 <li><Link href="#ayuda" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Ayuda y Soporte</Link></li>
                 <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Preguntas Frecuentes</Link></li>
-                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Libro de Reclamaciones</Link></li>
+                <li><Link href="/libro-de-reclamaciones" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Libro de Reclamaciones</Link></li>
               </ul>
             </div>
           </div>

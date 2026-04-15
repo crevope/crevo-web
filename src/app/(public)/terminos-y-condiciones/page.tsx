@@ -249,7 +249,7 @@ export default function TermsAndConditionsPage() {
       </p>
       <ul>
         <li>Correo electrónico: <a href={`mailto:${LEGAL_COMPANY.supportEmail}`}>{LEGAL_COMPANY.supportEmail}</a></li>
-        <li>Libro de Reclamaciones virtual disponible en la Plataforma (conforme al D.S. N° 011-2011-PCM).</li>
+        <li><a href="/libro-de-reclamaciones">Libro de Reclamaciones virtual</a> disponible en la Plataforma (conforme al D.S. N° 011-2011-PCM).</li>
       </ul>
       <p>
         Atenderemos tu reclamo dentro del plazo legal de quince (15) días hábiles, prorrogable por

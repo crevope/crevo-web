@@ -28,6 +28,18 @@ button, [role="button"] {
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* ─── Crevo brand tokens (stable, do NOT invert between themes) ──────────── */
+  --color-brand-primary: var(--brand-primary);         /* #0A192F navy */
+  --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-secondary: var(--brand-secondary);     /* #D4AF37 gold */
+  --color-brand-secondary-hover: var(--brand-secondary-hover);
+  --color-brand-accent: var(--brand-accent);           /* #00E5FF cyan */
+  --color-brand-surface: var(--brand-surface);         /* page background */
+  --color-brand-card: var(--brand-card);               /* card background */
+  --color-brand-text: var(--brand-text);               /* primary text */
+  --color-brand-text-muted: var(--brand-text-muted);
+  --color-brand-border: var(--brand-border);
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -87,6 +99,18 @@ button, [role="button"] {
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Crevo brand — light */
+  --brand-primary: #0A192F;
+  --brand-primary-hover: #112240;
+  --brand-secondary: #D4AF37;
+  --brand-secondary-hover: #B8932D;
+  --brand-accent: #00E5FF;
+  --brand-surface: #F8FAFC;
+  --brand-card: #FFFFFF;
+  --brand-text: #0A192F;
+  --brand-text-muted: #64748B;
+  --brand-border: #E2E8F0;
 }
 
 /* ─── Dark mode — Oscuro Premium ─────────────────────────────────────────── */
@@ -123,6 +147,18 @@ button, [role="button"] {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Crevo brand — dark (los tres de marca NO invierten; sólo surface/card/text se adaptan) */
+  --brand-primary: #0A192F;
+  --brand-primary-hover: #112240;
+  --brand-secondary: #D4AF37;
+  --brand-secondary-hover: #E6C24A;
+  --brand-accent: #00E5FF;
+  --brand-surface: #0F172A;
+  --brand-card: #1E293B;
+  --brand-text: #F1F5F9;
+  --brand-text-muted: #94A3B8;
+  --brand-border: rgba(255, 255, 255, 0.06);
 }
 
 /* ─── Base ────────────────────────────────────────────────────────────────── */

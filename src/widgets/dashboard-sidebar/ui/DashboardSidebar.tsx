@@ -20,6 +20,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/loans',        icon: 'fa-solid fa-wallet',               label: 'Mis Préstamos', matchPrefix: '/loans' },
   { href: '/payments',     icon: 'fa-solid fa-money-bill-transfer',  label: 'Pagos' },
   { href: '/notifications',icon: 'fa-regular fa-bell',               label: 'Notificaciones' },
+  { href: '/my-complaints', icon: 'fa-solid fa-book',                label: 'Mis Reclamos' },
   { href: '/profile',      icon: 'fa-solid fa-user',                 label: 'Mi Perfil' },
 ]
 

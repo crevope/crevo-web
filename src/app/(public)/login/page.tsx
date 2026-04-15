@@ -67,11 +67,11 @@ export default function LoginPage() {
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
                   Al continuar, aceptas nuestros{' '}
-                  <Link href="#" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline">
+                  <Link href="/terminos-y-condiciones" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline">
                     Términos de Uso
                   </Link>{' '}
                   y{' '}
-                  <Link href="#" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline">
+                  <Link href="/politica-de-privacidad" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline">
                     Política de Privacidad
                   </Link>.
                 </p>
