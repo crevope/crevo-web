@@ -19,7 +19,7 @@ export default function RegisterPage() {
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF] text-[13px] font-medium mb-8">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-                Préstamos 100% digitales • Regulado por SBS
+                Préstamos 100% digitales • Empresa peruana
               </div>
 
               <h1 className="text-[33px] font-bold mb-4 leading-tight">
@@ -92,7 +92,7 @@ export default function RegisterPage() {
       <footer className="w-full py-5 px-4 text-center">
         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-2">
           <i className="fa-solid fa-lock" />
-          © {CURRENT_YEAR} Crevo. Conexión segura 256-bits • Regulado por SBS
+          © {CURRENT_YEAR} Crevo. Conexión segura 256-bits • Sujeto Obligado UIF-Perú
         </p>
       </footer>
     </div>

@@ -363,7 +363,7 @@ export function LoanSimulator() {
         <p className="max-w-2xl">
           Simulación referencial. Los valores reales, incluyendo TEA y TCEA, se calcularán en base
           a tu perfil crediticio y serán detallados en tu propuesta oficial antes de aceptar el
-          préstamo. Crevo Plus requiere mínimo 10 préstamos cancelados. Regulado por la SBS.
+          préstamo. Crevo Plus requiere mínimo 10 préstamos cancelados.
         </p>
       </div>
     </>

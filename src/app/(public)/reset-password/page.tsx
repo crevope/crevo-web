@@ -221,7 +221,7 @@ export default function ResetPasswordPage() {
               <div className="bg-white/8 backdrop-blur-md rounded-lg p-5 border border-white/15 hover:-translate-y-1 transition-transform duration-500">
                 <div className="flex items-center justify-between mb-5">
                   <i className="fa-solid fa-shield-halved text-[#00E5FF]" />
-                  <span className="text-white/60 text-xs">Seguridad SBS</span>
+                  <span className="text-white/60 text-xs">Seguridad bancaria</span>
                 </div>
                 <h3 className="text-white text-base font-semibold mb-1.5">Protección Avanzada</h3>
                 <p className="text-white/60 text-sm leading-relaxed">
@@ -264,7 +264,7 @@ export default function ResetPasswordPage() {
 
       <footer className="w-full py-6 px-4 text-center">
         <p className="text-xs text-gray-400 dark:text-gray-500">
-          © {CURRENT_YEAR} Crevo. Regulado por la SBS. Conexión segura 256-bits.
+          © {CURRENT_YEAR} Crevo. Sujeto Obligado UIF-Perú. Conexión segura 256-bits.
         </p>
       </footer>
     </div>

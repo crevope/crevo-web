@@ -1,5 +1,5 @@
 'use client'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -8,6 +8,12 @@ import { Loader2 } from 'lucide-react'
 import { Checkbox } from '@/shared/ui/checkbox'
 import { registerSchema, type RegisterInput } from '../lib/authSchemas'
 import { useAuthStore } from '../model/useAuthStore'
+import {
+  legalRepository,
+  LEGAL_DOCUMENT_TYPES,
+  LEGAL_VERSIONS,
+  LEGAL_URLS,
+} from '@/features/legal'
 
 const inputCls =
   'w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-[#334155] bg-[#F8FAFC] dark:bg-[#1E293B] text-[#0A192F] dark:text-[#F1F5F9] text-sm placeholder-gray-400 dark:placeholder-[#64748B] focus:outline-none focus:border-[#0A192F] dark:focus:border-[#D4AF37] focus:ring-2 focus:ring-[#0A192F]/20 dark:focus:ring-[#D4AF37]/20 focus:bg-white dark:focus:bg-[#0F172A] transition-all'
@@ -20,16 +26,27 @@ export function RegisterForm() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { firstName: '', lastName: '', dni: '', phone: '', email: '', password: '', confirmPassword: '' },
+    defaultValues: { firstName: '', lastName: '', dni: '', phone: '', email: '', password: '', confirmPassword: '', acceptTerms: false as unknown as true },
   })
 
   const onSubmit = async (values: RegisterInput) => {
     try {
-      const { confirmPassword: _, ...dto } = values
+      const { confirmPassword: _, acceptTerms: __, ...dto } = values
       await registerUser(dto)
+
+      // Record the three legal acceptances bundled in the registration checkbox.
+      // Best-effort: the user is already registered; if these fail we still proceed
+      // (the auditMiddleware on the backend logs the failure).
+      legalRepository.acceptMany([
+        { documentType: LEGAL_DOCUMENT_TYPES.TERMS,              documentVersion: LEGAL_VERSIONS.TERMS },
+        { documentType: LEGAL_DOCUMENT_TYPES.PRIVACY,            documentVersion: LEGAL_VERSIONS.PRIVACY },
+        { documentType: LEGAL_DOCUMENT_TYPES.CREDIT_BUREAU_AUTH, documentVersion: LEGAL_VERSIONS.CREDIT_BUREAU_AUTH },
+      ]).catch(() => { /* swallow — do not block the post-register flow */ })
+
       toast.success('¡Cuenta creada! Revisa tu email para verificar tu cuenta.')
       router.push('/dashboard')
     } catch (err: unknown) {
@@ -177,15 +194,36 @@ export function RegisterForm() {
       </div>
 
       {/* Terms */}
-      <div className="flex items-start gap-3 pt-1">
-        <Checkbox id="terms" className="mt-0.5" />
-        <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-400 leading-tight cursor-pointer">
-          He leído y acepto los{' '}
-          <a href="#" className="text-[#0A192F] dark:text-[#D4AF37] hover:underline font-medium">Términos y Condiciones</a>,
-          la{' '}
-          <a href="#" className="text-[#0A192F] dark:text-[#D4AF37] hover:underline font-medium">Política de Privacidad</a>
-          {' '}y autorizo la consulta de mi historial crediticio en la SBS.
-        </label>
+      <div className="pt-1">
+        <div className="flex items-start gap-3">
+          <Controller
+            name="acceptTerms"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                id="terms"
+                className="mt-0.5"
+                checked={!!field.value}
+                onCheckedChange={(checked) => field.onChange(checked === true)}
+              />
+            )}
+          />
+          <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-400 leading-snug cursor-pointer">
+            He leído y acepto los{' '}
+            <a href={LEGAL_URLS.TERMS} target="_blank" rel="noopener noreferrer" className="text-[#0A192F] dark:text-[#D4AF37] hover:underline font-medium">
+              Términos y Condiciones
+            </a>
+            , la{' '}
+            <a href={LEGAL_URLS.PRIVACY} target="_blank" rel="noopener noreferrer" className="text-[#0A192F] dark:text-[#D4AF37] hover:underline font-medium">
+              Política de Privacidad
+            </a>
+            {' '}y autorizo a Crevo a consultar mi historial crediticio en las centrales de
+            riesgo (Equifax, Sentinel u otras) para evaluar mis solicitudes de préstamo.
+          </label>
+        </div>
+        {errors.acceptTerms && (
+          <p className="text-xs text-red-500 mt-1.5 ml-7">{errors.acceptTerms.message}</p>
+        )}
       </div>
 
       {/* Submit */}

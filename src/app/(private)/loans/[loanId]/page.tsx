@@ -859,7 +859,7 @@ export default function LoanDetailPage() {
                 )
               })()}
 
-              {/* Hoja Resumen SBS */}
+              {/* Hoja Resumen — formato SBS Res. 8181-2012 (aplicación voluntaria) */}
               {(() => {
                 const available = ['APPROVED', 'SIGNED', 'DISBURSED', 'ACTIVE', 'OVERDUE', 'PAID'].includes(loan.status)
                 return (
@@ -873,9 +873,9 @@ export default function LoanDetailPage() {
                         <i className="fa-solid fa-file-lines text-sm" />
                       </div>
                       <div>
-                        <h4 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Hoja Resumen SBS</h4>
+                        <h4 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Hoja Resumen</h4>
                         <p className="text-xs text-gray-500">
-                          {available ? 'Res. SBS N° 8181-2012 — costos y condiciones' : 'Disponible al aprobar el préstamo'}
+                          {available ? 'Detalle de costos y condiciones (formato SBS Res. 8181-2012)' : 'Disponible al aprobar el préstamo'}
                         </p>
                       </div>
                     </div>
@@ -1348,7 +1348,7 @@ export default function LoanDetailPage() {
                     onClick={handleDownloadSummary}
                     className="text-[#1A56FF] dark:text-blue-400 font-semibold underline underline-offset-2 hover:no-underline"
                   >
-                    Hoja Resumen SBS
+                    Hoja Resumen
                   </button>
                 </span>
               </label>

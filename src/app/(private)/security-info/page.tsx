@@ -109,7 +109,7 @@ const SECTIONS: SecuritySection[] = [
     id: 'regulation',
     icon: 'fa-solid fa-building-columns',
     title: 'Marco regulatorio',
-    subtitle: 'Operamos bajo la supervisión de las autoridades peruanas.',
+    subtitle: 'Cumplimos con las leyes peruanas que nos resultan aplicables.',
     color: 'text-amber-600 dark:text-amber-400',
     bg: 'bg-amber-100 dark:bg-amber-900/30',
     border: 'border-amber-200 dark:border-amber-700/40',
@@ -117,18 +117,28 @@ const SECTIONS: SecuritySection[] = [
     items: [
       {
         icon: 'fa-solid fa-landmark',
-        title: 'Supervisado por la SBS',
-        body: 'Crevo opera bajo la supervisión de la Superintendencia de Banca, Seguros y AFP (SBS), el organismo regulador del sistema financiero peruano. Puedes presentar reclamos ante la SBS al número 0-800-10840 (gratuito).',
+        title: 'Sujeto Obligado ante la UIF-Perú',
+        body: 'Crevo es sujeto obligado ante la Unidad de Inteligencia Financiera (UIF-Perú), órgano de la SBS, en materia de prevención del lavado de activos y financiamiento del terrorismo, conforme a la Ley N° 27693 y la Resolución SBS N° 789-2018-SBS. Reportamos operaciones sospechosas y mantenemos un programa interno de cumplimiento PLAFT.',
       },
       {
         icon: 'fa-solid fa-file-shield',
         title: 'Protección de datos personales — Ley N° 29733',
-        body: 'Tratamos tus datos conforme a la Ley de Protección de Datos Personales del Perú. Tus datos solo se usan para los fines declarados. Puedes solicitar la eliminación de tu cuenta y datos en cualquier momento desde tu perfil.',
+        body: 'Tratamos tus datos conforme a la Ley de Protección de Datos Personales del Perú, fiscalizada por la Autoridad Nacional de Protección de Datos Personales (ANPDP). Tus datos solo se usan para los fines declarados. Puedes solicitar la eliminación de tu cuenta y datos en cualquier momento desde tu perfil.',
       },
       {
         icon: 'fa-solid fa-scale-balanced',
-        title: 'Hoja Resumen SBS',
-        body: 'Por cada préstamo aprobado generamos una Hoja Resumen conforme a la Resolución SBS N° 8181-2012, donde se detallan en lenguaje claro todos los costos, tasas y condiciones del crédito.',
+        title: 'Hoja Resumen — formato SBS Res. 8181-2012',
+        body: 'Aplicamos voluntariamente el formato de Hoja Resumen establecido por la Resolución SBS N° 8181-2012 para entidades del sistema financiero, donde se detallan en lenguaje claro todos los costos, tasas y condiciones del crédito antes de la firma.',
+      },
+      {
+        icon: 'fa-solid fa-percent',
+        title: 'Topes de tasa BCRP — Ley N° 31143',
+        body: 'La TCEA aplicada a tus préstamos respeta los topes máximos de tasa de interés convencional compensatoria publicados semestralmente por el Banco Central de Reserva del Perú (BCRP) para créditos de consumo y MYPE.',
+      },
+      {
+        icon: 'fa-solid fa-handshake',
+        title: 'Protección al consumidor — INDECOPI',
+        body: 'Cumplimos con el Código de Protección y Defensa del Consumidor (Ley N° 29571). Contamos con Libro de Reclamaciones virtual en la plataforma conforme al D.S. N° 011-2011-PCM. Atendemos reclamos en máximo 15 días hábiles.',
       },
     ],
   },
@@ -166,7 +176,7 @@ const SECTIONS: SecuritySection[] = [
 const STATS = [
   { icon: 'fa-solid fa-lock',            value: 'AES-256',    label: 'Estándar de cifrado' },
   { icon: 'fa-solid fa-shield-halved',   value: '100%',       label: 'Tráfico cifrado HTTPS' },
-  { icon: 'fa-solid fa-building-columns',value: 'SBS',        label: 'Supervisión regulatoria' },
+  { icon: 'fa-solid fa-building-columns',value: 'UIF-Perú',   label: 'Sujeto Obligado PLAFT' },
   { icon: 'fa-solid fa-clock',           value: '15 min',     label: 'Expiración de sesión' },
 ]
 

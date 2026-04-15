@@ -454,3 +454,84 @@ button, [role="button"] {
     transform: translateY(0);
   }
 }
+
+/* ── Legal pages typography (T&C, Privacy, Cookies) ──────────────────────── */
+.legal-prose h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 2rem 0 0.75rem;
+  color: inherit;
+  scroll-margin-top: 2rem;
+}
+
+.legal-prose h3 {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+  color: inherit;
+}
+
+.legal-prose p {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  margin: 0.75rem 0;
+  color: rgb(75 85 99);
+}
+
+.dark .legal-prose p {
+  color: rgb(203 213 225);
+}
+
+.legal-prose ul,
+.legal-prose ol {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  margin: 0.75rem 0 0.75rem 1.5rem;
+  color: rgb(75 85 99);
+}
+
+.dark .legal-prose ul,
+.dark .legal-prose ol {
+  color: rgb(203 213 225);
+}
+
+.legal-prose ul {
+  list-style: disc;
+}
+
+.legal-prose ol {
+  list-style: decimal;
+}
+
+.legal-prose li {
+  margin: 0.25rem 0;
+}
+
+.legal-prose strong {
+  font-weight: 600;
+  color: inherit;
+}
+
+.legal-prose a {
+  color: #0A192F;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dark .legal-prose a {
+  color: #D4AF37;
+}
+
+.legal-prose .callout {
+  border: 1px solid rgb(229 231 235);
+  background: rgb(248 250 252);
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  font-size: 0.9rem;
+}
+
+.dark .legal-prose .callout {
+  border-color: rgb(51 65 85);
+  background: rgb(30 41 59);
+}

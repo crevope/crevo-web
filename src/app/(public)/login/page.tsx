@@ -84,7 +84,7 @@ export default function LoginPage() {
       <footer className="w-full py-6 px-4 text-center">
         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-2">
           <i className="fa-solid fa-lock" />
-          © {CURRENT_YEAR} Crevo. Conexión segura 256-bits • Regulado por SBS
+          © {CURRENT_YEAR} Crevo. Conexión segura 256-bits • Sujeto Obligado UIF-Perú
         </p>
       </footer>
     </div>

@@ -15,6 +15,12 @@ import { bankAccountRepository, type BankAccount } from '@/features/request-loan
 import { catalogRepository, type BankEntry } from '@/shared/api/catalogRepository'
 import { kycRepository } from '@/features/upload-kyc'
 import { useAuthStore, authRepository } from '@/features/auth'
+import {
+  legalRepository,
+  LEGAL_DOCUMENT_TYPES,
+  LEGAL_VERSIONS,
+  LEGAL_URLS,
+} from '@/features/legal'
 import { formatCurrency, shortName } from '@/shared/lib/utils'
 import { InfoTooltip } from '@/shared/ui/info-tooltip'
 import {
@@ -263,13 +269,37 @@ export default function RequestLoanPage() {
 
   const onSubmit = async (values: RequestInput) => {
     try {
-      await requestLoan({
+      const loan = await requestLoan({
         amount: values.amount,
         productType: values.productType,
         paymentFrequency: values.frequency,
         numInstallments: values.installments,
         bankAccountId: values.bankAccountId || undefined,
       })
+
+      // Record the legal acceptances tied to this specific loan request.
+      // Best-effort: failure here must not roll back the loan request.
+      legalRepository.acceptMany([
+        {
+          documentType: LEGAL_DOCUMENT_TYPES.LOAN_TERMS,
+          documentVersion: LEGAL_VERSIONS.LOAN_TERMS,
+          resourceId: loan.id,
+          resourceType: 'loan',
+          metadata: {
+            amount: values.amount,
+            productType: values.productType,
+            frequency: values.frequency,
+            installments: values.installments,
+          },
+        },
+        {
+          documentType: LEGAL_DOCUMENT_TYPES.CREDIT_BUREAU_AUTH,
+          documentVersion: LEGAL_VERSIONS.CREDIT_BUREAU_AUTH,
+          resourceId: loan.id,
+          resourceType: 'loan',
+        },
+      ]).catch(() => { /* swallow — loan request already succeeded */ })
+
       toast.success('¡Solicitud enviada! Te notificaremos cuando sea aprobada.')
       router.push('/loans')
     } catch (err: unknown) {
@@ -709,7 +739,7 @@ export default function RequestLoanPage() {
                       className="mt-0.5"
                     />
                     <span className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                      Autorizo a Crevo a consultar mi historial crediticio en las Centrales de Riesgo (Equifax/Sentinel) conforme a la normativa SBS para evaluar esta solicitud.
+                      Autorizo a Crevo a consultar mi historial crediticio en las Centrales de Riesgo (Equifax/Sentinel) conforme a la Ley N° 27489 para evaluar esta solicitud.
                     </span>
                   </label>
                   {form.formState.errors.consentCredit && (
@@ -723,10 +753,11 @@ export default function RequestLoanPage() {
                     />
                     <span className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                       Acepto los{' '}
-                      <Link href="#" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline">Términos y Condiciones</Link>
+                      <Link href={LEGAL_URLS.TERMS} target="_blank" rel="noopener noreferrer" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline">Términos y Condiciones</Link>
                       {' '}y la{' '}
-                      <Link href="#" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline">Política de Privacidad</Link>
-                      {' '}de Crevo.
+                      <Link href={LEGAL_URLS.PRIVACY} target="_blank" rel="noopener noreferrer" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline">Política de Privacidad</Link>
+                      {' '}de Crevo, así como las condiciones específicas de este préstamo
+                      (monto, cuotas, TCEA y costos detallados en el resumen).
                     </span>
                   </label>
                   {form.formState.errors.consentTerms && (
@@ -737,7 +768,7 @@ export default function RequestLoanPage() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-100 dark:border-white/6 pt-5">
                   <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1.5">
                     <i className="fa-solid fa-lock text-[#0A192F] dark:text-[#D4AF37]" />
-                    Protegido por Ley N° 29733 · Regulado por SBS
+                    Protegido por Ley N° 29733 · Sujeto Obligado UIF-Perú
                   </p>
                   <button
                     type="submit"
@@ -868,7 +899,7 @@ export default function RequestLoanPage() {
 
                 <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
                   <i className="fa-solid fa-shield-halved mr-1" />
-                  Datos cifrados con AES-256 · Supervisado por SBS · Ley N° 29733
+                  Datos cifrados con AES-256 · Sujeto Obligado UIF-Perú · Ley N° 29733
                 </p>
               </div>
             </div>

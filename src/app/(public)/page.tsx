@@ -29,12 +29,12 @@ export default function LandingPage() {
               {/* Badge light */}
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00E5FF]/10 border border-[#00E5FF]/25 text-[#0A192F] text-xs font-medium mb-7 dark:hidden">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-                Préstamos 100% digitales • Regulado por SBS
+                Préstamos 100% digitales • Empresa peruana
               </div>
               {/* Badge dark */}
               <div className="hidden dark:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00E5FF]/15 border border-[#00E5FF]/30 text-[#00E5FF] text-xs font-medium mb-7">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-                Préstamos 100% digitales • Regulado por SBS
+                Préstamos 100% digitales • Empresa peruana
               </div>
 
               {/* H1 light */}
@@ -199,7 +199,7 @@ export default function LandingPage() {
             <p className="mt-5 text-xs text-gray-500 font-medium flex items-center justify-center gap-3 flex-wrap relative z-10">
               <span className="flex items-center gap-1.5"><i className="fa-solid fa-lock" /> Datos protegidos por ley</span>
               <span>•</span>
-              <span className="flex items-center gap-1.5"><i className="fa-solid fa-building-columns" /> Regulado por SBS</span>
+              <span className="flex items-center gap-1.5"><i className="fa-solid fa-building-columns" /> Sujeto Obligado UIF-Perú</span>
             </p>
           </div>
 
@@ -243,7 +243,7 @@ export default function LandingPage() {
             <p className="mt-5 text-xs text-gray-400 font-medium flex items-center justify-center gap-3 flex-wrap relative z-10">
               <span className="flex items-center gap-1.5"><i className="fa-solid fa-lock" /> Datos protegidos por ley</span>
               <span>•</span>
-              <span className="flex items-center gap-1.5"><i className="fa-solid fa-building-columns" /> Regulado por SBS</span>
+              <span className="flex items-center gap-1.5"><i className="fa-solid fa-building-columns" /> Sujeto Obligado UIF-Perú</span>
             </p>
           </div>
         </section>
@@ -273,8 +273,8 @@ export default function LandingPage() {
                 <div className="w-11 h-11 rounded-lg bg-[#0A192F]/8 dark:bg-[#D4AF37]/10 flex items-center justify-center mb-5">
                   <i className="fa-solid fa-building-shield text-lg text-[#0A192F] dark:text-[#D4AF37]" />
                 </div>
-                <h3 className="text-base font-semibold text-[#0A192F] dark:text-white mb-2">Regulado y Seguro</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Tus datos están protegidos con encriptación de nivel bancario. Operamos bajo las normativas de la SBS.</p>
+                <h3 className="text-base font-semibold text-[#0A192F] dark:text-white mb-2">Empresa Peruana Confiable</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Tus datos están protegidos con encriptación de nivel bancario. Cumplimos con la Ley N° 29733 y aplicamos voluntariamente los estándares de transparencia SBS para tasas y costos.</p>
               </div>
 
               <div className="p-6 rounded-lg bg-[#F8FAFC] dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 hover:border-gray-200 dark:hover:border-white/10 transition-colors">
@@ -400,17 +400,17 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ─── SBS BADGE ────────────────────────────────────────────────────── */}
-        <section id="sbs-badge" className="w-full py-12 px-6 sm:px-10 lg:px-16 xl:px-24 bg-white dark:bg-[#0F172A] border-t border-gray-200 dark:border-[#334155]">
+        {/* ─── COMPLIANCE BADGE ─────────────────────────────────────────────── */}
+        <section id="compliance-badge" className="w-full py-12 px-6 sm:px-10 lg:px-16 xl:px-24 bg-white dark:bg-[#0F172A] border-t border-gray-200 dark:border-[#334155]">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-lg bg-[#0A192F]/8 dark:bg-[#D4AF37]/10 flex items-center justify-center">
-                  <i className="fa-solid fa-building-columns text-lg text-[#0A192F] dark:text-[#D4AF37]" />
+                  <i className="fa-solid fa-shield-halved text-lg text-[#0A192F] dark:text-[#D4AF37]" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-[#0A192F] dark:text-white mb-0.5">Regulado por la SBS</h3>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">Superintendencia de Banca, Seguros y AFP del Perú</p>
+                  <h3 className="text-sm font-semibold text-[#0A192F] dark:text-white mb-0.5">Cumplimiento normativo peruano</h3>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">INDECOPI · ANPDP · UIF-Perú · BCRP</p>
                 </div>
               </div>
               <div className="flex items-center gap-6 flex-wrap justify-center">
@@ -419,8 +419,8 @@ export default function LandingPage() {
                   <p className="text-sm font-semibold text-[#0A192F] dark:text-white">256-bit</p>
                 </div>
                 <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#1E293B] rounded-lg border border-gray-200 dark:border-[#334155]">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Cumplimiento</p>
-                  <p className="text-sm font-semibold text-[#0A192F] dark:text-white">ISO 27001</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">PLAFT</p>
+                  <p className="text-sm font-semibold text-[#0A192F] dark:text-white">UIF-Perú</p>
                 </div>
                 <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#1E293B] rounded-lg border border-gray-200 dark:border-[#334155]">
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Protección de Datos</p>
@@ -461,8 +461,9 @@ export default function LandingPage() {
               <h4 className="text-white font-semibold mb-4 text-sm">Empresa</h4>
               <ul className="space-y-2 text-sm">
                 <li><Link href="#nosotros" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Nosotros</Link></li>
-                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Términos y Condiciones</Link></li>
-                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Política de Privacidad</Link></li>
+                <li><Link href="/terminos-y-condiciones" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Términos y Condiciones</Link></li>
+                <li><Link href="/politica-de-privacidad" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Política de Privacidad</Link></li>
+                <li><Link href="/politica-de-cookies" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Política de Cookies</Link></li>
               </ul>
             </div>
 
@@ -477,7 +478,7 @@ export default function LandingPage() {
           </div>
 
           <div className="pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">© {CURRENT_YEAR} Crevo. Todos los derechos reservados. Regulado por la SBS.</p>
+            <p className="text-gray-400 text-sm">© {CURRENT_YEAR} Crevo. Todos los derechos reservados. Sujeto Obligado UIF-Perú.</p>
             <div className="flex items-center gap-4">
               <Link href="#" className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-[#D4AF37] hover:bg-gray-700 transition-all">
                 <i className="fa-brands fa-facebook-f" />
