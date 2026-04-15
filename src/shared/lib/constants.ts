@@ -12,6 +12,4 @@ export const PAYMENT_METHODS = [
   { value: 'CASH', label: 'Efectivo', icon: '💵' },
 ] as const
 
-export const TOKEN_KEY = 'crevo_token'
-
 export const CURRENT_YEAR = new Date().getFullYear()

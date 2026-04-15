@@ -1,33 +1,61 @@
 import axios, { AxiosError } from 'axios'
 import { env } from '@/shared/config/env'
 
-export const TOKEN_KEY         = 'crevo_token'
-export const REFRESH_TOKEN_KEY = 'crevo_refresh_token'
+// ─── Cookie names shared with the backend ────────────────────────────────────
+// Must stay in sync with `src/shared/utils/authCookies.ts` on the server.
+
+/** Readable CSRF cookie (non-HttpOnly). The SPA reads it and echoes it back
+ *  in the `X-CSRF-Token` header on every mutating request. */
+const CSRF_COOKIE_NAME = 'crevo_csrf'
+const CSRF_HEADER_NAME = 'X-CSRF-Token'
+
+/** Key under which we cache the user profile for client-side hydration. The
+ *  auth token itself is never stored — it lives in an HttpOnly cookie only. */
+export const USER_STORAGE_KEY = 'crevo_user'
+
+// ─── Axios instance ──────────────────────────────────────────────────────────
 
 export const apiClient = axios.create({
   baseURL: env.apiUrl,
   headers: { 'Content-Type': 'application/json' },
+  // withCredentials is THE switch that tells the browser to include our
+  // HttpOnly auth cookies on cross-origin API calls. Without it, the server
+  // sees anonymous requests even after a successful login.
+  withCredentials: true,
 })
 
+// ─── Request interceptor: attach CSRF header ─────────────────────────────────
+
 apiClient.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem(TOKEN_KEY)
-    if (token) config.headers.Authorization = `Bearer ${token}`
+  if (typeof window === 'undefined') return config
+
+  // Safe methods don't mutate state and are exempt from CSRF validation.
+  const method = (config.method ?? 'get').toLowerCase()
+  const isSafe = method === 'get' || method === 'head' || method === 'options'
+  if (isSafe) return config
+
+  const csrfToken = readCookie(CSRF_COOKIE_NAME)
+  if (csrfToken) {
+    config.headers = config.headers ?? {}
+    ;(config.headers as Record<string, string>)[CSRF_HEADER_NAME] = csrfToken
   }
   return config
 })
 
-// ── Refresh token interceptor ─────────────────────────────────────────────────
-// Previene múltiples llamadas simultáneas al endpoint de refresh.
-let isRefreshing = false
-let refreshSubscribers: ((token: string) => void)[] = []
+// ─── Response interceptor: transparent refresh on 401 ────────────────────────
+//
+// Prevents a thundering herd: while one request is refreshing, every other
+// 401 is queued and replayed against the new cookie.
 
-function subscribeTokenRefresh(cb: (token: string) => void) {
+let isRefreshing = false
+let refreshSubscribers: Array<() => void> = []
+
+function subscribeToRefresh(cb: () => void) {
   refreshSubscribers.push(cb)
 }
 
-function onTokenRefreshed(newToken: string) {
-  refreshSubscribers.forEach((cb) => cb(newToken))
+function notifyRefreshCompleted() {
+  refreshSubscribers.forEach((cb) => cb())
   refreshSubscribers = []
 }
 
@@ -36,11 +64,13 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as typeof error.config & { _retry?: boolean }
 
-    // Solo intentar refresh en errores 401 que no sean ya del endpoint de refresh/logout
+    // Don't try to refresh when the failure IS on an auth endpoint — no loops.
+    const url = originalRequest?.url ?? ''
     const isAuthEndpoint =
-      originalRequest?.url?.includes('/auth/refresh') ||
-      originalRequest?.url?.includes('/auth/logout') ||
-      originalRequest?.url?.includes('/auth/login')
+      url.includes('/auth/refresh') ||
+      url.includes('/auth/logout') ||
+      url.includes('/auth/login') ||
+      url.includes('/auth/register')
 
     if (
       error.response?.status === 401 &&
@@ -48,59 +78,35 @@ apiClient.interceptors.response.use(
       !originalRequest?._retry &&
       typeof window !== 'undefined'
     ) {
-      const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY)
+      originalRequest._retry = true
 
-      if (refreshToken) {
-        originalRequest._retry = true
+      if (isRefreshing) {
+        // Another request is already refreshing; wait for it and retry.
+        return new Promise((resolve, reject) => {
+          subscribeToRefresh(() => resolve(apiClient(originalRequest)))
+          setTimeout(() => reject(new Error('Refresh timeout')), 10_000)
+        })
+      }
 
-        if (isRefreshing) {
-          // Esperar a que otro request ya en curso termine el refresh
-          return new Promise((resolve, reject) => {
-            subscribeTokenRefresh((newToken) => {
-              if (originalRequest.headers) {
-                originalRequest.headers.Authorization = `Bearer ${newToken}`
-              }
-              resolve(apiClient(originalRequest))
-            })
-            // Timeout de seguridad: si el refresh tarda más de 10s, rechazar
-            setTimeout(() => reject(new Error('Refresh timeout')), 10_000)
-          })
-        }
+      isRefreshing = true
 
-        isRefreshing = true
+      try {
+        // The browser sends the refresh cookie automatically thanks to
+        // `withCredentials: true`. Body is empty — the server reads the
+        // `crevo_rt` cookie, rotates the access cookie, and also rotates the
+        // CSRF cookie so our next request picks up the fresh value.
+        await apiClient.post('/auth/refresh', {})
 
-        try {
-          const { data } = await axios.post(
-            `${apiClient.defaults.baseURL}/auth/refresh`,
-            { refreshToken },
-          )
-          const newToken: string = data.data.token
-          localStorage.setItem(TOKEN_KEY, newToken)
-
-          isRefreshing = false
-          onTokenRefreshed(newToken)
-
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`
-          }
-          return apiClient(originalRequest)
-        } catch {
-          // Refresh falló — limpiar sesión y redirigir a login
-          isRefreshing = false
-          refreshSubscribers = []
-          localStorage.removeItem(TOKEN_KEY)
-          localStorage.removeItem(REFRESH_TOKEN_KEY)
-          localStorage.removeItem('crevo_user')
-          window.location.href = '/login'
-          return Promise.reject(new Error('Sesión expirada. Por favor inicia sesión de nuevo.'))
-        }
-      } else {
-        // No hay refresh token → redirect directo
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem(TOKEN_KEY)
-          localStorage.removeItem('crevo_user')
-          window.location.href = '/login'
-        }
+        isRefreshing = false
+        notifyRefreshCompleted()
+        return apiClient(originalRequest)
+      } catch {
+        // Refresh failed — clear local user cache and kick to login.
+        isRefreshing = false
+        refreshSubscribers = []
+        localStorage.removeItem(USER_STORAGE_KEY)
+        window.location.href = '/login'
+        return Promise.reject(new Error('Sesión expirada. Por favor inicia sesión de nuevo.'))
       }
     }
 
@@ -129,6 +135,22 @@ apiClient.interceptors.response.use(
     return Promise.reject(new Error(message))
   },
 )
+
+// ─── Utility: read a cookie by name ──────────────────────────────────────────
+
+function readCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null
+  const needle = `${encodeURIComponent(name)}=`
+  const pairs = document.cookie.split('; ')
+  for (const pair of pairs) {
+    if (pair.startsWith(needle)) {
+      return decodeURIComponent(pair.slice(needle.length))
+    }
+  }
+  return null
+}
+
+// ─── Rate-limit header parsing ───────────────────────────────────────────────
 
 /**
  * Reads the seconds-until-reset value from the response headers, handling both

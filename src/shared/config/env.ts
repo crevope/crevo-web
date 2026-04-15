@@ -25,6 +25,22 @@ const httpUrl = z
     message: 'must start with http:// or https://',
   })
 
+/**
+ * API URL accepts either:
+ *   - A full URL (`http://...`) — the SPA hits that origin directly.
+ *   - A relative path starting with `/` (e.g. `/api`) — the SPA hits its own
+ *     origin and relies on a reverse proxy / Next.js rewrite to forward to
+ *     the backend. This is the recommended setup in development because it
+ *     keeps auth cookies same-origin regardless of the LAN IP used.
+ */
+const apiUrlSchema = z
+  .string()
+  .trim()
+  .min(1, 'must not be empty')
+  .refine((v) => /^https?:\/\//.test(v) || v.startsWith('/'), {
+    message: 'must be a full URL (http(s)://...) or a relative path starting with "/"',
+  })
+
 const optionalString = z
   .string()
   .trim()
@@ -35,7 +51,7 @@ const optionalString = z
 
 const envSchema = z.object({
   // Required — without these the app cannot work at all.
-  NEXT_PUBLIC_API_URL: httpUrl,
+  NEXT_PUBLIC_API_URL: apiUrlSchema,
 
   // Supabase client (required — auth and storage rely on it).
   NEXT_PUBLIC_SUPABASE_URL: httpUrl,

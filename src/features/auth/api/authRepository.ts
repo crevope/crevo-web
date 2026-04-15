@@ -1,11 +1,20 @@
-import { apiClient, TOKEN_KEY, REFRESH_TOKEN_KEY } from '@/shared/api/client'
+import { apiClient, USER_STORAGE_KEY } from '@/shared/api/client'
 import type { AuthUser } from '@/entities/user'
 
+/**
+ * Auth API adapter.
+ *
+ * Access/refresh tokens are transported exclusively via HttpOnly cookies set
+ * by the backend — the SPA never sees or stores them. This repository only
+ * owns the cached `user` profile in localStorage for fast client-side
+ * hydration before /auth/me resolves.
+ */
 export const authRepository = {
-  async login(email: string, password: string): Promise<{ user: AuthUser; token: string; refreshToken: string }> {
+  async login(email: string, password: string): Promise<{ user: AuthUser }> {
     const { data } = await apiClient.post('/auth/login', { email, password })
-    // Backend returns: { token, refreshToken, user: { id, email, firstName, lastName, isIdentityVerified } }
-    const { token, refreshToken, user: u } = data.data
+    // Backend returns: { user: { id, email, firstName, lastName, emailVerified, isIdentityVerified } }
+    // Cookies (crevo_at, crevo_rt, crevo_csrf) are set server-side via Set-Cookie.
+    const u = data.data.user
     const user: AuthUser = {
       id: u.id,
       email: u.email,
@@ -14,29 +23,31 @@ export const authRepository = {
       emailVerified: u.emailVerified ?? false,
       isIdentityVerified: u.isIdentityVerified ?? false,
     }
-    return { user, token, refreshToken: refreshToken ?? '' }
+    return { user }
   },
 
   async register(dto: {
     email: string; password: string; firstName: string
     lastName: string; dni: string; phone: string
-  }): Promise<{ user: AuthUser; token: string; refreshToken: string }> {
+  }): Promise<{ user: AuthUser }> {
     const { data } = await apiClient.post('/auth/register', dto)
-    // Backend returns flat: { id, email, firstName, lastName, emailVerified, token, refreshToken }
-    const { token, refreshToken, id, email, firstName, lastName, emailVerified } = data.data
+    // Backend returns: { id, email, firstName, lastName, emailVerified }
+    const { id, email, firstName, lastName, emailVerified } = data.data
     const user: AuthUser = {
       id, email, firstName, lastName,
       emailVerified: emailVerified ?? false,
       isIdentityVerified: false,
     }
-    return { user, token, refreshToken: refreshToken ?? '' }
+    return { user }
   },
 
-  async logout(refreshToken: string): Promise<void> {
+  async logout(): Promise<void> {
     try {
-      await apiClient.post('/auth/logout', { refreshToken })
+      // The refresh cookie travels automatically thanks to withCredentials.
+      await apiClient.post('/auth/logout', {})
     } catch {
-      // Logout del backend falla silenciosamente — la sesión local ya se limpió
+      // Logout is best-effort; server-side cleanup is idempotent and the
+      // browser cookie state is cleared regardless.
     }
   },
 
@@ -76,23 +87,17 @@ export const authRepository = {
     }
   },
 
-  saveToken(token: string) { localStorage.setItem(TOKEN_KEY, token) },
-  clearToken() { localStorage.removeItem(TOKEN_KEY) },
-  getToken(): string | null {
-    if (typeof window === 'undefined') return null
-    return localStorage.getItem(TOKEN_KEY)
-  },
-  saveRefreshToken(token: string) { localStorage.setItem(REFRESH_TOKEN_KEY, token) },
-  clearRefreshToken() { localStorage.removeItem(REFRESH_TOKEN_KEY) },
-  getRefreshToken(): string | null {
-    if (typeof window === 'undefined') return null
-    return localStorage.getItem(REFRESH_TOKEN_KEY)
-  },
-  saveUser(user: AuthUser) { localStorage.setItem('crevo_user', JSON.stringify(user)) },
-  clearUser() { localStorage.removeItem('crevo_user') },
+  // ── User profile cache (localStorage) ──────────────────────────────────
+  // We still cache the `user` object so the UI can render immediately on
+  // refresh without waiting for /auth/me. This is NOT the security boundary:
+  // the server treats every request as anonymous unless it carries a valid
+  // HttpOnly auth cookie.
+
+  saveUser(user: AuthUser) { localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user)) },
+  clearUser() { localStorage.removeItem(USER_STORAGE_KEY) },
   getStoredUser(): AuthUser | null {
     if (typeof window === 'undefined') return null
-    const raw = localStorage.getItem('crevo_user')
+    const raw = localStorage.getItem(USER_STORAGE_KEY)
     if (!raw || raw === 'undefined') return null
     try { return JSON.parse(raw) } catch { return null }
   },

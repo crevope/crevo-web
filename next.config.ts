@@ -1,7 +1,35 @@
 import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs'
 
-const nextConfig: NextConfig = {}
+/**
+ * Backend upstream for the `/api/*` rewrite.
+ *
+ * Only read server-side — it MUST NOT be a `NEXT_PUBLIC_` variable, otherwise
+ * it would be inlined into the client bundle and exposed to the browser.
+ *
+ * When set, every request the SPA makes to `/api/<path>` is transparently
+ * forwarded by the Next.js dev server (or Vercel/Node in prod) to the backend.
+ * This keeps auth cookies same-origin with the frontend and eliminates cross-
+ * site SameSite headaches whether you browse at `localhost`, the LAN IP, or
+ * from your phone pointing at your dev machine.
+ *
+ * When unset, no rewrite is added — the SPA must hit the API directly via
+ * `NEXT_PUBLIC_API_URL`. Useful for previews where the frontend is served by
+ * the same process as the API.
+ */
+const BACKEND_UPSTREAM_URL = process.env.BACKEND_UPSTREAM_URL?.replace(/\/+$/, '')
+
+const nextConfig: NextConfig = {
+  async rewrites() {
+    if (!BACKEND_UPSTREAM_URL) return []
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${BACKEND_UPSTREAM_URL}/api/:path*`,
+      },
+    ]
+  },
+}
 
 export default withSentryConfig(nextConfig, {
   // URL de tu organización/proyecto en Sentry (para source maps)
