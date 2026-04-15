@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { LoanSimulator } from '@/features/simulator/ui/LoanSimulator'
+import { RepresentativeExample } from '@/features/simulator/ui/RepresentativeExample'
 import { LandingHeader } from '@/shared/ui/landing-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
 
@@ -330,6 +331,13 @@ export default function LandingPage() {
               <p className="text-sm text-gray-400 dark:text-gray-500">Calcula tu cuota en segundos</p>
             </div>
             <LoanSimulator />
+          </div>
+
+          {/* Ejemplo representativo exigido por SBS Res. 3274-2017 y Ley 28587.
+              Se renderiza bajo el simulador para dar un caso concreto con TEA
+              y TCEA incluso a usuarios que no interactúan con los controles. */}
+          <div className="mt-6">
+            <RepresentativeExample />
           </div>
         </section>
 

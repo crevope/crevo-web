@@ -340,6 +340,25 @@ export default function DashboardPage() {
                   </span>
                 )}
               </div>
+              {/* ── Tasas del préstamo activo (transparencia SBS Res. 3274-2017)
+                  TEA y TCEA se muestran con igual prominencia. El detalle
+                  completo está en /loans/[id]. */}
+              {activeLoan && (
+                <div className="flex gap-2.5">
+                  <div className="flex-1 bg-white/10 rounded-lg p-3">
+                    <p className="text-[11px] text-gray-300 mb-0.5">TEA</p>
+                    <p className="text-white font-bold text-sm">
+                      {(activeLoan.interestRate * 100).toFixed(2)}%
+                    </p>
+                  </div>
+                  <div className="flex-1 bg-white/10 rounded-lg p-3">
+                    <p className="text-[11px] text-gray-300 mb-0.5">TCEA</p>
+                    <p className="text-white font-bold text-sm">
+                      {(activeLoan.tcea * 100).toFixed(2)}%
+                    </p>
+                  </div>
+                </div>
+              )}
               {activeLoan ? (
                 <div className="flex gap-2.5">
                   <Link

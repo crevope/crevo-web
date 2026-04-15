@@ -316,17 +316,32 @@ export function LoanSimulator() {
                     <span className="font-semibold">S/ {fmt(result.amount)}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Interés (TEA {result.teaPercent.toFixed(0)}%)</span>
-                    <span className="font-semibold text-[#D4AF37]">S/ {fmt(result.totalInterest)}</span>
+                    <span className="text-gray-400">Plazo</span>
+                    <span className="font-semibold">{result.numInstallments} cuota{result.numInstallments > 1 ? 's' : ''} {freqLabel}{result.numInstallments > 1 ? 's' : ''}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Interés</span>
+                    <span className="font-semibold">S/ {fmt(result.totalInterest)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400">Comisiones e IGV</span>
                     <span className="font-semibold">S/ {fmt(totalFees!)}</span>
                   </div>
+
+                  {/* ── Tasas (transparencia SBS Res. 3274-2017) ─────────────
+                      TEA y TCEA se muestran con igual prominencia. La TEA es
+                      la tasa compensatoria; la TCEA incluye además comisiones,
+                      portes e IGV y permite comparar costo total entre ofertas. */}
+                  <div className="w-full h-px bg-gray-700/60 my-2" />
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Plazo</span>
-                    <span className="font-semibold">{result.numInstallments} cuota{result.numInstallments > 1 ? 's' : ''} {freqLabel}{result.numInstallments > 1 ? 's' : ''}</span>
+                    <span className="text-gray-300 font-medium">TEA</span>
+                    <span className="font-semibold text-[#D4AF37]">{result.teaPercent.toFixed(2)}% anual</span>
                   </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-300 font-medium">TCEA</span>
+                    <span className="font-semibold text-[#D4AF37]">{result.tceaPercent.toFixed(2)}% anual</span>
+                  </div>
+
                   <div className="w-full h-px bg-gray-700 my-2" />
                   <div className="flex justify-between items-center text-lg">
                     <span className="font-bold">Total a devolver</span>
