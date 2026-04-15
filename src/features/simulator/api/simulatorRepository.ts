@@ -53,3 +53,39 @@ export async function simulate(params: SimulateParams): Promise<SimulationResult
   const { data } = await apiClient.post('/loans/simulate', params)
   return data.data
 }
+
+/**
+ * Descarga la Hoja Resumen preliminar (Res. SBS 3274-2017) en PDF.
+ *
+ * El endpoint acepta sesión opcional: si el usuario está autenticado, el PDF
+ * sale personalizado con su nombre y DNI; si no, se emite con el rótulo
+ * genérico "Cliente prospectivo". En ambos casos la Hoja es preliminar y
+ * queda sujeta a evaluación crediticia al solicitar el préstamo.
+ */
+export async function downloadSummary(params: SimulateParams): Promise<void> {
+  const response = await apiClient.post('/loans/simulate/summary', params, {
+    responseType: 'blob',
+  })
+
+  // Preferir el filename que manda el backend en Content-Disposition;
+  // si no está accesible (CORS no expone la cabecera), caemos a uno basado
+  // en X-Simulation-Ref, y si tampoco está, un genérico con timestamp.
+  const disposition: string | undefined = response.headers['content-disposition']
+  const simRef: string | undefined = response.headers['x-simulation-ref']
+  let filename = `hoja_resumen_preliminar_${simRef ?? Date.now()}.pdf`
+  if (disposition) {
+    const match = disposition.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i)
+    if (match) filename = decodeURIComponent(match[1])
+  }
+
+  const blob = new Blob([response.data as BlobPart], { type: 'application/pdf' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  // Cedemos el objeto tras un tick para no cancelar la descarga en Firefox.
+  setTimeout(() => URL.revokeObjectURL(url), 0)
+}

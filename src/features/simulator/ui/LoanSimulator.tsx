@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTheme } from 'next-themes'
-import { Zap, TrendingUp, Star, Info } from 'lucide-react'
+import { Zap, TrendingUp, Star, Info, Download, Loader2 } from 'lucide-react'
 import { Skeleton } from '@/shared/ui/skeleton'
 import Link from 'next/link'
-import { simulate, type SimulationResult, type LoanProductType, type PaymentFrequency } from '../api/simulatorRepository'
+import { simulate, downloadSummary, type SimulationResult, type LoanProductType, type PaymentFrequency } from '../api/simulatorRepository'
 import {
   Select,
   SelectContent,
@@ -72,6 +72,8 @@ export function LoanSimulator() {
   const [result, setResult] = useState<SimulationResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [downloadingSummary, setDownloadingSummary] = useState(false)
+  const [summaryError, setSummaryError] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
 
@@ -111,6 +113,28 @@ export function LoanSimulator() {
     const timer = setTimeout(runSimulation, 500)
     return () => clearTimeout(timer)
   }, [runSimulation])
+
+  // ── Descarga de Hoja Resumen preliminar ────────────────────────────────
+  // La Res. SBS 3274-2017 Art. 13 exige que el cliente reciba la Hoja Resumen
+  // "de manera previa a la contratación". Este handler habilita la descarga
+  // desde el simulador antes incluso de solicitar el préstamo; el endpoint
+  // acepta sesión opcional (nombre/DNI si hay auth, anónimo si no).
+  const handleDownloadSummary = async () => {
+    setDownloadingSummary(true)
+    setSummaryError(null)
+    try {
+      await downloadSummary({
+        amount,
+        productType: product,
+        paymentFrequency: frequency,
+        numInstallments: installments,
+      })
+    } catch (err: unknown) {
+      setSummaryError(err instanceof Error ? err.message : 'No se pudo generar la Hoja Resumen.')
+    } finally {
+      setDownloadingSummary(false)
+    }
+  }
 
   const isDark = mounted && resolvedTheme === 'dark'
   const fillColor = isDark ? '#D4AF37' : '#0A192F'
@@ -369,6 +393,33 @@ export function LoanSimulator() {
           >
             Solicitar ahora
           </Link>
+
+          {/* ── Hoja Resumen preliminar (Res. SBS 3274-2017) ─────────────────
+              Descarga el PDF con el desglose de tasas, comisiones e IGV
+              exactos para el escenario simulado. Es preliminar (sujeto a
+              evaluación crediticia) pero permite comparar ofertas antes de
+              firmar. */}
+          <button
+            type="button"
+            onClick={handleDownloadSummary}
+            disabled={downloadingSummary || loading || !result}
+            className="w-full mt-3 py-2.5 px-4 bg-transparent border border-white/20 text-gray-200 hover:bg-white/5 hover:border-white/40 font-medium rounded-xl transition-colors relative z-10 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {downloadingSummary ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Generando PDF…
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4" />
+                Descargar Hoja Resumen (PDF)
+              </>
+            )}
+          </button>
+          {summaryError && (
+            <p className="mt-2 text-xs text-red-300 text-center relative z-10">{summaryError}</p>
+          )}
         </div>
       </div>
 
