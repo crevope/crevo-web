@@ -1,10 +1,11 @@
 import axios, { AxiosError } from 'axios'
+import { env } from '@/shared/config/env'
 
 export const TOKEN_KEY         = 'crevo_token'
 export const REFRESH_TOKEN_KEY = 'crevo_refresh_token'
 
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api',
+  baseURL: env.apiUrl,
   headers: { 'Content-Type': 'application/json' },
 })
 
@@ -103,6 +104,24 @@ apiClient.interceptors.response.use(
       }
     }
 
+    // ── 429 handling ─────────────────────────────────────────────────────
+    // The backend already returns a friendly Spanish message; we enrich it
+    // with the remaining time when standard rate-limit headers are present.
+    // express-rate-limit (draft-7) emits a combined `RateLimit` header like:
+    //   RateLimit: limit=5, remaining=0, reset=900
+    // Older draft-6 splits it into `RateLimit-Reset`. We try both.
+    if (error.response?.status === 429) {
+      const baseMessage =
+        (error.response.data as { message?: string })?.message ||
+        'Demasiadas solicitudes. Intenta de nuevo en unos minutos.'
+      const resetSeconds = parseRateLimitReset(error.response.headers ?? {})
+      const suffix =
+        resetSeconds !== null && resetSeconds > 0
+          ? ` (puedes reintentar en ${formatRetryAfter(resetSeconds)})`
+          : ''
+      return Promise.reject(new Error(baseMessage + suffix))
+    }
+
     const message: string =
       (error.response?.data as { message?: string })?.message ||
       error.message ||
@@ -110,3 +129,45 @@ apiClient.interceptors.response.use(
     return Promise.reject(new Error(message))
   },
 )
+
+/**
+ * Reads the seconds-until-reset value from the response headers, handling both
+ * the combined RFC draft-7 `RateLimit` header and the older draft-6 split
+ * variants (`RateLimit-Reset` / `Retry-After`).
+ */
+function parseRateLimitReset(headers: Record<string, unknown>): number | null {
+  // draft-7 combined header: "limit=5, remaining=0, reset=900"
+  const combined = headers['ratelimit']
+  if (typeof combined === 'string') {
+    const match = combined.match(/reset=(\d+)/i)
+    if (match) {
+      const v = Number.parseInt(match[1], 10)
+      if (Number.isFinite(v)) return v
+    }
+  }
+
+  // draft-6 split header
+  const split = headers['ratelimit-reset']
+  if (typeof split === 'string' || typeof split === 'number') {
+    const v = Number.parseInt(String(split), 10)
+    if (Number.isFinite(v)) return v
+  }
+
+  // Last resort: standard Retry-After (seconds OR HTTP-date)
+  const retryAfter = headers['retry-after']
+  if (typeof retryAfter === 'string' || typeof retryAfter === 'number') {
+    const v = Number.parseInt(String(retryAfter), 10)
+    if (Number.isFinite(v)) return v
+  }
+
+  return null
+}
+
+/** Formats a retry-after value in seconds into a friendly Spanish string. */
+function formatRetryAfter(seconds: number): string {
+  if (seconds < 60) return `${seconds} segundos`
+  const minutes = Math.ceil(seconds / 60)
+  if (minutes < 60) return `${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`
+  const hours = Math.ceil(minutes / 60)
+  return `${hours} ${hours === 1 ? 'hora' : 'horas'}`
+}

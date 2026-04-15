@@ -2,6 +2,7 @@
 import { useEffect } from 'react'
 import { getToken, onMessage } from 'firebase/messaging'
 import { getFirebaseMessaging } from '@/shared/lib/firebase'
+import { env } from '@/shared/config/env'
 import { notificationsRepository } from '@/features/notifications/api/notificationsRepository'
 
 /**
@@ -37,8 +38,8 @@ export function usePushNotifications() {
         if (!messaging) return
 
         const token = await getToken(messaging, {
-          vapidKey:                    process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
-          serviceWorkerRegistration:   registration,
+          vapidKey: env.firebase.vapidKey,
+          serviceWorkerRegistration: registration,
         })
 
         if (token) {
@@ -48,11 +49,11 @@ export function usePushNotifications() {
         // Notificaciones recibidas con la app abierta (foreground)
         unsubscribe = onMessage(messaging, (payload) => {
           const title = payload.notification?.title
-          const body  = payload.notification?.body
+          const body = payload.notification?.body
           if (title) {
             new Notification(title, {
-              body:  body ?? '',
-              icon:  '/logo-192.png',
+              body: body ?? '',
+              icon: '/logo-192.png',
               badge: '/logo-96.png',
             })
           }

@@ -1,19 +1,23 @@
 import { initializeApp, getApps, getApp } from 'firebase/app'
 import { getMessaging } from 'firebase/messaging'
+import { env, hasFirebaseConfig } from '@/shared/config/env'
 
 const firebaseConfig = {
-  apiKey:            process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain:        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId:         process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket:     process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId:             process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: env.firebase.apiKey,
+  authDomain: env.firebase.authDomain,
+  projectId: env.firebase.projectId,
+  storageBucket: env.firebase.storageBucket,
+  messagingSenderId: env.firebase.messagingSenderId,
+  appId: env.firebase.appId,
 }
 
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
+// Initialize lazily — Firebase is optional for local dev, required for push notifications in prod.
+const app = hasFirebaseConfig
+  ? (getApps().length ? getApp() : initializeApp(firebaseConfig))
+  : null
 
-// getMessaging solo puede llamarse en el browser
+// getMessaging can only be called in the browser
 export const getFirebaseMessaging = () => {
-  if (typeof window === 'undefined') return null
+  if (typeof window === 'undefined' || !app) return null
   return getMessaging(app)
 }

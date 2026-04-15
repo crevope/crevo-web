@@ -1,11 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
+import { env } from '@/shared/config/env'
 
-// Cliente público (anon key) — solo se usa para suscripciones Realtime Broadcast.
-// No accede a datos de la BD directamente; los datos sensibles se obtienen
-// siempre a través de la API del backend con el JWT propio del usuario.
-const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL  ?? ''
-const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
-
-export const supabase = createClient(supabaseUrl, supabaseAnon, {
+// Public client (anon key) — used only for Realtime Broadcast subscriptions.
+// It does not access database rows directly; sensitive data always flows
+// through the backend API authenticated with the user's own JWT.
+export const supabase = createClient(env.supabase.url, env.supabase.anonKey, {
   realtime: { params: { eventsPerSecond: 10 } },
 })

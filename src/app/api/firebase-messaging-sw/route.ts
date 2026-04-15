@@ -1,16 +1,18 @@
+import { env } from '@/shared/config/env'
+
 /**
- * Sirve el Service Worker de Firebase Messaging con la config inyectada desde env vars.
- * El header Service-Worker-Allowed: / permite registrarlo con scope raíz aunque el script
- * esté en /api/firebase-messaging-sw.
+ * Serves the Firebase Messaging Service Worker with the config injected from env vars.
+ * The `Service-Worker-Allowed: /` header lets us register it with root scope even
+ * though the script lives at /api/firebase-messaging-sw.
  */
 export async function GET() {
   const config = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? '',
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? '',
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? '',
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? '',
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? '',
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? '',
+    apiKey: env.firebase.apiKey,
+    authDomain: env.firebase.authDomain,
+    projectId: env.firebase.projectId,
+    storageBucket: env.firebase.storageBucket,
+    messagingSenderId: env.firebase.messagingSenderId,
+    appId: env.firebase.appId,
   }
 
   const sw = `
