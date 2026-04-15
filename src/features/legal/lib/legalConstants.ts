@@ -31,12 +31,35 @@ export const LEGAL_VERSIONS: Record<LegalDocumentType, string> = {
   CREDIT_BUREAU_AUTH: '2026-04-15',
 }
 
-/** Public URLs of every legal document — single source of truth for links. */
+/** Public URLs of every legal / regulatory document — single source of truth for links. */
 export const LEGAL_URLS = {
   TERMS: '/terminos-y-condiciones',
   PRIVACY: '/politica-de-privacidad',
   COOKIES: '/politica-de-cookies',
+  TARIFF: '/tarifas',
+  USER_RIGHTS: '/derechos-del-usuario',
+  COLLECTIONS_POLICY: '/politica-de-cobranza',
+  COMPLAINTS_BOOK: '/libro-de-reclamaciones',
 } as const
+
+/**
+ * Ordered list of legal / regulatory links shown on every legal page's footer
+ * and on the public landing footer. Ordering goes:
+ *   1. Contractual (T&C, Privacy, Cookies)
+ *   2. Rate disclosure (Tariff) — SBS Res. 3274-2017
+ *   3. User-facing rights (ARCO) — Ley 29733
+ *   4. Collections disclosure — Ley 27598
+ *   5. Complaints book — D.S. 011-2011-PCM (INDECOPI)
+ */
+export const LEGAL_LINKS: ReadonlyArray<{ label: string; href: string }> = [
+  { label: 'Términos y Condiciones', href: LEGAL_URLS.TERMS },
+  { label: 'Política de Privacidad', href: LEGAL_URLS.PRIVACY },
+  { label: 'Política de Cookies', href: LEGAL_URLS.COOKIES },
+  { label: 'Tarifario', href: LEGAL_URLS.TARIFF },
+  { label: 'Derechos del usuario', href: LEGAL_URLS.USER_RIGHTS },
+  { label: 'Política de cobranza', href: LEGAL_URLS.COLLECTIONS_POLICY },
+  { label: 'Libro de Reclamaciones', href: LEGAL_URLS.COMPLAINTS_BOOK },
+]
 
 /** Company contact data shown on every legal page — single source of truth. */
 export const LEGAL_COMPANY = {

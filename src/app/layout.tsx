@@ -6,6 +6,8 @@ import { Toaster } from '@/shared/ui/sonner'
 import Script from 'next/script'
 import './globals.css'
 import { cn } from "@/shared/lib/utils";
+import { CookieConsentProvider } from '@/features/cookie-consent/lib/CookieConsentContext'
+import { CookieBanner } from '@/features/cookie-consent/ui/CookieBanner'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
 
@@ -23,8 +25,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body className={`${geist.variable} font-(family-name:--font-sans)`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          {children}
-          <Toaster richColors position="top-right" />
+          <CookieConsentProvider>
+            {children}
+            <CookieBanner />
+            <Toaster richColors position="top-right" />
+          </CookieConsentProvider>
         </ThemeProvider>
         <Script src="https://checkout.culqi.com/js/v4" strategy="lazyOnload" />
         <Analytics />

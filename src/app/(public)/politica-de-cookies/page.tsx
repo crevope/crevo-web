@@ -15,6 +15,7 @@ export default function CookiesPolicyPage() {
       title="Política de Cookies"
       version={LEGAL_VERSIONS.COOKIES}
       effectiveDate="15 de abril de 2026"
+      currentHref="/politica-de-cookies"
       intro={
         `Esta Política explica qué cookies y tecnologías similares utiliza Crevo en su sitio web ` +
         `(${LEGAL_COMPANY.domain}), con qué finalidad y cómo puedes gestionarlas. Forma parte ` +
@@ -73,10 +74,18 @@ export default function CookiesPolicyPage() {
 
       <h2>4. Consentimiento y gestión</h2>
       <p>
-        La primera vez que ingresas a la Plataforma podrás aceptar o rechazar las cookies no
-        esenciales. Puedes cambiar tu decisión en cualquier momento desde la configuración de tu
-        navegador. Ten presente que bloquear las cookies estrictamente necesarias puede impedir el
-        funcionamiento correcto de la Plataforma (por ejemplo, no podrás iniciar sesión).
+        La primera vez que ingresas a la Plataforma verás un banner con tres opciones —
+        <em> aceptar todo, rechazar opcionales</em> o <em>personalizar</em> por categoría —
+        todas con el mismo peso visual, conforme a la Directiva ANPDP 01-2020. Tu decisión
+        se guarda en tu dispositivo y rige las siguientes visitas.
+      </p>
+      <p>
+        Puedes cambiar tu decisión en cualquier momento usando el botón{' '}
+        <strong>“Gestionar cookies”</strong> del pie de página. Si actualizamos las
+        categorías o los proveedores, el banner volverá a aparecer para renovar el
+        consentimiento. Ten presente que bloquear las cookies estrictamente necesarias
+        puede impedir el funcionamiento correcto de la Plataforma (por ejemplo, no podrás
+        iniciar sesión).
       </p>
 
       <h3>4.1. Cómo configurar las cookies en tu navegador</h3>

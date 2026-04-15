@@ -15,6 +15,7 @@ export default function PrivacyPolicyPage() {
       title="Política de Privacidad"
       version={LEGAL_VERSIONS.PRIVACY}
       effectiveDate="15 de abril de 2026"
+      currentHref="/politica-de-privacidad"
       intro={
         `Esta Política de Privacidad describe cómo Crevo recopila, utiliza, almacena, comparte y ` +
         `protege tus datos personales en cumplimiento de la Ley N° 29733 — Ley de Protección de ` +

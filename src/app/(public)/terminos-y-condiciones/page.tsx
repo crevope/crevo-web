@@ -15,6 +15,7 @@ export default function TermsAndConditionsPage() {
       title="Términos y Condiciones"
       version={LEGAL_VERSIONS.TERMS}
       effectiveDate="15 de abril de 2026"
+      currentHref="/terminos-y-condiciones"
       intro={
         `Estos Términos y Condiciones (los "Términos") regulan el uso de la plataforma Crevo ` +
         `(en adelante, la "Plataforma") y la solicitud, otorgamiento y pago de préstamos ofrecidos ` +
