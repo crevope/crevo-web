@@ -101,10 +101,17 @@ apiClient.interceptors.response.use(
         notifyRefreshCompleted()
         return apiClient(originalRequest)
       } catch {
-        // Refresh failed — clear local user cache and kick to login.
+        // Refresh failed — clear the full session so the next login starts
+        // from a clean slate (no stale HttpOnly cookies triggering CSRF).
         isRefreshing = false
         refreshSubscribers = []
-        localStorage.removeItem(USER_STORAGE_KEY)
+
+        await Promise.race([
+          apiClient.post('/auth/logout', {}).catch(() => {}),
+          new Promise((r) => setTimeout(r, 2000)),
+        ])
+        clearClientSession()
+
         window.location.href = '/login'
         return Promise.reject(new Error('Sesión expirada. Por favor inicia sesión de nuevo.'))
       }
@@ -135,6 +142,23 @@ apiClient.interceptors.response.use(
     return Promise.reject(new Error(message))
   },
 )
+
+// ─── Session cleanup ────────────────────────────────────────────────────────
+
+/**
+ * Wipes every piece of client-side session state.
+ *
+ * HttpOnly cookies (`crevo_at`, `crevo_rt`) can only be cleared by a server
+ * `Set-Cookie` response — that's handled by the `/auth/logout` call above.
+ * Here we clear the non-HttpOnly CSRF cookie and localStorage so the next
+ * login starts from a perfectly clean slate.
+ */
+function clearClientSession() {
+  localStorage.removeItem(USER_STORAGE_KEY)
+  if (typeof document !== 'undefined') {
+    document.cookie = `${CSRF_COOKIE_NAME}=; Path=/; Max-Age=0`
+  }
+}
 
 // ─── Utility: read a cookie by name ──────────────────────────────────────────
 
