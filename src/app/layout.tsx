@@ -9,6 +9,9 @@ import './globals.css'
 import { cn } from '@/shared/lib/utils'
 import { CookieConsentProvider } from '@/features/cookie-consent/lib/CookieConsentContext'
 import { CookieBanner } from '@/features/cookie-consent/ui/CookieBanner'
+import { JsonLd } from '@/shared/seo/JsonLd'
+import { organizationSchema } from '@/shared/seo/schemas/organization'
+import { websiteSchema } from '@/shared/seo/schemas/website'
 import {
   SITE_URL,
   SITE,
@@ -172,6 +175,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <Toaster richColors position="top-right" />
           </CookieConsentProvider>
         </ThemeProvider>
+        {/* Structured data — site-wide identity. Per-page schemas (FAQPage,
+            BreadcrumbList) live in their own segments and add to this graph. */}
+        <JsonLd id="ld-organization" data={organizationSchema()} />
+        <JsonLd id="ld-website" data={websiteSchema()} />
         <Analytics />
         <SpeedInsights />
       </body>

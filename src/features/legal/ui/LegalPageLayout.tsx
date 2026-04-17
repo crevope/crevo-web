@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { LEGAL_LINKS } from '../lib/legalConstants'
+import { JsonLd } from '@/shared/seo/JsonLd'
+import { breadcrumbSchema } from '@/shared/seo/schemas/breadcrumb'
 
 interface LegalPageLayoutProps {
   title: string
@@ -38,8 +40,20 @@ export function LegalPageLayout({
   children,
 }: LegalPageLayoutProps) {
   const otherLinks = currentHref ? LEGAL_LINKS.filter((l) => l.href !== currentHref) : LEGAL_LINKS
+
+  // BreadcrumbList JSON-LD: Inicio → {title}. Drives the breadcrumb rich
+  // snippet Google shows above the page URL in search results, so users
+  // see the hierarchy ("Crevo › Tarifas") instead of the raw path.
+  // Only emit when we know the canonical path (currentHref) — without it
+  // we can't build a valid Item URL and Google would silently drop the
+  // markup.
+  const breadcrumb = currentHref
+    ? breadcrumbSchema([{ name: title, path: currentHref }])
+    : null
+
   return (
     <main className="min-h-screen bg-white dark:bg-[#0F172A] text-[#0A192F] dark:text-[#F1F5F9]">
+      {breadcrumb && <JsonLd id="ld-breadcrumb" data={breadcrumb} />}
       <div className="max-w-5xl mx-auto px-6 sm:px-8 py-12 lg:py-16">
         <Link
           href="/"

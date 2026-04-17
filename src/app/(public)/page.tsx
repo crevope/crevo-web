@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import { LoanSimulator } from '@/features/simulator/ui/LoanSimulator'
 import { RepresentativeExample } from '@/features/simulator/ui/RepresentativeExample'
+import { FaqSection, faqJsonLd } from '@/features/faq'
 import { LandingHeader } from '@/shared/ui/landing-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
 import { buildMetadata } from '@/shared/seo/buildMetadata'
+import { JsonLd } from '@/shared/seo/JsonLd'
 
 // SEO money page. Title leads with "Crevo" (brand awareness) + the head
 // keyword "préstamos online en Perú" + qualifiers ("rápidos", "100% digital")
@@ -437,6 +439,12 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* ─── FAQ ──────────────────────────────────────────────────────────── */}
+        {/* Single source of truth: same FAQS array drives the visual accordion
+            AND the FAQPage JSON-LD that Google may render as rich results. */}
+        <FaqSection />
+        <JsonLd id="ld-faq" data={faqJsonLd()} />
 
         {/* ─── COMPLIANCE BADGE ─────────────────────────────────────────────── */}
         <section id="compliance-badge" className="w-full py-12 px-6 sm:px-10 lg:px-16 xl:px-24 bg-white dark:bg-[#0F172A] border-t border-gray-200 dark:border-[#334155]">
