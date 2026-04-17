@@ -93,6 +93,17 @@ export const authRepository = {
   // the server treats every request as anonymous unless it carries a valid
   // HttpOnly auth cookie.
 
+  /**
+   * Permanently close the authenticated account — Ley 29733 Art. 19 right
+   * to suppression. The backend anonymizes the live row and moves a copy
+   * to the PLAFT archive (5-year retention per UIF), then invalidates the
+   * session. The client-side cleanup mirrors logout.
+   */
+  async deleteMyAccount(): Promise<void> {
+    await apiClient.delete('/users/me')
+    clearClientSession()
+  },
+
   saveUser(user: AuthUser) { localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user)) },
   /** Full client-side cleanup on logout: localStorage (preserves cookie
    *  consent + theme), sessionStorage CSRF, and the readable CSRF cookie. */

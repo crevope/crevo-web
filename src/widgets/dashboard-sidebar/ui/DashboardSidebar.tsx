@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import {
   Home, HandCoins, Wallet, ArrowLeftRight, Bell, BookOpen, User,
-  Sun, Moon, LogOut,
+  Sun, Moon, LogOut, Headphones,
 } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { useNotificationStore } from '@/features/notifications'
@@ -26,6 +26,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/loans',          icon: Wallet,         label: 'Mis Préstamos', matchPrefix: '/loans' },
   { href: '/payments',       icon: ArrowLeftRight, label: 'Pagos' },
   { href: '/notifications',  icon: Bell,           label: 'Notificaciones' },
+  { href: '/soporte',        icon: Headphones,     label: 'Soporte', matchPrefix: '/soporte' },
   { href: '/my-complaints',  icon: BookOpen,       label: 'Mis Reclamos' },
   { href: '/profile',        icon: User,           label: 'Mi Perfil' },
 ]

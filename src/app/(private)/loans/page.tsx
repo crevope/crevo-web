@@ -5,7 +5,7 @@ import {
   Info, Download, Bell, Plus, Wallet, History, FileText,
   Search, FolderOpen, Headphones, ArrowRight,
 } from 'lucide-react'
-import { useLoanStore } from '@/features/request-loan'
+import { useLoanStore, useLoanSummaries, type LoanSummary } from '@/features/request-loan'
 import { formatCurrency, formatDate, loanRef } from '@/shared/lib/utils'
 import type { Loan } from '@/entities/loan'
 import {
@@ -43,11 +43,21 @@ function statusBadge(status: string) {
   return <span className="px-2.5 py-0.5 bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 text-xs font-medium rounded-full">{status}</span>
 }
 
-function LoanCard({ loan }: Readonly<{ loan: Loan }>) {
+function LoanCard({ loan, summary }: Readonly<{ loan: Loan; summary?: LoanSummary }>) {
   const isActive = ACTIVE_STATUSES.includes(loan.status)
   const isReview = REVIEW_STATUSES.includes(loan.status)
   const isPaid = loan.status === 'PAID'
   const ref = `#${loanRef(loan.id)}`
+
+  // Fall back to the original amount when the live balance hasn't loaded
+  // yet or failed — better than showing 0 while we wait, and closed loans
+  // never fetch a summary in the first place.
+  const remaining = summary && !summary.loading && !summary.error
+    ? summary.remaining
+    : isPaid
+      ? 0
+      : loan.amount
+  const nextInstallment = summary?.nextInstallment
 
   return (
     <div className={`${cardCls} p-6 border-l-2 ${statusBorderColor(loan.status)} hover:bg-gray-50 dark:hover:bg-[#0F172A]/50 transition-colors`}>
@@ -84,10 +94,13 @@ function LoanCard({ loan }: Readonly<{ loan: Loan }>) {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-100 dark:border-white/6">
               <div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Saldo Pendiente</p>
-                {/* TODO: fetch balance per loan for real remaining amount */}
-                <p className="text-sm font-bold text-[#0A192F] dark:text-white">
-                  {formatCurrency(loan.amount)}
-                </p>
+                {summary?.loading ? (
+                  <Skeleton className="h-4 w-20" />
+                ) : (
+                  <p className="text-sm font-bold text-[#0A192F] dark:text-white">
+                    {formatCurrency(remaining)}
+                  </p>
+                )}
               </div>
               <div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Plazo</p>
@@ -97,15 +110,28 @@ function LoanCard({ loan }: Readonly<{ loan: Loan }>) {
               </div>
               <div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Próxima Cuota</p>
-                {/* TODO: fetch installment schedule for due amount */}
-                <p className={`text-sm font-bold ${isActive ? 'text-yellow-600 dark:text-[#D4AF37]' : 'text-gray-500 dark:text-gray-400'}`}>
-                  —
-                </p>
+                {summary?.loading ? (
+                  <Skeleton className="h-4 w-16" />
+                ) : nextInstallment ? (
+                  <p className={`text-sm font-bold ${nextInstallment.status === 'OVERDUE' ? 'text-red-500 dark:text-red-400' : 'text-yellow-600 dark:text-[#D4AF37]'}`}>
+                    {formatCurrency(nextInstallment.amount)}
+                  </p>
+                ) : (
+                  <p className={`text-sm font-bold ${isActive ? 'text-yellow-600 dark:text-[#D4AF37]' : 'text-gray-500 dark:text-gray-400'}`}>
+                    —
+                  </p>
+                )}
               </div>
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Vencimiento</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  {nextInstallment ? 'Vence cuota' : 'Vencimiento'}
+                </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                  {loan.dueDate ? formatDate(loan.dueDate) : '—'}
+                  {nextInstallment
+                    ? formatDate(nextInstallment.dueDate)
+                    : loan.dueDate
+                      ? formatDate(loan.dueDate)
+                      : '—'}
                 </p>
               </div>
             </div>
@@ -157,6 +183,10 @@ export default function LoansPage() {
 
   useEffect(() => { loadMyLoans() }, [loadMyLoans])
 
+  // Fetch balance + next installment for every active loan in parallel.
+  // Closed loans skip the fetch inside the hook so we don't burn requests.
+  const summaries = useLoanSummaries(loans)
+
   const byTab = (tab: Tab) => loans.filter(l => {
     if (tab === 'activos') return ACTIVE_STATUSES.includes(l.status)
     if (tab === 'revision') return REVIEW_STATUSES.includes(l.status)
@@ -178,9 +208,24 @@ export default function LoansPage() {
   const activeCount = byTab('activos').length
   const reviewCount = byTab('revision').length
   const closedCount = byTab('cerrados').length
+  // Sum live remaining balances when the hook has them; fall back to the
+  // cached original amount so the stat is never a suspicious 0 while
+  // summaries are still loading.
   const totalActive = loans
     .filter(l => ACTIVE_STATUSES.includes(l.status))
-    .reduce((sum, l) => sum + l.amount, 0)
+    .reduce((sum, l) => {
+      const s = summaries[l.id]
+      const value = s && !s.loading && !s.error ? s.remaining : l.amount
+      return sum + value
+    }, 0)
+  // Sum of the next unpaid installment across every active loan — this is
+  // what the consumer has to budget for in the next cycle.
+  const nextPaymentTotal = loans
+    .filter(l => ACTIVE_STATUSES.includes(l.status))
+    .reduce((sum, l) => sum + (summaries[l.id]?.nextInstallment?.amount ?? 0), 0)
+  const nextPaymentLoading = loans
+    .filter(l => ACTIVE_STATUSES.includes(l.status))
+    .some(l => summaries[l.id]?.loading !== false)
 
   const tabs: { id: Tab; label: string; count: number; countCls: string }[] = [
     { id: 'activos', label: 'Activos', count: activeCount, countCls: 'bg-[#D4AF37]/20 text-yellow-700 dark:text-[#D4AF37]' },
@@ -232,9 +277,18 @@ export default function LoansPage() {
           ))
         ) : (
           [
-            { icon: Wallet, iconBg: 'bg-[#D4AF37]/20 text-yellow-600 dark:text-[#D4AF37]', label: 'Total Activo', value: formatCurrency(totalActive) },
-            { icon: History, iconBg: 'bg-[#00E5FF]/20 text-cyan-600 dark:text-[#00E5FF]', label: 'Próximo Pago Total', value: '—' },
-            { icon: FileText, iconBg: 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400', label: 'Préstamos en Revisión', value: String(reviewCount) },
+            { icon: Wallet, iconBg: 'bg-[#D4AF37]/20 text-yellow-600 dark:text-[#D4AF37]', label: 'Total Activo', value: formatCurrency(totalActive), loading: false },
+            {
+              icon: History,
+              iconBg: 'bg-[#00E5FF]/20 text-cyan-600 dark:text-[#00E5FF]',
+              label: 'Próximo Pago Total',
+              // Show a dash (not "S/ 0.00") when there's no active loan or
+              // every active loan is already paid through the horizon —
+              // the latter is a legitimate state after a bulk payoff.
+              value: nextPaymentTotal > 0 ? formatCurrency(nextPaymentTotal) : '—',
+              loading: activeCount > 0 && nextPaymentLoading,
+            },
+            { icon: FileText, iconBg: 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400', label: 'Préstamos en Revisión', value: String(reviewCount), loading: false },
           ].map(s => {
             const StatIcon = s.icon
             return (
@@ -246,7 +300,11 @@ export default function LoansPage() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">{s.label}</p>
-                  <h3 className="text-2xl font-bold text-[#0A192F] dark:text-white">{s.value}</h3>
+                  {s.loading ? (
+                    <Skeleton className="h-8 w-32" />
+                  ) : (
+                    <h3 className="text-2xl font-bold text-[#0A192F] dark:text-white">{s.value}</h3>
+                  )}
                 </div>
               </div>
             )
@@ -351,7 +409,9 @@ export default function LoansPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          {sortedAndFiltered.map(loan => <LoanCard key={loan.id} loan={loan} />)}
+          {sortedAndFiltered.map(loan => (
+            <LoanCard key={loan.id} loan={loan} summary={summaries[loan.id]} />
+          ))}
         </div>
       )}
 
