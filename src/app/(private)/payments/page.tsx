@@ -376,7 +376,7 @@ export default function PaymentsPage() {
                           <i className="fa-solid fa-bolt text-sm" />
                         </div>
                         <div>
-                          <h4 className="text-[#0A192F] dark:text-white font-medium">Préstamo Crevo</h4>
+                          <h3 className="text-[#0A192F] dark:text-white font-medium">Préstamo Crevo</h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
                             Ref: #{loanRef(loan.id)}
                           </p>
@@ -445,7 +445,7 @@ export default function PaymentsPage() {
                       }`}
                     >
                       <div>
-                        <h4 className="text-sm font-medium text-[#0A192F] dark:text-white">Pago Total de Cuota</h4>
+                        <h3 className="text-sm font-medium text-[#0A192F] dark:text-white">Pago Total de Cuota</h3>
                         <p className="text-sm font-semibold text-[#0A192F] dark:text-[#D4AF37] mt-0.5">
                           {formatCurrency(selectedLoan!.installmentAmount)}
                         </p>
@@ -474,7 +474,7 @@ export default function PaymentsPage() {
                       }`}
                     >
                       <div>
-                        <h4 className="text-sm font-medium text-[#0A192F] dark:text-white">Otro Monto</h4>
+                        <h3 className="text-sm font-medium text-[#0A192F] dark:text-white">Otro Monto</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Pago parcial o adelantado</p>
                       </div>
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors

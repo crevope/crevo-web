@@ -721,7 +721,7 @@ export default function LoanDetailPage() {
             {/* Payment history nested inside calendar tab */}
             {payments.length > 0 && (
               <div className="mt-8 pt-6 border-t border-gray-100 dark:border-white/6">
-                <h4 className="text-sm font-semibold text-[#0A192F] dark:text-white mb-4">Pagos Realizados</h4>
+                <h3 className="text-sm font-semibold text-[#0A192F] dark:text-white mb-4">Pagos Realizados</h3>
                 <div className="space-y-2">
                   {payments.map(p => (
                     <div
@@ -848,7 +848,7 @@ export default function LoanDetailPage() {
                         <i className={`fa-solid ${isSigned ? 'fa-file-circle-check' : 'fa-file-pdf'} text-sm`} />
                       </div>
                       <div>
-                        <h4 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Contrato de Préstamo</h4>
+                        <h3 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Contrato de Préstamo</h3>
                         <p className={`text-xs ${isSigned ? 'text-green-500 dark:text-green-400' : 'text-gray-500'}`}>
                           {subtitle}
                         </p>
@@ -873,7 +873,7 @@ export default function LoanDetailPage() {
                         <i className="fa-solid fa-file-lines text-sm" />
                       </div>
                       <div>
-                        <h4 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Hoja Resumen</h4>
+                        <h3 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Hoja Resumen</h3>
                         <p className="text-xs text-gray-500">
                           {available ? 'Detalle de costos y condiciones (formato SBS Res. 8181-2012)' : 'Disponible al aprobar el préstamo'}
                         </p>
@@ -903,7 +903,7 @@ export default function LoanDetailPage() {
                         <i className="fa-solid fa-file-invoice-dollar text-sm" />
                       </div>
                       <div>
-                        <h4 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Cronograma de Pagos</h4>
+                        <h3 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Cronograma de Pagos</h3>
                         <p className="text-xs text-gray-500">
                           {available ? 'Cuotas con fechas reales de vencimiento' : 'Disponible al desembolsar el préstamo'}
                         </p>
@@ -926,7 +926,7 @@ export default function LoanDetailPage() {
             <i className="fa-solid fa-headset text-[#0A192F] dark:text-[#00E5FF]" />
           </div>
           <div>
-            <h4 className="text-sm font-medium text-gray-800 dark:text-gray-200">¿Problemas con este préstamo?</h4>
+            <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">¿Problemas con este préstamo?</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400">Si tienes dudas sobre tu cuota o necesitas reestructurar tu deuda, contáctanos.</p>
           </div>
         </div>

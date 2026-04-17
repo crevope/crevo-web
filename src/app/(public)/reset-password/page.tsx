@@ -150,10 +150,11 @@ function ResetPasswordContent() {
             <button
               type="button"
               onClick={() => setShowNew(p => !p)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              title="Mostrar/Ocultar contraseña"
+              aria-label={showNew ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'}
+              aria-pressed={showNew}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              <i className={`fa-regular ${showNew ? 'fa-eye-slash' : 'fa-eye'} text-sm`} />
+              <i className={`fa-regular ${showNew ? 'fa-eye-slash' : 'fa-eye'} text-sm`} aria-hidden="true" />
             </button>
           </div>
           {errors.newPassword && (
@@ -177,10 +178,11 @@ function ResetPasswordContent() {
             <button
               type="button"
               onClick={() => setShowConfirm(p => !p)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              title="Mostrar/Ocultar contraseña"
+              aria-label={showConfirm ? 'Ocultar confirmación de contraseña' : 'Mostrar confirmación de contraseña'}
+              aria-pressed={showConfirm}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              <i className={`fa-regular ${showConfirm ? 'fa-eye-slash' : 'fa-eye'} text-sm`} />
+              <i className={`fa-regular ${showConfirm ? 'fa-eye-slash' : 'fa-eye'} text-sm`} aria-hidden="true" />
             </button>
           </div>
           {errors.confirmPassword && (

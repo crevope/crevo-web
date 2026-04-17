@@ -356,7 +356,7 @@ export default function LoansPage() {
             <i className="fa-solid fa-headset" />
           </div>
           <div>
-            <h4 className="text-white font-medium text-lg">¿Necesitas ayuda con tus préstamos?</h4>
+            <h3 className="text-white font-medium text-lg">¿Necesitas ayuda con tus préstamos?</h3>
             <p className="text-sm text-gray-300">Nuestro equipo de soporte está disponible 24/7 en todo el Perú.</p>
           </div>
         </div>

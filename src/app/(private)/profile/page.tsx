@@ -641,7 +641,7 @@ export default function ProfilePage() {
                 <div className="pb-6 border-b border-gray-100 dark:border-white/6">
                   <div className="flex justify-between items-start gap-4">
                     <div>
-                      <h4 className="font-semibold text-[#0A192F] dark:text-white text-sm">Contraseña</h4>
+                      <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">Contraseña</h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                         Actualiza tu contraseña actual
                       </p>
@@ -728,7 +728,7 @@ export default function ProfilePage() {
                 {/* Biometric */}
                 <div className="flex justify-between items-center pb-6 border-b border-gray-100 dark:border-white/6">
                   <div>
-                    <h4 className="font-semibold text-[#0A192F] dark:text-white text-sm">Autenticación Biométrica</h4>
+                    <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">Autenticación Biométrica</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Próximamente disponible en app móvil</p>
                   </div>
                   <Toggle checked={false} onChange={() => {}} />
@@ -737,7 +737,7 @@ export default function ProfilePage() {
                 {/* 2FA */}
                 <div className="flex justify-between items-center">
                   <div>
-                    <h4 className="font-semibold text-[#0A192F] dark:text-white text-sm">Autenticación de Dos Factores (2FA)</h4>
+                    <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">Autenticación de Dos Factores (2FA)</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Próximamente disponible</p>
                   </div>
                   <Toggle checked={false} onChange={() => {}} />
@@ -782,7 +782,7 @@ export default function ProfilePage() {
                         ]).map(item => (
                           <div key={item.key} className="flex justify-between items-center p-4 rounded-xl border border-gray-100 dark:border-white/6 bg-gray-50 dark:bg-[#0F172A]">
                             <div>
-                              <h4 className="font-semibold text-[#0A192F] dark:text-white text-sm">{item.label}</h4>
+                              <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">{item.label}</h3>
                               <p className="text-xs text-gray-400 dark:text-gray-500">{item.desc}</p>
                             </div>
                             <Toggle checked={notifs[item.key]} onChange={v => handleToggleNotif(item.key, v)} />
@@ -803,7 +803,7 @@ export default function ProfilePage() {
                         ]).map(item => (
                           <div key={item.key} className="flex justify-between items-center p-4 rounded-xl border border-gray-100 dark:border-white/6 bg-gray-50 dark:bg-[#0F172A]">
                             <div>
-                              <h4 className="font-semibold text-[#0A192F] dark:text-white text-sm">{item.label}</h4>
+                              <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">{item.label}</h3>
                               <p className="text-xs text-gray-400 dark:text-gray-500">{item.desc}</p>
                             </div>
                             <Toggle checked={notifs[item.key]} onChange={v => handleToggleNotif(item.key, v)} />

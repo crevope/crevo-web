@@ -154,9 +154,9 @@ export default function DashboardPage() {
                 <i className="fa-solid fa-shield-halved text-xl" />
               </div>
               <div>
-                <h4 className="text-[#0A192F] dark:text-white font-medium text-sm">
+                <h3 className="text-[#0A192F] dark:text-white font-medium text-sm">
                   Protección de cuenta activada
-                </h4>
+                </h3>
                 <p className="text-gray-500 dark:text-gray-400 text-xs">
                   Tu información financiera está protegida con cifrado AES-256 de nivel bancario.
                 </p>
@@ -538,7 +538,7 @@ export default function DashboardPage() {
                   <i className={`${card.icon} text-sm`} />
                 </div>
                 <div>
-                  <h4 className="font-medium text-[#0A192F] dark:text-white text-sm mb-1.5">{card.title}</h4>
+                  <h3 className="font-medium text-[#0A192F] dark:text-white text-sm mb-1.5">{card.title}</h3>
                   <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{card.text}</p>
                 </div>
               </div>
@@ -598,9 +598,9 @@ export default function DashboardPage() {
                       />
                     </div>
                     <div>
-                      <h4 className="text-[#0A192F] dark:text-white font-medium text-sm">
+                      <h3 className="text-[#0A192F] dark:text-white font-medium text-sm">
                         Préstamo #{loanRef(loan.id)}
-                      </h4>
+                      </h3>
                       <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(loan.createdAt)}</p>
                     </div>
                   </div>

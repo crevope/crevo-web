@@ -168,7 +168,7 @@ export default function LandingPage() {
                   <div className="flex items-center gap-1 text-[#D4AF37] text-sm mb-1">
                     <i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star-half-stroke" />
                   </div>
-                  <span className="text-gray-400 text-xs">Peruanos confían en nosotros</span>
+                  <span className="text-gray-500 text-xs">Peruanos confían en nosotros</span>
                 </div>
               </div>
 
@@ -221,7 +221,7 @@ export default function LandingPage() {
                     <div className="flex items-center gap-1.5">
                       <Image src="/images/avatars/avatar-5.jpg" className="w-6 h-6 rounded-full object-cover" alt="" width={24} height={24} />
                       <span className="text-xs font-medium text-gray-800">María S.</span>
-                      <span className="text-xs text-gray-400">• Lima</span>
+                      <span className="text-xs text-gray-500">• Lima</span>
                     </div>
                   </div>
                 </div>
@@ -258,7 +258,7 @@ export default function LandingPage() {
               <div className="absolute top-5 right-5 glass-effect-dark rounded-lg px-3 py-2.5 shadow-lg border border-white/10 flex items-center gap-2.5 animate-[bounce_4s_ease-in-out_infinite]">
                 <i className="fa-solid fa-shield-halved text-[#00E5FF]" />
                 <div>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide">Seguridad bancaria</p>
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wide">Seguridad bancaria</p>
                   <p className="text-xs font-semibold text-white">Cifrado AES-256</p>
                 </div>
               </div>
@@ -271,7 +271,7 @@ export default function LandingPage() {
                     <div className="flex items-center gap-1.5">
                       <Image src="/images/avatars/avatar-5.jpg" className="w-6 h-6 rounded-full object-cover" alt="" width={24} height={24} />
                       <span className="text-xs font-medium text-white">María S.</span>
-                      <span className="text-xs text-gray-400">• Lima</span>
+                      <span className="text-xs text-gray-500">• Lima</span>
                     </div>
                   </div>
                 </div>
@@ -338,7 +338,7 @@ export default function LandingPage() {
               <h2 className="text-2xl sm:text-3xl font-semibold text-[#0A192F] dark:text-white mb-3">
                 Tu préstamo en <span className="text-gradient-gold">3 simples pasos</span>
               </h2>
-              <p className="text-sm text-gray-400 dark:text-gray-500 max-w-xl mx-auto">Obtener liquidez nunca fue tan fácil y rápido.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xl mx-auto">Obtener liquidez nunca fue tan fácil y rápido.</p>
             </div>
 
             <div className="flex flex-col md:flex-row justify-between items-start relative">
@@ -370,7 +370,7 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto bg-[#F8FAFC] dark:bg-[#1E293B] rounded-lg shadow-sm border border-gray-100 dark:border-white/6 p-6 md:p-8">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-1">Simulador Rápido</h2>
-              <p className="text-sm text-gray-400 dark:text-gray-500">Calcula tu cuota en segundos</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Calcula tu cuota en segundos</p>
             </div>
             <LoanSimulator />
           </div>
@@ -390,7 +390,7 @@ export default function LandingPage() {
               <h2 className="text-2xl sm:text-3xl font-semibold text-[#0A192F] dark:text-white mb-3">
                 Lo que dicen nuestros <span className="text-gradient-gold">clientes</span>
               </h2>
-              <p className="text-sm text-gray-400 dark:text-gray-500 max-w-xl mx-auto">
+              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
                 Miles de peruanos ya han impulsado sus metas con Crevo.
               </p>
             </div>
@@ -406,8 +406,8 @@ export default function LandingPage() {
                 <div className="flex items-center gap-3">
                   <Image src="/images/avatars/avatar-6.jpg" className="w-9 h-9 rounded-full border border-gray-100 dark:border-white/10 object-cover" alt="" width={36} height={36} />
                   <div>
-                    <h4 className="font-medium text-sm text-[#0A192F] dark:text-white">Carmen R.</h4>
-                    <p className="text-xs text-gray-400">Emprendedora, Arequipa</p>
+                    <h3 className="font-medium text-sm text-[#0A192F] dark:text-white">Carmen R.</h3>
+                    <p className="text-xs text-gray-500">Emprendedora, Arequipa</p>
                   </div>
                 </div>
               </div>
@@ -422,8 +422,8 @@ export default function LandingPage() {
                 <div className="flex items-center gap-3">
                   <Image src="/images/avatars/avatar-3.jpg" className="w-9 h-9 rounded-full border border-gray-100 dark:border-white/10 object-cover" alt="" width={36} height={36} />
                   <div>
-                    <h4 className="font-medium text-sm text-[#0A192F] dark:text-white">Luis M.</h4>
-                    <p className="text-xs text-gray-400">Ingeniero, Lima</p>
+                    <h3 className="font-medium text-sm text-[#0A192F] dark:text-white">Luis M.</h3>
+                    <p className="text-xs text-gray-500">Ingeniero, Lima</p>
                   </div>
                 </div>
               </div>
@@ -438,8 +438,8 @@ export default function LandingPage() {
                 <div className="flex items-center gap-3">
                   <Image src="/images/avatars/avatar-7.jpg" className="w-9 h-9 rounded-full border border-gray-100 dark:border-white/10 object-cover" alt="" width={36} height={36} />
                   <div>
-                    <h4 className="font-medium text-sm text-[#0A192F] dark:text-white">Andrea V.</h4>
-                    <p className="text-xs text-gray-400">Diseñadora, Trujillo</p>
+                    <h3 className="font-medium text-sm text-[#0A192F] dark:text-white">Andrea V.</h3>
+                    <p className="text-xs text-gray-500">Diseñadora, Trujillo</p>
                   </div>
                 </div>
               </div>
@@ -463,7 +463,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-[#0A192F] dark:text-white mb-0.5">Cumplimiento normativo peruano</h3>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">INDECOPI · ANPDP · UIF-Perú · BCRP</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">INDECOPI · ANPDP · UIF-Perú · BCRP</p>
                 </div>
               </div>
               <div className="flex items-center gap-6 flex-wrap justify-center">
@@ -513,7 +513,7 @@ export default function LandingPage() {
 
             {/* Productos */}
             <div>
-              <h4 className="text-white font-semibold mb-4 text-sm">Productos</h4>
+              <h3 className="text-white font-semibold mb-4 text-sm">Productos</h3>
               <ul className="space-y-2 text-sm">
                 <li><Link href="/#simulador" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Simulador de préstamos</Link></li>
                 <li><Link href="/tarifas" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Tarifario (TEA · TCEA)</Link></li>
@@ -524,7 +524,7 @@ export default function LandingPage() {
 
             {/* Atención al cliente */}
             <div>
-              <h4 className="text-white font-semibold mb-4 text-sm">Atención al cliente</h4>
+              <h3 className="text-white font-semibold mb-4 text-sm">Atención al cliente</h3>
               <ul className="space-y-2 text-sm">
                 <li>
                   <a href="mailto:soporte@crevo.pe" className="text-gray-400 hover:text-[#D4AF37] transition-colors">
@@ -539,7 +539,7 @@ export default function LandingPage() {
 
             {/* Legales */}
             <div>
-              <h4 className="text-white font-semibold mb-4 text-sm">Información legal</h4>
+              <h3 className="text-white font-semibold mb-4 text-sm">Información legal</h3>
               <ul className="space-y-2 text-sm">
                 <li><Link href="/terminos-y-condiciones" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Términos y Condiciones</Link></li>
                 <li><Link href="/politica-de-privacidad" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Política de Privacidad</Link></li>

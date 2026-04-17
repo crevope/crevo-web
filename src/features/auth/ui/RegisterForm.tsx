@@ -156,9 +156,11 @@ export function RegisterForm() {
             <button
               type="button"
               onClick={() => setShowPass(p => !p)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              aria-pressed={showPass}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              <i className={`fa-regular ${showPass ? 'fa-eye-slash' : 'fa-eye'}`} />
+              <i className={`fa-regular ${showPass ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true" />
             </button>
           </div>
           {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
