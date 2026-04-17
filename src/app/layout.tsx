@@ -153,11 +153,20 @@ export const metadata: Metadata = {
   },
 
   // Misc <meta> tags that don't have a typed slot in Next.js Metadata.
-  // - apple-mobile-web-app-*: PWA hints for iOS Safari.
+  //
+  // - mobile-web-app-capable + apple-mobile-web-app-capable: BOTH are
+  //   required for full PWA install support. Chrome/Lighthouse now prefer
+  //   the un-prefixed name (the apple- variant logs a deprecation warning
+  //   in Chrome DevTools), but iOS Safari STILL only honors the apple-
+  //   prefixed version. Emit both so every OS plays nicely.
+  // - apple-mobile-web-app-status-bar-style + apple-mobile-web-app-title:
+  //   iOS-only — Safari uses these when the user adds the site to their
+  //   home screen. No equivalent un-prefixed alternative exists.
   // - fb:app_id: optional Facebook App linkage. Only emitted when
   //   NEXT_PUBLIC_FB_APP_ID is set in the environment. Without it the
   //   FB Sharing Debugger flags a warning, but link previews still work.
   other: {
+    'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
     'apple-mobile-web-app-title': SITE.name,
