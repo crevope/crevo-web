@@ -118,12 +118,26 @@ export const PRIVATE_ROUTE_PREFIXES = [
   '/verify-email',
 ] as const
 
-/** Search engine verification tokens. Set after registering the site in
- *  Google Search Console / Bing Webmaster Tools. */
+/** Search engine verification tokens.
+ *
+ *  Read from env vars (public — they're rendered as <meta> tags, no secret).
+ *  Steps to obtain each one are in `docs/SEO.md`. Until they're set the
+ *  corresponding `<meta name="google-site-verification">` /
+ *  `<meta name="msvalidate.01">` tag is omitted, which is fine — the
+ *  alternative DNS-record verification still works.
+ */
 export const VERIFICATION = {
-  google: undefined as string | undefined, // TODO: set after Google Search Console verification
-  bing: undefined as string | undefined,   // TODO: set after Bing Webmaster Tools verification
-} as const
+  google:
+    process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION &&
+    process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION.length > 0
+      ? process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+      : undefined,
+  bing:
+    process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION &&
+    process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION.length > 0
+      ? process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      : undefined,
+}
 
 /** Facebook App ID — optional. Emits `<meta property="fb:app_id">` when set,
  *  which unlocks:
