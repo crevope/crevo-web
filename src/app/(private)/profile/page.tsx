@@ -2,6 +2,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
+import {
+  User, Landmark, ShieldCheck, Bell, CircleCheck, CircleX, IdCard,
+  Loader2, LineChart, Circle, Lock, Star, Trash2, Plus,
+} from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { authRepository } from '@/features/auth'
 import { apiClient } from '@/shared/api/client'
@@ -17,11 +21,11 @@ const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-w
 
 type Section = 'personal' | 'banking' | 'security' | 'notifications'
 
-const NAV_ITEMS: { id: Section; icon: string; label: string }[] = [
-  { id: 'personal',      icon: 'fa-regular fa-user',          label: 'Información Personal' },
-  { id: 'banking',       icon: 'fa-solid fa-building-columns', label: 'Datos Bancarios' },
-  { id: 'security',      icon: 'fa-solid fa-shield-halved',    label: 'Seguridad' },
-  { id: 'notifications', icon: 'fa-regular fa-bell',           label: 'Notificaciones' },
+const NAV_ITEMS: { id: Section; icon: typeof User; label: string }[] = [
+  { id: 'personal',      icon: User,       label: 'Información Personal' },
+  { id: 'banking',       icon: Landmark,   label: 'Datos Bancarios' },
+  { id: 'security',      icon: ShieldCheck, label: 'Seguridad' },
+  { id: 'notifications', icon: Bell,       label: 'Notificaciones' },
 ]
 
 const RISK_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
@@ -260,19 +264,22 @@ export default function ProfilePage() {
         {/* Inner sidebar */}
         <aside className="w-full md:w-64 shrink-0">
           <nav className="flex flex-col gap-1 md:sticky md:top-8">
-            {NAV_ITEMS.map(item => (
-              <button
-                key={item.id}
-                onClick={() => setActiveSection(item.id)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-colors ${activeSection === item.id
-                  ? 'bg-[#0A192F]/5 dark:bg-[#00E5FF]/10 text-[#0A192F] dark:text-[#D4AF37]'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#0F172A] hover:text-[#0A192F] dark:hover:text-white'
-                  }`}
-              >
-                <i className={`${item.icon} w-5 text-center`} />
-                {item.label}
-              </button>
-            ))}
+            {NAV_ITEMS.map(item => {
+              const ItemIcon = item.icon
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveSection(item.id)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-colors ${activeSection === item.id
+                    ? 'bg-[#0A192F]/5 dark:bg-[#00E5FF]/10 text-[#0A192F] dark:text-[#D4AF37]'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#0F172A] hover:text-[#0A192F] dark:hover:text-white'
+                    }`}
+                >
+                  <ItemIcon className="h-4 w-4" aria-hidden="true" />
+                  {item.label}
+                </button>
+              )
+            })}
           </nav>
         </aside>
 
@@ -298,13 +305,13 @@ export default function ProfilePage() {
                       </h3>
                       <p className="text-sm mt-0.5">
                         {displayUser.emailVerified
-                          ? <span className="text-green-600 dark:text-green-400"><i className="fa-solid fa-circle-check mr-1.5" />Email verificado</span>
-                          : <span className="text-red-500 dark:text-red-400"><i className="fa-solid fa-circle-xmark mr-1.5" />Email no verificado</span>}
+                          ? <span className="inline-flex items-center gap-1.5 text-green-600 dark:text-green-400"><CircleCheck className="h-3.5 w-3.5" aria-hidden="true" />Email verificado</span>
+                          : <span className="inline-flex items-center gap-1.5 text-red-500 dark:text-red-400"><CircleX className="h-3.5 w-3.5" aria-hidden="true" />Email no verificado</span>}
                       </p>
                       <p className="text-sm mt-0.5">
                         {displayUser.isIdentityVerified
-                          ? <span className="text-green-600 dark:text-green-400"><i className="fa-solid fa-id-card mr-1.5" />Identidad verificada</span>
-                          : <span className="text-gray-500 dark:text-gray-400"><i className="fa-regular fa-id-card mr-1.5" />Identidad pendiente</span>}
+                          ? <span className="inline-flex items-center gap-1.5 text-green-600 dark:text-green-400"><IdCard className="h-3.5 w-3.5" aria-hidden="true" />Identidad verificada</span>
+                          : <span className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400"><IdCard className="h-3.5 w-3.5" aria-hidden="true" />Identidad pendiente</span>}
                       </p>
                     </div>
                   </div>
@@ -338,13 +345,13 @@ export default function ProfilePage() {
 
                 {scoreLoading ? (
                   <div className="p-6 flex items-center justify-center gap-3 text-gray-400">
-                    <i className="fa-solid fa-spinner animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                     <span className="text-sm">Cargando evaluación...</span>
                   </div>
                 ) : !score ? (
                   <div className="p-6 text-center">
                     <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-3">
-                      <i className="fa-solid fa-chart-line text-gray-400 text-lg" />
+                      <LineChart className="h-5 w-5 text-gray-400" aria-hidden="true" />
                     </div>
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Sin evaluación crediticia</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Completa la verificación de identidad para obtener tu score.</p>
@@ -382,7 +389,7 @@ export default function ProfilePage() {
                             const cfg = RISK_CONFIG[score.riskLevel] ?? RISK_CONFIG['MEDIUM']
                             return (
                               <span className={`inline-flex items-center gap-1.5 text-sm font-semibold px-3 py-1 rounded-full ${cfg.bg} ${cfg.color}`}>
-                                <i className="fa-solid fa-circle text-[8px]" />
+                                <Circle className="h-2 w-2 fill-current" aria-hidden="true" />
                                 {cfg.label}
                               </span>
                             )
@@ -469,8 +476,8 @@ export default function ProfilePage() {
                               >
                                 <div className="flex items-center justify-center gap-1.5 mb-0.5">
                                   {unlocked
-                                    ? <i className="fa-solid fa-circle-check text-green-500 text-xs" />
-                                    : <i className="fa-solid fa-lock text-gray-400 text-xs" />
+                                    ? <CircleCheck className="h-3 w-3 text-green-500" aria-hidden="true" />
+                                    : <Lock className="h-3 w-3 text-gray-400" aria-hidden="true" />
                                   }
                                   <span className={`text-xs font-semibold ${unlocked ? 'text-[#0A192F] dark:text-white' : 'text-gray-400'}`}>
                                     {tier.label}
@@ -495,13 +502,13 @@ export default function ProfilePage() {
                   {/* Account list */}
                   {bankAccountsLoading ? (
                     <div className="flex items-center justify-center gap-3 py-8 text-gray-400">
-                      <i className="fa-solid fa-spinner animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                       <span className="text-sm">Cargando cuentas...</span>
                     </div>
                   ) : bankAccounts.length === 0 ? (
                     <div className="flex flex-col items-center py-8 text-center">
                       <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center mb-3">
-                        <i className="fa-solid fa-building-columns text-xl text-gray-400 dark:text-gray-500" />
+                        <Landmark className="h-6 w-6 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                       </div>
                       <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Sin cuentas registradas</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Agrega una cuenta CCI para recibir tus préstamos.</p>
@@ -512,14 +519,14 @@ export default function ProfilePage() {
                         <div key={account.id} className="flex items-center justify-between gap-4 p-4 rounded-xl border border-gray-100 dark:border-white/6 bg-gray-50 dark:bg-[#0F172A]">
                           <div className="flex items-center gap-3 min-w-0">
                             <div className="w-9 h-9 rounded-lg bg-[#0A192F]/5 dark:bg-[#D4AF37]/10 flex items-center justify-center shrink-0">
-                              <i className="fa-solid fa-building-columns text-[#0A192F] dark:text-[#D4AF37] text-sm" />
+                              <Landmark className="h-4 w-4 text-[#0A192F] dark:text-[#D4AF37]" aria-hidden="true" />
                             </div>
                             <div className="min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
                                 <span className="font-semibold text-[#0A192F] dark:text-white text-sm">{account.bankName}</span>
                                 {account.isDefault && (
                                   <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-[#0A192F]/10 dark:bg-[#D4AF37]/15 text-[#0A192F] dark:text-[#D4AF37]">
-                                    <i className="fa-solid fa-star text-[8px]" />
+                                    <Star className="h-2 w-2 fill-current" aria-hidden="true" />
                                     Predeterminada
                                   </span>
                                 )}
@@ -543,7 +550,7 @@ export default function ProfilePage() {
                               onClick={() => handleDeleteAccount(account.id)}
                               className="text-xs px-2.5 py-1.5 rounded-lg border border-red-100 dark:border-red-900/30 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
                             >
-                              <i className="fa-solid fa-trash-can" />
+                              <Trash2 className="h-4 w-4" aria-hidden="true" />
                             </button>
                           </div>
                         </div>
@@ -559,7 +566,7 @@ export default function ProfilePage() {
                           onClick={() => setShowAddForm(true)}
                           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-gray-200 dark:border-white/10 text-sm font-medium text-gray-600 dark:text-gray-400 hover:border-[#0A192F] dark:hover:border-[#D4AF37] hover:text-[#0A192F] dark:hover:text-[#D4AF37] transition-colors"
                         >
-                          <i className="fa-solid fa-plus text-xs" />
+                          <Plus className="h-3 w-3" aria-hidden="true" />
                           Agregar cuenta
                         </button>
                       ) : (
@@ -609,7 +616,7 @@ export default function ProfilePage() {
                               disabled={addLoading || addForm.cci.length !== 20}
                               className="px-4 py-2 text-sm font-semibold rounded-xl bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
                             >
-                              {addLoading && <i className="fa-solid fa-spinner animate-spin text-xs" />}
+                              {addLoading && <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />}
                               Guardar cuenta
                             </button>
                             <button
@@ -647,7 +654,7 @@ export default function ProfilePage() {
                       </p>
                       {pwDone && (
                         <p className="text-xs text-green-600 dark:text-green-400 mt-2 flex items-center gap-1">
-                          <i className="fa-solid fa-circle-check" />
+                          <CircleCheck className="h-4 w-4" aria-hidden="true" />
                           Contraseña actualizada correctamente.
                         </p>
                       )}
@@ -710,7 +717,7 @@ export default function ProfilePage() {
                           disabled={pwLoading}
                           className="px-4 py-2 text-sm font-semibold rounded-xl bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
                         >
-                          {pwLoading && <i className="fa-solid fa-spinner animate-spin text-xs" />}
+                          {pwLoading && <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />}
                           Actualizar contraseña
                         </button>
                         <button
@@ -751,7 +758,7 @@ export default function ProfilePage() {
             <div className="space-y-6">
               {notifsLoading ? (
                 <div className="flex items-center gap-3 text-gray-400 py-8 justify-center">
-                  <i className="fa-solid fa-spinner animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                   <span className="text-sm">Cargando preferencias...</span>
                 </div>
               ) : (
@@ -765,7 +772,7 @@ export default function ProfilePage() {
                         </div>
                         {notifsSaving && (
                           <span className="text-xs text-gray-400 flex items-center gap-1.5">
-                            <i className="fa-solid fa-spinner animate-spin text-[10px]" />
+                            <Loader2 className="h-2.5 w-2.5 animate-spin" aria-hidden="true" />
                             Guardando...
                           </span>
                         )}

@@ -2,6 +2,7 @@
 
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
+import { Sun, Moon } from 'lucide-react'
 
 export function LandingThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
@@ -24,7 +25,7 @@ export function LandingThemeToggle() {
         aria-label="Cambiar a tema oscuro"
         className="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-all ml-2"
       >
-        <i className="fa-solid fa-moon text-gray-600" aria-hidden="true" />
+        <Moon className="h-4 w-4 text-gray-600" aria-hidden="true" />
       </button>
     )
   }
@@ -36,7 +37,7 @@ export function LandingThemeToggle() {
       aria-label="Cambiar a tema claro"
       className="w-10 h-10 rounded-lg bg-[#1E293B] hover:bg-[#334155] flex items-center justify-center transition-all ml-2"
     >
-      <i className="fa-solid fa-sun text-[#D4AF37]" aria-hidden="true" />
+      <Sun className="h-4 w-4 text-[#D4AF37]" aria-hidden="true" />
     </button>
   )
 }

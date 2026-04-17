@@ -3,6 +3,11 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
+import type { LucideIcon } from 'lucide-react'
+import {
+  Home, HandCoins, Wallet, ArrowLeftRight, Bell, BookOpen, User,
+  Sun, Moon, LogOut,
+} from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { useNotificationStore } from '@/features/notifications'
 import { Logo } from '@/shared/ui/Logo'
@@ -10,19 +15,19 @@ import { shortName } from '@/shared/lib/utils'
 
 interface NavItem {
   href: string
-  icon: string
+  icon: LucideIcon
   label: string
   matchPrefix?: string
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard',    icon: 'fa-solid fa-house',                label: 'Dashboard' },
-  { href: '/request-loan', icon: 'fa-solid fa-hand-holding-dollar',  label: 'Solicitar Préstamo' },
-  { href: '/loans',        icon: 'fa-solid fa-wallet',               label: 'Mis Préstamos', matchPrefix: '/loans' },
-  { href: '/payments',     icon: 'fa-solid fa-money-bill-transfer',  label: 'Pagos' },
-  { href: '/notifications',icon: 'fa-regular fa-bell',               label: 'Notificaciones' },
-  { href: '/my-complaints', icon: 'fa-solid fa-book',                label: 'Mis Reclamos' },
-  { href: '/profile',      icon: 'fa-solid fa-user',                 label: 'Mi Perfil' },
+  { href: '/dashboard',      icon: Home,           label: 'Dashboard' },
+  { href: '/request-loan',   icon: HandCoins,      label: 'Solicitar Préstamo' },
+  { href: '/loans',          icon: Wallet,         label: 'Mis Préstamos', matchPrefix: '/loans' },
+  { href: '/payments',       icon: ArrowLeftRight, label: 'Pagos' },
+  { href: '/notifications',  icon: Bell,           label: 'Notificaciones' },
+  { href: '/my-complaints',  icon: BookOpen,       label: 'Mis Reclamos' },
+  { href: '/profile',        icon: User,           label: 'Mi Perfil' },
 ]
 
 interface Props {
@@ -102,6 +107,7 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
         <nav className="grow space-y-0.5">
           {NAV_ITEMS.map((item) => {
             const active = isActive(item)
+            const ItemIcon = item.icon
             return (
               <Link
                 key={item.href}
@@ -115,7 +121,7 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
                   }
                 `}
               >
-                <i className={`${item.icon} w-4 text-center text-sm`} />
+                <ItemIcon className="h-4 w-4" aria-hidden="true" />
                 {item.label}
                 {item.href === '/notifications' && unreadCount > 0 && (
                   <span className="ml-auto w-[18px] h-[18px] rounded-full bg-[#00E5FF] text-[#0A192F] text-[10px] font-bold inline-flex items-center justify-center leading-none shrink-0">
@@ -134,7 +140,7 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-gray-400 hover:bg-white/5 hover:text-white transition-colors w-full"
           >
             {mounted ? (
-              <i className={`fa-solid ${isDark ? 'fa-sun' : 'fa-moon'} w-4 text-center`} />
+              isDark ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />
             ) : (
               <span className="w-4" />
             )}
@@ -145,7 +151,7 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
             onClick={handleLogout}
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-red-400 hover:bg-red-400/10 transition-colors w-full"
           >
-            <i className="fa-solid fa-arrow-right-from-bracket w-4 text-center" />
+            <LogOut className="h-4 w-4" aria-hidden="true" />
             Cerrar Sesión
           </button>
         </div>

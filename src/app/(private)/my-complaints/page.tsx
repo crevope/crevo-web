@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Plus, FolderOpen, ArrowLeft, CircleCheck, Clock, ChevronRight } from 'lucide-react'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
@@ -65,7 +66,7 @@ export default function MyComplaintsPage() {
           className="hidden sm:inline-flex bg-brand-primary hover:bg-brand-primary-hover text-white"
         >
           <Link href="/libro-de-reclamaciones">
-            <i className="fa-solid fa-plus text-xs" /> Nuevo reclamo
+            <Plus className="h-3 w-3" aria-hidden="true" /> Nuevo reclamo
           </Link>
         </Button>
       </div>
@@ -86,7 +87,7 @@ export default function MyComplaintsPage() {
       ) : complaints.length === 0 ? (
         <Card className={`${cardCls} p-16 text-center`}>
           <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-brand-surface flex items-center justify-center mx-auto mb-5">
-            <i className="fa-regular fa-folder-open text-3xl text-gray-400 dark:text-gray-500" />
+            <FolderOpen className="h-9 w-9 text-gray-400 dark:text-gray-500" aria-hidden="true" />
           </div>
           <h3 className="text-lg font-semibold text-brand-text mb-2">
             Aún no has presentado reclamos
@@ -97,7 +98,7 @@ export default function MyComplaintsPage() {
           </p>
           <Button asChild className="bg-brand-primary hover:bg-brand-primary-hover text-white">
             <Link href="/libro-de-reclamaciones">
-              <i className="fa-solid fa-plus text-xs" /> Presentar reclamo
+              <Plus className="h-3 w-3" aria-hidden="true" /> Presentar reclamo
             </Link>
           </Button>
         </Card>
@@ -109,7 +110,7 @@ export default function MyComplaintsPage() {
             onClick={() => setSelectedId(null)}
             className="px-0 h-auto text-sm text-gray-500 dark:text-gray-400 hover:text-brand-primary dark:hover:text-brand-secondary hover:no-underline"
           >
-            <i className="fa-solid fa-arrow-left text-xs" /> Volver a la lista
+            <ArrowLeft className="h-3 w-3" aria-hidden="true" /> Volver a la lista
           </Button>
           <ComplaintDetailCard complaint={selected} />
         </div>
@@ -132,7 +133,7 @@ export default function MyComplaintsPage() {
                         : 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400'
                     }`}
                   >
-                    <i className={`fa-solid ${isClosed ? 'fa-circle-check' : 'fa-clock'}`} />
+                    {isClosed ? <CircleCheck className="h-4 w-4" aria-hidden="true" /> : <Clock className="h-4 w-4" aria-hidden="true" />}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -172,7 +173,7 @@ export default function MyComplaintsPage() {
                     </p>
                   </div>
 
-                  <i className="fa-solid fa-chevron-right text-gray-300 dark:text-gray-600 text-xs mt-3" />
+                  <ChevronRight className="h-3 w-3 text-gray-300 dark:text-gray-600 mt-3" aria-hidden="true" />
                 </button>
               )
             })}

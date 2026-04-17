@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Loader2, User, IdCard, Mail, Lock, Eye, EyeOff, CheckCheck, ShieldCheck, ArrowRight } from 'lucide-react'
 import { Checkbox } from '@/shared/ui/checkbox'
 import { registerSchema, type RegisterInput } from '../lib/authSchemas'
 import { useAuthStore } from '../model/useAuthStore'
@@ -63,7 +63,7 @@ export function RegisterForm() {
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nombres</label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <i className="fa-regular fa-user text-gray-400 dark:text-gray-500" />
+              <User className="h-4 w-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
             </div>
             <input
               type="text"
@@ -92,7 +92,7 @@ export function RegisterForm() {
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">DNI</label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <i className="fa-regular fa-id-card text-gray-400 dark:text-gray-500" />
+              <IdCard className="h-4 w-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
             </div>
             <input
               type="text"
@@ -126,7 +126,7 @@ export function RegisterForm() {
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Correo electrónico</label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <i className="fa-regular fa-envelope text-gray-400 dark:text-gray-500" />
+            <Mail className="h-4 w-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
           </div>
           <input
             type="email"
@@ -145,7 +145,7 @@ export function RegisterForm() {
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Contraseña</label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <i className="fa-solid fa-lock text-gray-400 dark:text-gray-500" />
+              <Lock className="h-4 w-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
             </div>
             <input
               type={showPass ? 'text' : 'password'}
@@ -160,7 +160,7 @@ export function RegisterForm() {
               aria-pressed={showPass}
               className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              <i className={`fa-regular ${showPass ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true" />
+              {showPass ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
             </button>
           </div>
           {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
@@ -169,7 +169,7 @@ export function RegisterForm() {
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Confirmar contraseña</label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <i className="fa-solid fa-check-double text-gray-400 dark:text-gray-500" />
+              <CheckCheck className="h-4 w-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
             </div>
             <input
               type="password"
@@ -185,7 +185,7 @@ export function RegisterForm() {
       {/* Password requirements */}
       <div className="bg-gray-50 dark:bg-[#0F172A] p-3 rounded-lg border border-gray-200 dark:border-[#334155]">
         <p className="text-xs text-gray-700 dark:text-gray-300 font-medium mb-1 flex items-center gap-1.5">
-          <i className="fa-solid fa-shield-halved text-[#0A192F] dark:text-[#D4AF37]" /> Requisitos de contraseña:
+          <ShieldCheck className="h-3.5 w-3.5 text-[#0A192F] dark:text-[#D4AF37]" aria-hidden="true" /> Requisitos de contraseña:
         </p>
         <ul className="text-xs text-gray-500 dark:text-gray-400 grid grid-cols-2 gap-1 pl-5 list-disc">
           <li>Mínimo 8 caracteres</li>
@@ -238,7 +238,7 @@ export function RegisterForm() {
           {isSubmitting ? (
             <><Loader2 className="h-4 w-4 animate-spin" /> Creando cuenta...</>
           ) : (
-            <>Crear Cuenta <i className="fa-solid fa-arrow-right text-sm" /></>
+            <>Crear Cuenta <ArrowRight className="h-4 w-4" aria-hidden="true" /></>
           )}
         </button>
       </div>

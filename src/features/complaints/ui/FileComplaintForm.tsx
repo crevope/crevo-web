@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Send } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Checkbox } from '@/shared/ui/checkbox'
@@ -367,7 +367,7 @@ export function FileComplaintForm({ onFiled }: Props) {
           {submitting ? (
             <><Loader2 className="h-4 w-4 animate-spin" /> Registrando...</>
           ) : (
-            <>Enviar reclamo <i className="fa-solid fa-paper-plane text-sm" /></>
+            <>Enviar reclamo <Send className="h-4 w-4" aria-hidden="true" /></>
           )}
         </Button>
       </Card>

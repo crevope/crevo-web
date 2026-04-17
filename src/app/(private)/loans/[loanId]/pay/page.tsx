@@ -3,7 +3,10 @@ import { useEffect, useCallback, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Loader2, Sparkles, TrendingDown } from 'lucide-react'
+import {
+  Loader2, Sparkles, TrendingDown, ArrowLeft, TriangleAlert,
+  PiggyBank, Lock, ShieldCheck, CreditCard,
+} from 'lucide-react'
 import { loanRepository, useLoanStore } from '@/features/request-loan'
 import { useAuthStore } from '@/features/auth'
 import { formatCurrency, loanRef } from '@/shared/lib/utils'
@@ -84,7 +87,7 @@ export default function PayLoanPage() {
           href={`/loans/${loanId}`}
           className="w-10 h-10 rounded-xl bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors"
         >
-          <i className="fa-solid fa-arrow-left" />
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-[#0A192F] dark:text-white">Realizar Pago</h1>
@@ -111,7 +114,7 @@ export default function PayLoanPage() {
           )}
           {balance.isOverdue && (
             <div className="flex items-center gap-2 mt-2 text-red-300 text-sm">
-              <i className="fa-solid fa-triangle-exclamation" />
+              <TriangleAlert className="h-4 w-4" aria-hidden="true" />
               Este préstamo está vencido
             </div>
           )}
@@ -207,7 +210,7 @@ export default function PayLoanPage() {
           {earlyPayoffQuote.interestSaved > 0 && (
             <div className="flex items-center justify-between bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-700/30 rounded-lg px-4 py-2.5 mb-4">
               <div className="flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-400">
-                <i className="fa-solid fa-piggy-bank" />
+                <PiggyBank className="h-4 w-4" aria-hidden="true" />
                 <span>Ahorro en intereses futuros</span>
               </div>
               <span className="font-semibold text-emerald-700 dark:text-emerald-400 text-sm">
@@ -231,11 +234,11 @@ export default function PayLoanPage() {
             >
               {isEarlyPaying
                 ? <><Loader2 className="h-4 w-4 animate-spin" />Procesando...</>
-                : <><i className="fa-solid fa-lock" />Pagar {formatCurrency(earlyPayoffQuote.payoffAmount)}</>}
+                : <><Lock className="h-4 w-4" aria-hidden="true" />Pagar {formatCurrency(earlyPayoffQuote.payoffAmount)}</>}
             </button>
           </div>
           <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-3">
-            <i className="fa-solid fa-shield-halved mr-1" />
+            <ShieldCheck className="inline h-3 w-3 mr-1" aria-hidden="true" />
             Pago seguro procesado por Culqi · Cifrado 256-bit
           </p>
         </div>
@@ -246,7 +249,7 @@ export default function PayLoanPage() {
         <div className={`${cardCls} p-6`}>
           <div className="flex items-center gap-3 mb-5">
             <div className="w-9 h-9 rounded-lg bg-[#0A192F]/5 dark:bg-[#D4AF37]/10 flex items-center justify-center text-[#0A192F] dark:text-[#D4AF37]">
-              <i className="fa-solid fa-credit-card" />
+              <CreditCard className="h-4 w-4" aria-hidden="true" />
             </div>
             <div>
               <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">Pagar con tarjeta</h3>
@@ -270,11 +273,11 @@ export default function PayLoanPage() {
           >
             {isPaying
               ? <><Loader2 className="h-4 w-4 animate-spin" />Procesando...</>
-              : <><i className="fa-solid fa-lock" />Pagar {formatCurrency(balance.remaining)}</>}
+              : <><Lock className="h-4 w-4" aria-hidden="true" />Pagar {formatCurrency(balance.remaining)}</>}
           </button>
 
           <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-3">
-            <i className="fa-solid fa-shield-halved mr-1" />
+            <ShieldCheck className="inline h-3 w-3 mr-1" aria-hidden="true" />
             Pago seguro procesado por Culqi · Cifrado 256-bit
           </p>
         </div>

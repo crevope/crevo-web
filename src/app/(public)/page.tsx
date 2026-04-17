@@ -1,10 +1,15 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import {
+  Zap, LineChart, Crown, Calculator, ArrowRight, Star, StarHalf,
+  CirclePlay, ShieldCheck, Quote, Check, Lock, Landmark, Smartphone,
+} from 'lucide-react'
 import { LoanSimulator } from '@/features/simulator/ui/LoanSimulator'
 import { RepresentativeExample } from '@/features/simulator/ui/RepresentativeExample'
 import { FaqSection, faqJsonLd } from '@/features/faq'
 import { LandingHeader } from '@/shared/ui/landing-header'
 import { Logo } from '@/shared/ui/Logo'
+import { FacebookIcon } from '@/shared/ui/brand-icons'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
 import { buildMetadata } from '@/shared/seo/buildMetadata'
 import { JsonLd } from '@/shared/seo/JsonLd'
@@ -93,25 +98,25 @@ export default function LandingPage() {
               {/* Product pills light */}
               <div className="flex flex-wrap gap-2 mb-9 dark:hidden">
                 <div className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600">
-                  <i className="fa-solid fa-bolt text-[#00E5FF] mr-1" /> Crevo Express
+                  <Zap className="inline h-3 w-3 text-[#00E5FF] mr-1" aria-hidden="true" /> Crevo Express
                 </div>
                 <div className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600">
-                  <i className="fa-solid fa-chart-line text-[#D4AF37] mr-1" /> Crevo Flex
+                  <LineChart className="inline h-3 w-3 text-[#D4AF37] mr-1" aria-hidden="true" /> Crevo Flex
                 </div>
                 <div className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-600">
-                  <i className="fa-solid fa-crown text-[#D4AF37] mr-1" /> Crevo Plus
+                  <Crown className="inline h-3 w-3 text-[#D4AF37] mr-1" aria-hidden="true" /> Crevo Plus
                 </div>
               </div>
               {/* Product pills dark */}
               <div className="hidden dark:flex flex-wrap gap-2 mb-9">
                 <div className="px-3 py-1.5 bg-[#1E293B] border border-[#334155] rounded-full text-xs font-medium text-gray-300">
-                  <i className="fa-solid fa-bolt text-[#00E5FF] mr-1" /> Crevo Express
+                  <Zap className="inline h-3 w-3 text-[#00E5FF] mr-1" aria-hidden="true" /> Crevo Express
                 </div>
                 <div className="px-3 py-1.5 bg-[#1E293B] border border-[#334155] rounded-full text-xs font-medium text-gray-300">
-                  <i className="fa-solid fa-chart-line text-[#D4AF37] mr-1" /> Crevo Flex
+                  <LineChart className="inline h-3 w-3 text-[#D4AF37] mr-1" aria-hidden="true" /> Crevo Flex
                 </div>
                 <div className="px-3 py-1.5 bg-[#1E293B] border border-[#334155] rounded-full text-xs font-medium text-gray-300">
-                  <i className="fa-solid fa-crown text-[#D4AF37] mr-1" /> Crevo Plus
+                  <Crown className="inline h-3 w-3 text-[#D4AF37] mr-1" aria-hidden="true" /> Crevo Plus
                 </div>
               </div>
 
@@ -119,15 +124,15 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row gap-3 mb-10">
                 {/* Simular — light */}
                 <Link href="#simulador" className="px-7 py-3 bg-[#0A192F] text-white rounded-lg font-semibold text-base hover:bg-[#0A192F]/90 transition-all flex items-center justify-center gap-2.5 dark:hidden">
-                  <i className="fa-solid fa-calculator text-[#D4AF37]" />
+                  <Calculator className="h-4 w-4 text-[#D4AF37]" aria-hidden="true" />
                   Simular préstamo (S/)
-                  <i className="fa-solid fa-arrow-right text-sm" />
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
                 {/* Simular — dark */}
                 <Link href="#simulador" className="px-7 py-3 bg-[#0A192F] text-white rounded-lg font-semibold text-base hover:opacity-90 transition-all hidden dark:flex items-center justify-center gap-2.5">
-                  <i className="fa-solid fa-calculator text-[#D4AF37]" />
+                  <Calculator className="h-4 w-4 text-[#D4AF37]" aria-hidden="true" />
                   Simular préstamo (S/)
-                  <i className="fa-solid fa-arrow-right text-sm" />
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
 
                 {/* Registrarme — light */}
@@ -151,7 +156,7 @@ export default function LandingPage() {
                 </div>
                 <div className="text-sm">
                   <div className="flex items-center gap-1 text-[#D4AF37] text-sm mb-1">
-                    <i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star-half-stroke" />
+                    <Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><StarHalf className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" />
                   </div>
                   <span className="text-gray-500 text-xs">Peruanos confían en nosotros</span>
                 </div>
@@ -166,7 +171,7 @@ export default function LandingPage() {
                 </div>
                 <div className="text-sm">
                   <div className="flex items-center gap-1 text-[#D4AF37] text-sm mb-1">
-                    <i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star-half-stroke" />
+                    <Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><StarHalf className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" />
                   </div>
                   <span className="text-gray-500 text-xs">Peruanos confían en nosotros</span>
                 </div>
@@ -175,11 +180,11 @@ export default function LandingPage() {
               {/* Discover link */}
               <div className="mt-6">
                 <Link href="#como-funciona" className="inline-flex items-center gap-2 text-[#0A192F] dark:hidden font-medium group text-sm">
-                  <i className="fa-regular fa-circle-play text-lg group-hover:scale-110 transition-transform text-[#00E5FF]" />
+                  <CirclePlay className="h-5 w-5 group-hover:scale-110 transition-transform text-[#00E5FF]" aria-hidden="true" />
                   Descubre cómo funciona
                 </Link>
                 <Link href="#como-funciona" className="hidden dark:inline-flex items-center gap-2 text-[#D4AF37] font-medium group text-sm">
-                  <i className="fa-regular fa-circle-play text-lg group-hover:scale-110 transition-transform text-[#00E5FF]" />
+                  <CirclePlay className="h-5 w-5 group-hover:scale-110 transition-transform text-[#00E5FF]" aria-hidden="true" />
                   Descubre cómo funciona
                 </Link>
               </div>
@@ -205,7 +210,7 @@ export default function LandingPage() {
 
               {/* Security badge */}
               <div className="absolute top-5 right-5 glass-effect rounded-lg px-3 py-2.5 shadow-lg flex items-center gap-2.5 animate-[bounce_4s_ease-in-out_infinite]">
-                <i className="fa-solid fa-shield-halved text-[#00E5FF]" />
+                <ShieldCheck className="h-4 w-4 text-[#00E5FF]" aria-hidden="true" />
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase tracking-wide">Seguridad bancaria</p>
                   <p className="text-xs font-semibold text-gray-900">Cifrado AES-256</p>
@@ -215,7 +220,7 @@ export default function LandingPage() {
               {/* Testimonial */}
               <div className="absolute bottom-12 -left-6 glass-effect rounded-lg p-4 shadow-xl max-w-64 transform -rotate-1">
                 <div className="flex items-start gap-2.5">
-                  <i className="fa-solid fa-quote-left text-[#D4AF37] text-xl mt-0.5 shrink-0" />
+                  <Quote className="h-5 w-5 text-[#D4AF37] mt-0.5 shrink-0" aria-hidden="true" />
                   <div>
                     <p className="text-xs text-gray-700 leading-snug mb-2.5">&quot;Solicité S/ 5,000 con Crevo Express y en 15 minutos ya estaba en mi CCI del BCP.&quot;</p>
                     <div className="flex items-center gap-1.5">
@@ -229,15 +234,15 @@ export default function LandingPage() {
 
               {/* Approval badge */}
               <div className="absolute bottom-5 right-5 glass-effect rounded-lg px-3 py-2 shadow-lg flex items-center gap-2">
-                <i className="fa-solid fa-check text-[#00E5FF] text-sm" />
+                <Check className="h-3.5 w-3.5 text-[#00E5FF]" aria-hidden="true" />
                 <span className="text-xs font-medium text-gray-900">Aprobación Inmediata</span>
               </div>
             </div>
 
             <p className="mt-5 text-xs text-gray-500 font-medium flex items-center justify-center gap-3 flex-wrap relative z-10">
-              <span className="flex items-center gap-1.5"><i className="fa-solid fa-lock" /> Datos protegidos por ley</span>
+              <span className="flex items-center gap-1.5"><Lock className="h-3 w-3" aria-hidden="true" /> Datos protegidos por ley</span>
               <span>•</span>
-              <span className="flex items-center gap-1.5"><i className="fa-solid fa-building-columns" /> Sujeto Obligado UIF-Perú</span>
+              <span className="flex items-center gap-1.5"><Landmark className="h-3 w-3" aria-hidden="true" /> Sujeto Obligado UIF-Perú</span>
             </p>
           </div>
 
@@ -256,7 +261,7 @@ export default function LandingPage() {
               />
 
               <div className="absolute top-5 right-5 glass-effect-dark rounded-lg px-3 py-2.5 shadow-lg border border-white/10 flex items-center gap-2.5 animate-[bounce_4s_ease-in-out_infinite]">
-                <i className="fa-solid fa-shield-halved text-[#00E5FF]" />
+                <ShieldCheck className="h-4 w-4 text-[#00E5FF]" aria-hidden="true" />
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase tracking-wide">Seguridad bancaria</p>
                   <p className="text-xs font-semibold text-white">Cifrado AES-256</p>
@@ -265,7 +270,7 @@ export default function LandingPage() {
 
               <div className="absolute bottom-12 -left-6 glass-effect-dark rounded-lg p-4 shadow-xl border border-white/10 max-w-64 transform -rotate-1">
                 <div className="flex items-start gap-2.5">
-                  <i className="fa-solid fa-quote-left text-[#D4AF37] text-xl mt-0.5 shrink-0" />
+                  <Quote className="h-5 w-5 text-[#D4AF37] mt-0.5 shrink-0" aria-hidden="true" />
                   <div>
                     <p className="text-xs text-gray-200 leading-snug mb-2.5">&quot;Solicité S/ 5,000 con Crevo Express y en 15 minutos ya estaba en mi CCI del BCP.&quot;</p>
                     <div className="flex items-center gap-1.5">
@@ -278,15 +283,15 @@ export default function LandingPage() {
               </div>
 
               <div className="absolute bottom-5 right-5 glass-effect-dark rounded-lg px-3 py-2 shadow-lg border border-white/10 flex items-center gap-2">
-                <i className="fa-solid fa-check text-[#D4AF37] text-sm" />
+                <Check className="h-3.5 w-3.5 text-[#D4AF37]" aria-hidden="true" />
                 <span className="text-xs font-medium text-white">Aprobación Inmediata</span>
               </div>
             </div>
 
             <p className="mt-5 text-xs text-gray-400 font-medium flex items-center justify-center gap-3 flex-wrap relative z-10">
-              <span className="flex items-center gap-1.5"><i className="fa-solid fa-lock" /> Datos protegidos por ley</span>
+              <span className="flex items-center gap-1.5"><Lock className="h-3 w-3" aria-hidden="true" /> Datos protegidos por ley</span>
               <span>•</span>
-              <span className="flex items-center gap-1.5"><i className="fa-solid fa-building-columns" /> Sujeto Obligado UIF-Perú</span>
+              <span className="flex items-center gap-1.5"><Landmark className="h-3 w-3" aria-hidden="true" /> Sujeto Obligado UIF-Perú</span>
             </p>
           </div>
         </section>
@@ -306,7 +311,7 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="p-6 rounded-lg bg-[#F8FAFC] dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 hover:border-gray-200 dark:hover:border-white/10 transition-colors">
                 <div className="w-11 h-11 rounded-lg bg-[#00E5FF]/10 flex items-center justify-center mb-5">
-                  <i className="fa-solid fa-mobile-screen-button text-lg text-[#00E5FF]" />
+                  <Smartphone className="h-5 w-5 text-[#00E5FF]" aria-hidden="true" />
                 </div>
                 <h3 className="text-base font-semibold text-[#0A192F] dark:text-white mb-2">100% Digital</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Olvídate de las colas y el papeleo. Todo el proceso, desde la solicitud hasta el desembolso, se realiza desde tu celular o computadora.</p>
@@ -314,7 +319,7 @@ export default function LandingPage() {
 
               <div className="p-6 rounded-lg bg-[#F8FAFC] dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 hover:border-gray-200 dark:hover:border-white/10 transition-colors">
                 <div className="w-11 h-11 rounded-lg bg-[#0A192F]/8 dark:bg-[#D4AF37]/10 flex items-center justify-center mb-5">
-                  <i className="fa-solid fa-building-shield text-lg text-[#0A192F] dark:text-[#D4AF37]" />
+                  <ShieldCheck className="h-5 w-5 text-[#0A192F] dark:text-[#D4AF37]" aria-hidden="true" />
                 </div>
                 <h3 className="text-base font-semibold text-[#0A192F] dark:text-white mb-2">Empresa Peruana Confiable</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Tus datos están protegidos con encriptación de nivel bancario. Cumplimos con la Ley N° 29733 y aplicamos voluntariamente los estándares de transparencia SBS para tasas y costos.</p>
@@ -322,7 +327,7 @@ export default function LandingPage() {
 
               <div className="p-6 rounded-lg bg-[#F8FAFC] dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 hover:border-gray-200 dark:hover:border-white/10 transition-colors">
                 <div className="w-11 h-11 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center mb-5">
-                  <i className="fa-solid fa-bolt text-lg text-[#D4AF37]" />
+                  <Zap className="h-5 w-5 text-[#D4AF37]" aria-hidden="true" />
                 </div>
                 <h3 className="text-base font-semibold text-[#0A192F] dark:text-white mb-2">Velocidad Crevo</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Aprobación en minutos. El dinero se transfiere directamente a tu CCI registrado casi de inmediato.</p>
@@ -398,9 +403,9 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Testimonial 1 */}
               <div className="bg-white dark:bg-[#0F172A] p-6 rounded-lg border border-gray-100 dark:border-white/6 relative">
-                <i className="fa-solid fa-quote-right absolute top-5 right-5 text-2xl text-gray-100 dark:text-white/5" />
+                <Quote className="absolute top-5 right-5 h-6 w-6 text-gray-100 dark:text-white/5 scale-x-[-1]" aria-hidden="true" />
                 <div className="flex items-center gap-0.5 text-[#D4AF37] text-xs mb-3">
-                  <i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" />
+                  <Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" />
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 relative z-10 leading-relaxed">&quot;Necesitaba capital para mi bodega. Con Crevo Flex me aprobaron súper rápido y pude pagar en 3 meses. El proceso es muy transparente.&quot;</p>
                 <div className="flex items-center gap-3">
@@ -414,9 +419,9 @@ export default function LandingPage() {
 
               {/* Testimonial 2 */}
               <div className="bg-white dark:bg-[#0F172A] p-6 rounded-lg border border-gray-100 dark:border-white/6 relative">
-                <i className="fa-solid fa-quote-right absolute top-5 right-5 text-2xl text-gray-100 dark:text-white/5" />
+                <Quote className="absolute top-5 right-5 h-6 w-6 text-gray-100 dark:text-white/5 scale-x-[-1]" aria-hidden="true" />
                 <div className="flex items-center gap-0.5 text-[#D4AF37] text-xs mb-3">
-                  <i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" />
+                  <Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" />
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 relative z-10 leading-relaxed">&quot;Tuve una emergencia médica y necesitaba liquidez urgente. Crevo Express me salvó. En menos de media hora ya tenía la plata en mi banco.&quot;</p>
                 <div className="flex items-center gap-3">
@@ -430,9 +435,9 @@ export default function LandingPage() {
 
               {/* Testimonial 3 */}
               <div className="bg-white dark:bg-[#0F172A] p-6 rounded-lg border border-gray-100 dark:border-white/6 relative">
-                <i className="fa-solid fa-quote-right absolute top-5 right-5 text-2xl text-gray-100 dark:text-white/5" />
+                <Quote className="absolute top-5 right-5 h-6 w-6 text-gray-100 dark:text-white/5 scale-x-[-1]" aria-hidden="true" />
                 <div className="flex items-center gap-0.5 text-[#D4AF37] text-xs mb-3">
-                  <i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star" /><i className="fa-solid fa-star-half-stroke" />
+                  <Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><Star className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" /><StarHalf className="inline h-3.5 w-3.5 fill-current" aria-hidden="true" />
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 relative z-10 leading-relaxed">&quot;La app es muy fácil de usar. Puedo ver exactamente cuánto voy a pagar desde el principio, sin sorpresas al final de mes.&quot;</p>
                 <div className="flex items-center gap-3">
@@ -459,7 +464,7 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-lg bg-[#0A192F]/8 dark:bg-[#D4AF37]/10 flex items-center justify-center">
-                  <i className="fa-solid fa-shield-halved text-lg text-[#0A192F] dark:text-[#D4AF37]" />
+                  <ShieldCheck className="h-5 w-5 text-[#0A192F] dark:text-[#D4AF37]" aria-hidden="true" />
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-[#0A192F] dark:text-white mb-0.5">Cumplimiento normativo peruano</h3>
@@ -506,7 +511,7 @@ export default function LandingPage() {
                 los peruanos. Regulados, seguros y sin papeleo.
               </p>
               <p className="text-xs text-gray-500">
-                <i className="fa-solid fa-shield-halved text-[#00E5FF] mr-1.5" />
+                <ShieldCheck className="inline h-4 w-4 text-[#00E5FF] mr-1.5" aria-hidden="true" />
                 Sujeto Obligado UIF-Perú · Cumple Ley 29733
               </p>
             </div>
@@ -559,7 +564,7 @@ export default function LandingPage() {
                 aria-label="Crevo en Facebook"
                 className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-[#D4AF37] hover:bg-gray-700 transition-all"
               >
-                <i className="fa-brands fa-facebook-f" />
+                <FacebookIcon className="h-4 w-4" />
               </a>
               {/* Instagram + LinkedIn pendientes — placeholders comentados para
                   agregar cuando los handles existan. Mejor no renderizar links

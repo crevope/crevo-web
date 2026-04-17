@@ -2,6 +2,11 @@
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import {
+  Bell, CreditCard, History, Receipt, X, Check, Clock, FileDown,
+  FolderOpen, Zap, TriangleAlert, CircleAlert, Loader2, Lock,
+  ShieldCheck, Download,
+} from 'lucide-react'
 import { loanRepository, useLoanStore } from '@/features/request-loan'
 import { formatCurrency, formatDate, formatDateTime, loanRef } from '@/shared/lib/utils'
 import type { Loan, LoanBalance, Payment } from '@/entities/loan'
@@ -142,29 +147,32 @@ export default function PaymentsPage() {
           href="/notifications"
           className="w-9 h-9 rounded-lg bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors"
         >
-          <i className="fa-regular fa-bell text-sm" />
+          <Bell className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>
 
       {/* Page tabs */}
       <div className="flex gap-1 bg-gray-100 dark:bg-white/5 p-1 rounded-xl w-fit">
         {([
-          { id: 'pay'     as PageTab, label: 'Realizar Pago',    icon: 'fa-solid fa-credit-card' },
-          { id: 'history' as PageTab, label: 'Historial',        icon: 'fa-solid fa-clock-rotate-left' },
-        ]).map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setPageTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              pageTab === tab.id
-                ? 'bg-white dark:bg-[#1E293B] text-[#0A192F] dark:text-white shadow-sm'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-            }`}
-          >
-            <i className={`${tab.icon} text-xs`} />
-            {tab.label}
-          </button>
-        ))}
+          { id: 'pay'     as PageTab, label: 'Realizar Pago',    icon: CreditCard },
+          { id: 'history' as PageTab, label: 'Historial',        icon: History },
+        ]).map(tab => {
+          const TabIcon = tab.icon
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setPageTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                pageTab === tab.id
+                  ? 'bg-white dark:bg-[#1E293B] text-[#0A192F] dark:text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+              }`}
+            >
+              <TabIcon className="h-3.5 w-3.5" aria-hidden="true" />
+              {tab.label}
+            </button>
+          )
+        })}
       </div>
 
       {/* ── History tab ───────────────────────────────────────────────── */}
@@ -207,7 +215,7 @@ export default function PaymentsPage() {
           ) : filteredHistory.length === 0 ? (
             <div className="flex flex-col items-center py-16 text-center">
               <div className="w-14 h-14 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mb-4">
-                <i className="fa-solid fa-receipt text-gray-400 text-xl" />
+                <Receipt className="h-6 w-6 text-gray-400" aria-hidden="true" />
               </div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Sin transacciones registradas</p>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Los pagos que realices aparecerán aquí.</p>
@@ -254,15 +262,15 @@ export default function PaymentsPage() {
                         <td className="px-5 py-3.5">
                           {isFailed ? (
                             <span className="inline-flex items-center gap-1 text-xs font-medium bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">
-                              <i className="fa-solid fa-xmark" />Fallido
+                              <X className="h-3.5 w-3.5" aria-hidden="true" />Fallido
                             </span>
                           ) : isOk ? (
                             <span className="inline-flex items-center gap-1 text-xs font-medium bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-2 py-0.5 rounded-full">
-                              <i className="fa-solid fa-check" />Exitoso
+                              <Check className="h-3.5 w-3.5" aria-hidden="true" />Exitoso
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-xs font-medium bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 px-2 py-0.5 rounded-full">
-                              <i className="fa-solid fa-clock" />Pendiente
+                              <Clock className="h-3.5 w-3.5" aria-hidden="true" />Pendiente
                             </span>
                           )}
                         </td>
@@ -278,7 +286,7 @@ export default function PaymentsPage() {
                               title="Descargar comprobante PDF"
                               className="text-gray-400 hover:text-[#0A192F] dark:hover:text-white transition-colors"
                             >
-                              <i className="fa-solid fa-file-arrow-down text-sm" />
+                              <FileDown className="h-4 w-4" aria-hidden="true" />
                             </button>
                           )}
                         </td>
@@ -344,7 +352,7 @@ export default function PaymentsPage() {
               </div>
             ) : activeLoans.length === 0 ? (
               <div className="text-center py-8">
-                <i className="fa-regular fa-folder-open text-4xl text-gray-300 dark:text-gray-600 mb-3" />
+                <FolderOpen className="h-10 w-10 text-gray-300 dark:text-gray-600 mb-3" aria-hidden="true" />
                 <p className="text-gray-500 dark:text-gray-400">No tienes préstamos activos para pagar.</p>
                 <Link href="/request-loan" className="mt-4 inline-block text-sm font-medium text-[#0A192F] dark:text-[#D4AF37] underline">
                   Solicitar un préstamo
@@ -373,7 +381,7 @@ export default function PaymentsPage() {
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-lg bg-[#00E5FF]/15 text-[#00E5FF] flex items-center justify-center shrink-0">
-                          <i className="fa-solid fa-bolt text-sm" />
+                          <Zap className="h-4 w-4" aria-hidden="true" />
                         </div>
                         <div>
                           <h3 className="text-[#0A192F] dark:text-white font-medium">Préstamo Crevo</h3>
@@ -503,7 +511,7 @@ export default function PaymentsPage() {
                       />
                     </div>
                     <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-2 flex items-center gap-1">
-                      <i className="fa-solid fa-triangle-exclamation" />
+                      <TriangleAlert className="h-4 w-4" aria-hidden="true" />
                       El monto mínimo aceptado es de S/ 50.00
                     </p>
                   </div>
@@ -572,7 +580,7 @@ export default function PaymentsPage() {
 
                 {error && (
                   <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 text-red-600 dark:text-red-400 text-sm flex items-start gap-2">
-                    <i className="fa-solid fa-circle-exclamation mt-0.5 shrink-0" />
+                    <CircleAlert className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
                     {error}
                   </div>
                 )}
@@ -583,15 +591,15 @@ export default function PaymentsPage() {
                   className="w-full bg-[#0A192F] dark:bg-[#D4AF37] hover:opacity-90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-[#0A192F] py-2.5 rounded-lg flex justify-center items-center gap-2 mb-3 font-semibold transition-all text-sm"
                 >
                   {isSubmitting ? (
-                    <><i className="fa-solid fa-circle-notch fa-spin" />Procesando...</>
+                    <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />Procesando...</>
                   ) : (
-                    <><i className="fa-solid fa-lock" />Pagar {paymentAmount > 0 ? formatCurrency(paymentAmount) : ''}</>
+                    <><Lock className="h-4 w-4" aria-hidden="true" />Pagar {paymentAmount > 0 ? formatCurrency(paymentAmount) : ''}</>
 
                   )}
                 </button>
 
                 <p className="text-xs text-gray-400 dark:text-gray-500 text-center flex items-center justify-center gap-1">
-                  <i className="fa-solid fa-shield-halved" />
+                  <ShieldCheck className="h-4 w-4" aria-hidden="true" />
                   Pago seguro procesado por Culqi · Cifrado 256-bit
                 </p>
               </>
@@ -652,7 +660,7 @@ export default function PaymentsPage() {
                             : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
                           }`}
                         >
-                          <i className={`fa-solid text-xs ${isFailed ? 'fa-xmark' : 'fa-check'}`} />
+                          {isFailed ? <X className="h-3 w-3" aria-hidden="true" /> : <Check className="h-3 w-3" aria-hidden="true" />}
                         </div>
                         <div>
                           <p className="text-[#0A192F] dark:text-white font-medium text-sm">
@@ -669,7 +677,7 @@ export default function PaymentsPage() {
                         </p>
                         {isOk && (
                           <button className="text-xs text-[#0A192F] dark:text-[#D4AF37] hover:underline flex items-center gap-1 justify-end mt-1">
-                            <i className="fa-solid fa-download" /> Recibo
+                            <Download className="h-4 w-4" aria-hidden="true" /> Recibo
                           </button>
                         )}
                         {isFailed && (

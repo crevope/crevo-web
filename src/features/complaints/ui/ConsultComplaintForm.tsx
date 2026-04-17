@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Search } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
@@ -116,7 +116,7 @@ export function ConsultComplaintForm({ defaultValues, onResult, autoSubmit }: Pr
           {submitting ? (
             <><Loader2 className="h-4 w-4 animate-spin" /> Consultando...</>
           ) : (
-            <>Consultar reclamo <i className="fa-solid fa-magnifying-glass text-sm" /></>
+            <>Consultar reclamo <Search className="h-4 w-4" aria-hidden="true" /></>
           )}
         </Button>
       </form>

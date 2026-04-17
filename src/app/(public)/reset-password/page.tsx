@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Loader2 } from 'lucide-react'
+import { Loader2, TriangleAlert, Check, Eye, EyeOff, ArrowLeft, ShieldCheck } from 'lucide-react'
 import { authRepository } from '@/features/auth'
 import { toast } from 'sonner'
 import { AuthHeader } from '@/shared/ui/auth-header'
@@ -85,7 +85,7 @@ function ResetPasswordContent() {
     return (
       <div className="text-center space-y-4">
         <div className="w-14 h-14 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center mx-auto">
-          <i className="fa-solid fa-triangle-exclamation text-xl text-red-500" />
+          <TriangleAlert className="h-6 w-6 text-red-500" aria-hidden="true" />
         </div>
         <p className="text-gray-400 dark:text-gray-500 text-sm">Enlace inválido o expirado.</p>
         <Link
@@ -102,7 +102,7 @@ function ResetPasswordContent() {
     return (
       <div className="text-center space-y-5 py-4">
         <div className="w-14 h-14 bg-green-100 dark:bg-green-500/20 rounded-full flex items-center justify-center mx-auto border border-green-400">
-          <i className="fa-solid fa-check text-2xl text-green-500" />
+          <Check className="h-7 w-7 text-green-500" aria-hidden="true" />
         </div>
         <div>
           <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2">¡Contraseña actualizada!</h2>
@@ -154,7 +154,7 @@ function ResetPasswordContent() {
               aria-pressed={showNew}
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              <i className={`fa-regular ${showNew ? 'fa-eye-slash' : 'fa-eye'} text-sm`} aria-hidden="true" />
+              {showNew ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
             </button>
           </div>
           {errors.newPassword && (
@@ -182,7 +182,7 @@ function ResetPasswordContent() {
               aria-pressed={showConfirm}
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              <i className={`fa-regular ${showConfirm ? 'fa-eye-slash' : 'fa-eye'} text-sm`} aria-hidden="true" />
+              {showConfirm ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
             </button>
           </div>
           {errors.confirmPassword && (
@@ -222,7 +222,7 @@ export default function ResetPasswordPage() {
             <div className="relative z-10 w-full max-w-sm">
               <div className="bg-white/8 backdrop-blur-md rounded-lg p-5 border border-white/15 hover:-translate-y-1 transition-transform duration-500">
                 <div className="flex items-center justify-between mb-5">
-                  <i className="fa-solid fa-shield-halved text-[#00E5FF]" />
+                  <ShieldCheck className="h-4 w-4 text-[#00E5FF]" aria-hidden="true" />
                   <span className="text-white/60 text-xs">Seguridad bancaria</span>
                 </div>
                 <h3 className="text-white text-base font-semibold mb-1.5">Protección Avanzada</h3>
@@ -248,7 +248,7 @@ export default function ResetPasswordPage() {
                 href="/login"
                 className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-[#00E5FF] dark:hover:text-[#00E5FF] transition-colors mb-7 group"
               >
-                <i className="fa-solid fa-arrow-left mr-2 text-xs group-hover:-translate-x-1 transition-transform" />
+                <ArrowLeft className="h-3 w-3 mr-2 group-hover:-translate-x-1 transition-transform" aria-hidden="true" />
                 Volver a Iniciar Sesión
               </Link>
 

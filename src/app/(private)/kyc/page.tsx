@@ -1,22 +1,25 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Loader2, RefreshCw } from 'lucide-react'
+import {
+  Loader2, RefreshCw, IdCard, Camera, ShieldCheck, HandCoins, Home,
+  Clock, Check, CircleX, Circle, Upload, CircleCheck, CloudUpload, Lock,
+} from 'lucide-react'
 import { kycRepository, type KycStatus } from '@/features/upload-kyc'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
 
 const DOC_FIELDS = [
-  { key: 'dniFront' as const, label: 'DNI – Anverso (parte delantera)', hint: 'Sube la parte frontal de tu DNI', icon: 'fa-solid fa-id-card' },
-  { key: 'dniBack' as const, label: 'DNI – Reverso (parte trasera)', hint: 'Sube la parte trasera de tu DNI', icon: 'fa-solid fa-id-card-clip' },
-  { key: 'selfie' as const, label: 'Selfie sosteniendo el DNI', hint: 'Tómate una foto con tu DNI visible', icon: 'fa-solid fa-camera' },
+  { key: 'dniFront' as const, label: 'DNI – Anverso (parte delantera)', hint: 'Sube la parte frontal de tu DNI', icon: IdCard },
+  { key: 'dniBack' as const, label: 'DNI – Reverso (parte trasera)', hint: 'Sube la parte trasera de tu DNI', icon: IdCard },
+  { key: 'selfie' as const, label: 'Selfie sosteniendo el DNI', hint: 'Tómate una foto con tu DNI visible', icon: Camera },
 ]
 
 function KycVerified() {
   return (
     <div className={`${cardCls} p-10 text-center`}>
       <div className="w-24 h-24 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-        <i className="fa-solid fa-shield-halved text-4xl text-green-500" />
+        <ShieldCheck className="h-10 w-10 text-green-500" aria-hidden="true" />
       </div>
       <h2 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-3 tracking-tight">¡Identidad Verificada!</h2>
       <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
@@ -27,14 +30,14 @@ function KycVerified() {
           href="/request-loan"
           className="bg-[#D4AF37] text-[#0A192F] font-semibold px-8 py-3 rounded-lg hover:bg-[#B8941F] transition-colors flex items-center justify-center gap-2"
         >
-          <i className="fa-solid fa-hand-holding-dollar" />
+          <HandCoins className="h-4 w-4" aria-hidden="true" />
           Solicitar préstamo
         </a>
         <a
           href="/dashboard"
           className="bg-white dark:bg-[#0F172A] text-[#0A192F] dark:text-gray-200 font-medium px-8 py-3 rounded-lg border border-gray-100 dark:border-white/6 hover:bg-gray-50 dark:hover:bg-[#334155] transition-colors flex items-center justify-center gap-2"
         >
-          <i className="fa-solid fa-house" />
+          <Home className="h-4 w-4" aria-hidden="true" />
           Ir al dashboard
         </a>
       </div>
@@ -46,7 +49,7 @@ function KycUnderReview({ onRefresh }: { onRefresh: () => void }) {
   return (
     <div className={`${cardCls} p-8 text-center`}>
       <div className="w-20 h-20 rounded-full bg-yellow-50 dark:bg-yellow-900/30 flex items-center justify-center mx-auto mb-5">
-        <i className="fa-solid fa-clock text-3xl text-yellow-500" />
+        <Clock className="h-9 w-9 text-yellow-500" aria-hidden="true" />
       </div>
       <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">Verificando tu identidad</h2>
       <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
@@ -61,7 +64,7 @@ function KycUnderReview({ onRefresh }: { onRefresh: () => void }) {
         ].map(step => (
           <div key={step.label} className="flex items-center gap-3">
             {step.done
-              ? <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-500 shrink-0"><i className="fa-solid fa-check text-xs" /></div>
+              ? <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-500 shrink-0"><Check className="h-3 w-3" aria-hidden="true" /></div>
               : <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-[#334155] flex items-center justify-center shrink-0"><Loader2 className="h-3 w-3 animate-spin text-gray-400" /></div>
             }
             <span className={`text-sm ${step.done ? 'text-gray-800 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400'}`}>
@@ -85,7 +88,7 @@ function KycRejected({ onRetry }: { onRetry: () => void }) {
   return (
     <div className={`${cardCls} p-8 text-center border-l-2 border-l-red-400`}>
       <div className="w-20 h-20 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-5">
-        <i className="fa-solid fa-circle-xmark text-3xl text-red-500" />
+        <CircleX className="h-9 w-9 text-red-500" aria-hidden="true" />
       </div>
       <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">Verificación no aprobada</h2>
       <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
@@ -94,9 +97,9 @@ function KycRejected({ onRetry }: { onRetry: () => void }) {
       <div className="max-w-xs mx-auto text-left mb-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50">
         <p className="text-sm font-semibold text-red-700 dark:text-red-400 mb-2">Consejos para el reintento:</p>
         <ul className="space-y-1.5 text-xs text-red-600 dark:text-red-400">
-          <li><i className="fa-solid fa-circle mr-1 text-[4px] relative -top-1" />Foto del DNI en ambiente bien iluminado, sin reflejos</li>
-          <li><i className="fa-solid fa-circle mr-1 text-[4px] relative -top-1" />Toda la información debe ser legible</li>
-          <li><i className="fa-solid fa-circle mr-1 text-[4px] relative -top-1" />En la selfie, sostén el DNI de forma visible</li>
+          <li><Circle className="inline h-1 w-1 fill-current mr-1 relative -top-1" aria-hidden="true" />Foto del DNI en ambiente bien iluminado, sin reflejos</li>
+          <li><Circle className="inline h-1 w-1 fill-current mr-1 relative -top-1" aria-hidden="true" />Toda la información debe ser legible</li>
+          <li><Circle className="inline h-1 w-1 fill-current mr-1 relative -top-1" aria-hidden="true" />En la selfie, sostén el DNI de forma visible</li>
         </ul>
       </div>
       <button
@@ -189,7 +192,7 @@ export default function KycPage() {
             }`}>
             <div className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold ${s.done ? 'bg-green-500 text-white' : s.active ? 'bg-[#D4AF37] text-[#0A192F]' : 'bg-gray-200 dark:bg-[#334155] text-gray-500 dark:text-gray-400'
               }`}>
-              {s.done ? <i className="fa-solid fa-check text-xs" /> : s.step}
+              {s.done ? <Check className="h-3 w-3" aria-hidden="true" /> : s.step}
             </div>
             <p className={`text-xs font-medium ${s.done ? 'text-green-700 dark:text-green-400' : s.active ? 'text-[#0A192F] dark:text-[#D4AF37]' : 'text-gray-500 dark:text-gray-400'}`}>
               {s.label}
@@ -231,7 +234,10 @@ export default function KycPage() {
                 >
                   <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${files[key] ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400' : 'bg-gray-100 dark:bg-[#0F172A] text-gray-400 dark:text-gray-500'
                     }`}>
-                    <i className={`${files[key] ? 'fa-solid fa-circle-check' : icon} text-xl`} />
+                    {files[key]
+                      ? <CircleCheck className="h-6 w-6" aria-hidden="true" />
+                      : (() => { const FieldIcon = icon; return <FieldIcon className="h-6 w-6" aria-hidden="true" /> })()
+                    }
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className={`text-sm font-medium truncate ${files[key] ? 'text-green-700 dark:text-green-400' : 'text-gray-600 dark:text-gray-400'}`}>
@@ -246,7 +252,7 @@ export default function KycPage() {
                     )}
                   </div>
                   {!files[key] && (
-                    <i className="fa-solid fa-upload text-gray-300 dark:text-gray-600 text-lg shrink-0" />
+                    <Upload className="h-5 w-5 text-gray-300 dark:text-gray-600 shrink-0" aria-hidden="true" />
                   )}
                 </div>
                 <input
@@ -267,12 +273,12 @@ export default function KycPage() {
               >
                 {isUploading
                   ? <><Loader2 className="h-5 w-5 animate-spin" />Enviando documentos...</>
-                  : <><i className="fa-solid fa-cloud-arrow-up" />Enviar documentos</>}
+                  : <><CloudUpload className="h-4 w-4" aria-hidden="true" />Enviar documentos</>}
               </button>
             </div>
 
             <p className="text-center text-xs text-gray-400 dark:text-gray-500">
-              <i className="fa-solid fa-lock mr-1" />
+              <Lock className="inline h-3 w-3 mr-1" aria-hidden="true" />
               Tus datos se transmiten de forma segura conforme a la Ley N° 29733
             </p>
           </div>

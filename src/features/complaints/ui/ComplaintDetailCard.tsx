@@ -1,4 +1,5 @@
 'use client'
+import { Clock } from 'lucide-react'
 import { Alert, AlertDescription } from '@/shared/ui/alert'
 import { Badge } from '@/shared/ui/badge'
 import { Card } from '@/shared/ui/card'
@@ -154,7 +155,7 @@ export function ComplaintDetailCard({ complaint }: Props) {
             </p>
           ) : (
             <Alert className="bg-[#FEF3C7] dark:bg-[#78350F]/30 border-[#FDE68A] dark:border-[#F59E0B]/30 text-[#78350F] dark:text-[#FCD34D]">
-              <i className="fa-solid fa-clock text-[#B45309] dark:text-[#FBBF24]" />
+              <Clock className="h-4 w-4 text-[#B45309] dark:text-[#FBBF24]" aria-hidden="true" />
               <AlertDescription className="text-[#78350F] dark:text-[#FCD34D]">
                 Tu reclamo está en trámite. Te responderemos por correo antes del{' '}
                 <strong>

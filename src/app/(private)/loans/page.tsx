@@ -1,6 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import {
+  Info, Download, Bell, Plus, Wallet, History, FileText,
+  Search, FolderOpen, Headphones, ArrowRight,
+} from 'lucide-react'
 import { useLoanStore } from '@/features/request-loan'
 import { formatCurrency, formatDate, loanRef } from '@/shared/lib/utils'
 import type { Loan } from '@/entities/loan'
@@ -73,7 +77,7 @@ function LoanCard({ loan }: Readonly<{ loan: Loan }>) {
           {/* Data grid */}
           {isReview ? (
             <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-[#0F172A] p-3 rounded-xl border border-gray-100 dark:border-white/6">
-              <i className="fa-solid fa-circle-info text-[#00E5FF]" />
+              <Info className="h-4 w-4 text-[#00E5FF]" aria-hidden="true" />
               <span>Tu solicitud está siendo analizada por nuestro equipo. Recibirás una respuesta en las próximas 24-48 horas.</span>
             </div>
           ) : (
@@ -136,7 +140,7 @@ function LoanCard({ loan }: Readonly<{ loan: Loan }>) {
           </Link>
           {isReview && (
             <button className="flex-1 lg:flex-none bg-transparent text-gray-500 dark:text-gray-400 py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2 font-medium hover:bg-gray-50 dark:hover:bg-[#0F172A]">
-              <i className="fa-solid fa-download text-xs" /> Contrato
+              <Download className="h-3 w-3" aria-hidden="true" /> Contrato
             </button>
           )}
         </div>
@@ -199,13 +203,13 @@ export default function LoansPage() {
             href="/notifications"
             className="w-10 h-10 rounded-xl bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors"
           >
-            <i className="fa-regular fa-bell" />
+            <Bell className="h-4 w-4" aria-hidden="true" />
           </Link>
           <Link
             href="/request-loan"
             className="bg-[#D4AF37] text-[#0A192F] font-medium px-6 py-2 rounded-lg cursor-pointer flex items-center gap-2 hover:bg-[#B8941F] transition-colors"
           >
-            <i className="fa-solid fa-plus text-xs" />
+            <Plus className="h-3 w-3" aria-hidden="true" />
             {' '}
             Nuevo Préstamo
           </Link>
@@ -228,22 +232,25 @@ export default function LoansPage() {
           ))
         ) : (
           [
-            { icon: 'fa-solid fa-wallet', iconBg: 'bg-[#D4AF37]/20 text-yellow-600 dark:text-[#D4AF37]', label: 'Total Activo', value: formatCurrency(totalActive) },
-            { icon: 'fa-solid fa-clock-rotate-left', iconBg: 'bg-[#00E5FF]/20 text-cyan-600 dark:text-[#00E5FF]', label: 'Próximo Pago Total', value: '—' },
-            { icon: 'fa-solid fa-file-invoice', iconBg: 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400', label: 'Préstamos en Revisión', value: String(reviewCount) },
-          ].map(s => (
-            <div key={s.label} className={`${cardCls} p-6 flex flex-col justify-between`}>
-              <div className="mb-4">
-                <div className={`w-9 h-9 rounded-lg ${s.iconBg} flex items-center justify-center`}>
-                  <i className={s.icon} />
+            { icon: Wallet, iconBg: 'bg-[#D4AF37]/20 text-yellow-600 dark:text-[#D4AF37]', label: 'Total Activo', value: formatCurrency(totalActive) },
+            { icon: History, iconBg: 'bg-[#00E5FF]/20 text-cyan-600 dark:text-[#00E5FF]', label: 'Próximo Pago Total', value: '—' },
+            { icon: FileText, iconBg: 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400', label: 'Préstamos en Revisión', value: String(reviewCount) },
+          ].map(s => {
+            const StatIcon = s.icon
+            return (
+              <div key={s.label} className={`${cardCls} p-6 flex flex-col justify-between`}>
+                <div className="mb-4">
+                  <div className={`w-9 h-9 rounded-lg ${s.iconBg} flex items-center justify-center`}>
+                    <StatIcon className="h-4 w-4" aria-hidden="true" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">{s.label}</p>
+                  <h3 className="text-2xl font-bold text-[#0A192F] dark:text-white">{s.value}</h3>
                 </div>
               </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">{s.label}</p>
-                <h3 className="text-2xl font-bold text-[#0A192F] dark:text-white">{s.value}</h3>
-              </div>
-            </div>
-          ))
+            )
+          })
         )}
       </div>
 
@@ -272,7 +279,7 @@ export default function LoansPage() {
           {/* Search + Sort */}
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             <div className="relative w-full sm:w-64">
-              <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm z-10" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" aria-hidden="true" />
               <Input
                 type="text"
                 placeholder="Buscar préstamo..."
@@ -337,7 +344,7 @@ export default function LoansPage() {
         </div>
       ) : sortedAndFiltered.length === 0 ? (
         <div className={`${cardCls} p-16 text-center`}>
-          <i className="fa-regular fa-folder-open text-5xl text-gray-300 dark:text-gray-600 mb-4" />
+          <FolderOpen className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" aria-hidden="true" />
           <p className="text-gray-500 dark:text-gray-400 font-medium">
             {search ? 'No se encontraron resultados.' : 'No tienes préstamos en esta categoría.'}
           </p>
@@ -353,7 +360,7 @@ export default function LoansPage() {
         <div className="absolute top-[-50%] right-[-10%] w-64 h-64 bg-[#00E5FF] rounded-full mix-blend-multiply filter blur-3xl opacity-10" />
         <div className="flex items-center gap-4 z-10">
           <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-[#D4AF37] text-xl border border-white/20 shrink-0">
-            <i className="fa-solid fa-headset" />
+            <Headphones className="h-4 w-4" aria-hidden="true" />
           </div>
           <div>
             <h3 className="text-white font-medium text-lg">¿Necesitas ayuda con tus préstamos?</h3>
@@ -362,7 +369,7 @@ export default function LoansPage() {
         </div>
         <button className="w-full md:w-auto px-6 py-2.5 rounded-lg cursor-pointer border border-white/20 text-white hover:bg-white/10 transition-colors text-sm font-medium z-10 flex items-center justify-center gap-2">
           Contactar Soporte
-          <i className="fa-solid fa-arrow-right text-xs" />
+          <ArrowRight className="h-3 w-3" aria-hidden="true" />
         </button>
       </div>
     </div>

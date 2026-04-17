@@ -5,7 +5,10 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { Loader2, ArrowRight } from 'lucide-react'
+import {
+  Loader2, ArrowRight, Zap, Layers, Star, Mail, CircleCheck, Send,
+  IdCard, ShieldCheck, Lock, Landmark, Plus, Save, CircleAlert, Info,
+} from 'lucide-react'
 import { Checkbox } from '@/shared/ui/checkbox'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { useTheme } from 'next-themes'
@@ -50,21 +53,21 @@ const PRODUCT_CONFIG = {
     minAmount: 100, maxAmount: 500, minInstallments: 1, maxInstallments: 1,
     frequencies: ['QUINCENAL', 'MENSUAL'] as const,
     defaultInstallments: 1, defaultFrequency: 'MENSUAL' as const, defaultAmount: 200,
-    icon: 'fa-solid fa-bolt', label: 'Express', sublabel: '1 cuota',
+    icon: Zap, label: 'Express', sublabel: '1 cuota',
     accentBg: 'bg-[#00E5FF]/10', borderActive: 'border-[#00E5FF]', textActive: 'text-[#00E5FF]',
   },
   FLEX: {
     minAmount: 100, maxAmount: 500, minInstallments: 2, maxInstallments: 6,
     frequencies: ['QUINCENAL', 'MENSUAL'] as const,
     defaultInstallments: 3, defaultFrequency: 'MENSUAL' as const, defaultAmount: 300,
-    icon: 'fa-solid fa-layer-group', label: 'Flex', sublabel: '2–6 cuotas',
+    icon: Layers, label: 'Flex', sublabel: '2–6 cuotas',
     accentBg: 'bg-[#D4AF37]/10', borderActive: 'border-[#D4AF37]', textActive: 'text-[#D4AF37]',
   },
   PLUS: {
     minAmount: 550, maxAmount: 2000, minInstallments: 7, maxInstallments: 12,
     frequencies: ['MENSUAL'] as const,
     defaultInstallments: 9, defaultFrequency: 'MENSUAL' as const, defaultAmount: 1000,
-    icon: 'fa-solid fa-star', label: 'Plus', sublabel: '7–12 cuotas',
+    icon: Star, label: 'Plus', sublabel: '7–12 cuotas',
     accentBg: 'bg-purple-400/10', borderActive: 'border-purple-400', textActive: 'text-purple-400',
   },
 } as const
@@ -340,7 +343,7 @@ export default function RequestLoanPage() {
         </div>
         <div className={`${cardCls} p-8 text-center`}>
           <div className="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-5">
-            <i className="fa-solid fa-envelope text-2xl text-blue-500" />
+            <Mail className="h-7 w-7 text-blue-500" aria-hidden="true" />
           </div>
           <h2 className="text-base font-semibold text-[#0A192F] dark:text-white mb-2">Verifica tu correo electrónico</h2>
           <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
@@ -352,7 +355,7 @@ export default function RequestLoanPage() {
           </p>
           {resendSent ? (
             <p className="inline-flex items-center gap-2 text-sm text-green-600 dark:text-green-400 font-medium">
-              <i className="fa-solid fa-circle-check" />
+              <CircleCheck className="h-4 w-4" aria-hidden="true" />
               Correo enviado — revisa tu bandeja
             </p>
           ) : (
@@ -364,7 +367,7 @@ export default function RequestLoanPage() {
             >
               {resendLoading
                 ? <Loader2 className="h-4 w-4 animate-spin" />
-                : <i className="fa-solid fa-paper-plane" />
+                : <Send className="h-4 w-4" aria-hidden="true" />
               }
               Reenviar correo de verificación
             </button>
@@ -384,7 +387,7 @@ export default function RequestLoanPage() {
         </div>
         <div className={`${cardCls} p-8 text-center`}>
           <div className="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center mx-auto mb-5">
-            <i className="fa-solid fa-id-card text-2xl text-amber-500" />
+            <IdCard className="h-7 w-7 text-amber-500" aria-hidden="true" />
           </div>
           <h2 className="text-base font-semibold text-[#0A192F] dark:text-white mb-2">Verifica tu identidad</h2>
           <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
@@ -394,7 +397,7 @@ export default function RequestLoanPage() {
             href="/kyc"
             className="inline-flex items-center gap-2 bg-[#D4AF37] text-[#0A192F] font-medium px-6 py-2.5 rounded-lg hover:bg-[#B8941F] transition-colors text-sm"
           >
-            <i className="fa-solid fa-shield-halved" />
+            <ShieldCheck className="h-4 w-4" aria-hidden="true" />
             {' '}
             Verificar identidad ahora
           </Link>
@@ -413,7 +416,7 @@ export default function RequestLoanPage() {
         </div>
         {user && (
           <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50">
-            <i className="fa-solid fa-circle-check text-green-500 text-sm" />
+            <CircleCheck className="h-4 w-4 text-green-500" aria-hidden="true" />
             <span className="text-sm text-green-700 dark:text-green-400">
               {shortName(user.firstName, user.lastName)}, tu identidad está verificada
             </span>
@@ -443,7 +446,7 @@ export default function RequestLoanPage() {
                   {/* Máximo aprobado */}
                   {!limitsLoading && loanLimits?.score && (
                     <div className="flex items-center gap-1.5 mb-3">
-                      <i className="fa-solid fa-circle-check text-[10px] text-emerald-500" />
+                      <CircleCheck className="h-2.5 w-2.5 text-emerald-500" aria-hidden="true" />
                       <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
                         Tu máximo aprobado: S/ {currentMax.toLocaleString('es-PE')}
                       </span>
@@ -514,7 +517,10 @@ export default function RequestLoanPage() {
                               : 'border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/20'
                             }`}
                         >
-                          <i className={`${locked ? 'fa-solid fa-lock' : p.icon} text-sm ${selected && !locked ? p.textActive : ''}`} />
+                          {(() => {
+                            const ProductIcon = locked ? Lock : p.icon
+                            return <ProductIcon className={`h-4 w-4 ${selected && !locked ? p.textActive : ''}`} aria-hidden="true" />
+                          })()}
                           <span className="text-xs font-semibold">{p.label}</span>
                           <span className={`text-[10px] font-normal ${selected && !locked ? 'opacity-80' : 'text-gray-400 dark:text-gray-500'}`}>
                             {locked ? `${loanLimits?.limits[key]?.requiredPaidLoans}+ pagados` : p.sublabel}
@@ -526,7 +532,7 @@ export default function RequestLoanPage() {
                   {/* Mensaje de producto bloqueado */}
                   {productType === 'PLUS' && isProductLocked('PLUS') && (
                     <p className="text-xs text-purple-400 dark:text-purple-300 mt-2 flex items-center gap-1.5">
-                      <i className="fa-solid fa-lock text-[10px]" />
+                      <Lock className="h-2.5 w-2.5" aria-hidden="true" />
                       {' '}
                       Disponible para clientes con {loanLimits?.limits.PLUS?.requiredPaidLoans ?? 10}+ préstamos pagados
                     </p>
@@ -611,7 +617,7 @@ export default function RequestLoanPage() {
                         </div>
                         {/* Bank icon */}
                         <div className="w-9 h-9 rounded-lg bg-[#0A192F]/8 dark:bg-white/6 flex items-center justify-center shrink-0">
-                          <i className="fa-solid fa-building-columns text-[#0A192F] dark:text-gray-300 text-sm" />
+                          <Landmark className="h-4 w-4 text-[#0A192F] dark:text-gray-300" aria-hidden="true" />
                         </div>
                         {/* Info */}
                         <div className="flex-1 min-w-0">
@@ -635,7 +641,7 @@ export default function RequestLoanPage() {
                     {!showAddForm && (
                       bankAccounts.length >= bankMaxAccounts ? (
                         <div className="flex items-start gap-3 p-3.5 rounded-lg border border-amber-200 dark:border-amber-700/40 bg-amber-50 dark:bg-amber-900/10 text-sm">
-                          <i className="fa-solid fa-lock text-amber-500 dark:text-amber-400 mt-0.5 shrink-0 text-xs" />
+                          <Lock className="h-3 w-3 text-amber-500 dark:text-amber-400 mt-0.5 shrink-0" aria-hidden="true" />
                           <div>
                             <p className="font-medium text-amber-700 dark:text-amber-300">Límite de cuentas alcanzado</p>
                             <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
@@ -652,7 +658,7 @@ export default function RequestLoanPage() {
                           onClick={() => { setShowAddForm(true); form.setValue('bankAccountId', '') }}
                           className="w-full flex items-center gap-3 p-4 rounded-lg border border-dashed border-gray-200 dark:border-white/12 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-white/25 hover:text-gray-700 dark:hover:text-gray-200 transition-all text-sm"
                         >
-                          <i className="fa-solid fa-plus text-xs" />
+                          <Plus className="h-3 w-3" aria-hidden="true" />
                           {bankAccounts.length === 0 ? 'Agregar una cuenta bancaria' : 'Usar una cuenta diferente'}
                         </button>
                       )
@@ -709,9 +715,9 @@ export default function RequestLoanPage() {
                           className="w-full py-2.5 rounded-lg bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] text-sm font-semibold hover:bg-[#0A192F]/90 dark:hover:bg-[#B8941F] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                           {addingAccount ? (
-                            <><i className="fa-solid fa-spinner animate-spin text-xs" />Guardando...</>
+                            <><Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />Guardando...</>
                           ) : (
-                            <><i className="fa-solid fa-floppy-disk text-xs" />Guardar y usar esta cuenta</>
+                            <><Save className="h-3 w-3" aria-hidden="true" />Guardar y usar esta cuenta</>
                           )}
                         </button>
                       </div>
@@ -720,7 +726,7 @@ export default function RequestLoanPage() {
                 )}
                 {form.formState.errors.bankAccountId && (
                   <p className="text-xs text-red-500 mt-2 flex items-center gap-1">
-                    <i className="fa-solid fa-circle-exclamation" />
+                    <CircleAlert className="h-4 w-4" aria-hidden="true" />
                     {form.formState.errors.bankAccountId.message}
                   </p>
                 )}
@@ -767,7 +773,7 @@ export default function RequestLoanPage() {
 
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-100 dark:border-white/6 pt-5">
                   <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1.5">
-                    <i className="fa-solid fa-lock text-[#0A192F] dark:text-[#D4AF37]" />
+                    <Lock className="h-4 w-4 text-[#0A192F] dark:text-[#D4AF37]" aria-hidden="true" />
                     Protegido por Ley N° 29733 · Sujeto Obligado UIF-Perú
                   </p>
                   <button
@@ -777,7 +783,7 @@ export default function RequestLoanPage() {
                   >
                     {form.formState.isSubmitting
                       ? <><Loader2 className="h-4 w-4 animate-spin" />Enviando...</>
-                      : <><i className="fa-solid fa-paper-plane" />Enviar solicitud</>}
+                      : <><Send className="h-4 w-4" aria-hidden="true" />Enviar solicitud</>}
                   </button>
                 </div>
               </div>
@@ -885,12 +891,12 @@ export default function RequestLoanPage() {
                     >
                       {form.formState.isSubmitting
                         ? <><Loader2 className="h-4 w-4 animate-spin" />Enviando solicitud...</>
-                        : <><i className="fa-solid fa-paper-plane" />Solicitar préstamo ahora</>}
+                        : <><Send className="h-4 w-4" aria-hidden="true" />Solicitar préstamo ahora</>}
                     </button>
 
                     {(!consentCredit || !consentTerms) && (
                       <p className="text-center text-xs text-gray-400 dark:text-gray-500">
-                        <i className="fa-solid fa-circle-info mr-1" />
+                        <Info className="inline h-3 w-3 mr-1" aria-hidden="true" />
                         Acepta los términos en el paso 3 para continuar
                       </p>
                     )}
@@ -898,7 +904,7 @@ export default function RequestLoanPage() {
                 )}
 
                 <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
-                  <i className="fa-solid fa-shield-halved mr-1" />
+                  <ShieldCheck className="inline h-3 w-3 mr-1" aria-hidden="true" />
                   Datos cifrados con AES-256 · Sujeto Obligado UIF-Perú · Ley N° 29733
                 </p>
               </div>

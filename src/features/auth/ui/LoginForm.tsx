@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useState } from 'react'
 import Link from 'next/link'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ArrowRight, CircleAlert, Eye, EyeOff } from 'lucide-react'
 import { Checkbox } from '@/shared/ui/checkbox'
 import { loginSchema, type LoginInput } from '../lib/authSchemas'
 import { useAuthStore } from '../model/useAuthStore'
@@ -47,7 +47,7 @@ export function LoginForm() {
         />
         {errors.email && (
           <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1 mt-1">
-            <i className="fa-solid fa-circle-exclamation" /> {errors.email.message}
+            <CircleAlert className="h-3.5 w-3.5" aria-hidden="true" /> {errors.email.message}
           </p>
         )}
       </div>
@@ -70,12 +70,12 @@ export function LoginForm() {
             aria-pressed={showPass}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
-            <i className={`fa-regular ${showPass ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true" />
+            {showPass ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
           </button>
         </div>
         {errors.password && (
           <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1 mt-1">
-            <i className="fa-solid fa-circle-exclamation" /> {errors.password.message}
+            <CircleAlert className="h-3.5 w-3.5" aria-hidden="true" /> {errors.password.message}
           </p>
         )}
       </div>
@@ -104,7 +104,7 @@ export function LoginForm() {
           {isSubmitting ? (
             <><Loader2 className="h-4 w-4 animate-spin" /> Iniciando sesión...</>
           ) : (
-            <><span>Iniciar Sesión</span><i className="fa-solid fa-arrow-right text-sm" /></>
+            <><span>Iniciar Sesión</span><ArrowRight className="h-4 w-4" aria-hidden="true" /></>
           )}
         </button>
       </div>

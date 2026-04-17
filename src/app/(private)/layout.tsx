@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Bell, Menu } from 'lucide-react'
 import { DashboardSidebar } from '@/widgets/dashboard-sidebar'
 import { useAuthStore } from '@/features/auth'
 import { useNotificationStore } from '@/features/notifications'
@@ -50,7 +51,7 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
 
         <div className="flex items-center gap-1">
           <Link href="/notifications" className="relative p-1 text-gray-300 hover:text-white transition-colors">
-            <i className="fa-regular fa-bell text-lg" />
+            <Bell className="h-5 w-5" aria-hidden="true" />
             {unreadCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full bg-[#00E5FF] text-[#0A192F] text-[9px] font-bold flex items-center justify-center px-1">
                 {unreadCount > 9 ? '9+' : unreadCount}
@@ -62,7 +63,7 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
             className="text-gray-300 hover:text-white text-lg focus:outline-none p-1 transition-colors"
             aria-label="Abrir menú"
           >
-            <i className="fa-solid fa-bars" />
+            <Menu className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </header>

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import { ArrowLeft } from 'lucide-react'
 import { LEGAL_LINKS } from '../lib/legalConstants'
 import { JsonLd } from '@/shared/seo/JsonLd'
 import { breadcrumbSchema } from '@/shared/seo/schemas/breadcrumb'
@@ -59,7 +60,7 @@ export function LegalPageLayout({
           href="/"
           className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-[#0A192F] dark:hover:text-[#D4AF37] mb-8"
         >
-          <i className="fa-solid fa-arrow-left" />
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Volver al inicio
         </Link>
 

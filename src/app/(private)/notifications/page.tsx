@@ -1,5 +1,6 @@
 'use client'
 import { useEffect } from 'react'
+import { CheckCheck, Bell, BellOff } from 'lucide-react'
 import { useNotificationStore } from '@/features/notifications'
 import { NOTIFICATION_ICONS } from '@/entities/notification'
 import { formatRelativeDate } from '@/shared/lib/utils'
@@ -32,7 +33,7 @@ export default function NotificationsPage() {
             onClick={markAllAsRead}
             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-100 dark:border-white/6 text-gray-500 dark:text-gray-400 font-medium text-sm hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors"
           >
-            <i className="fa-solid fa-check-double" />
+            <CheckCheck className="h-4 w-4" aria-hidden="true" />
             Marcar todas como leídas
           </button>
         )}
@@ -42,7 +43,7 @@ export default function NotificationsPage() {
       {unreadCount > 0 && (
         <div className={`${cardCls} p-4 flex items-center gap-4 border-l-2 border-l-[#00E5FF]`}>
           <div className="w-10 h-10 rounded-full bg-[#00E5FF]/10 flex items-center justify-center text-[#00E5FF] shrink-0">
-            <i className="fa-regular fa-bell text-lg" />
+            <Bell className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
             <p className="text-[#0A192F] dark:text-white font-medium text-sm">
@@ -72,7 +73,7 @@ export default function NotificationsPage() {
       ) : notifications.length === 0 ? (
         <div className={`${cardCls} p-16 text-center`}>
           <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-[#0F172A] flex items-center justify-center mx-auto mb-5">
-            <i className="fa-regular fa-bell-slash text-3xl text-gray-400 dark:text-gray-500" />
+            <BellOff className="h-9 w-9 text-gray-400 dark:text-gray-500" aria-hidden="true" />
           </div>
           <h3 className="text-lg font-semibold text-[#0A192F] dark:text-white mb-2">Sin notificaciones</h3>
           <p className="text-gray-500 dark:text-gray-400 text-sm">

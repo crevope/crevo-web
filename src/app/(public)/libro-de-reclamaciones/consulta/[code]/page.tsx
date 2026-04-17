@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { Suspense, useMemo, useState, use } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ArrowLeft } from 'lucide-react'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { Button } from '@/shared/ui/button'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
@@ -35,7 +35,7 @@ function ConsultaBody({ claimCode }: { claimCode: string }) {
           onClick={() => setComplaint(null)}
           className="px-0 h-auto text-sm text-gray-500 dark:text-gray-400 hover:text-brand-primary dark:hover:text-brand-secondary hover:no-underline"
         >
-          <i className="fa-solid fa-arrow-left text-xs" /> Consultar otro reclamo
+          <ArrowLeft className="h-3 w-3" aria-hidden="true" /> Consultar otro reclamo
         </Button>
         <ComplaintDetailCard complaint={complaint} />
       </div>
@@ -81,7 +81,7 @@ export default function ConsultaCodePage({ params }: PageProps) {
             className="px-0 h-auto text-sm text-gray-500 dark:text-gray-400 hover:text-brand-primary dark:hover:text-brand-secondary hover:no-underline mb-5"
           >
             <Link href="/libro-de-reclamaciones">
-              <i className="fa-solid fa-arrow-left text-xs" />
+              <ArrowLeft className="h-3 w-3" aria-hidden="true" />
               Volver al Libro de Reclamaciones
             </Link>
           </Button>

@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
+import { ArrowLeft } from 'lucide-react'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { Button } from '@/shared/ui/button'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
@@ -30,7 +31,7 @@ export default function ConsultaIndexPage() {
             className="px-0 h-auto text-sm text-gray-500 dark:text-gray-400 hover:text-brand-primary dark:hover:text-brand-secondary hover:no-underline mb-5"
           >
             <Link href="/libro-de-reclamaciones">
-              <i className="fa-solid fa-arrow-left text-xs" />
+              <ArrowLeft className="h-3 w-3" aria-hidden="true" />
               Volver al Libro de Reclamaciones
             </Link>
           </Button>
@@ -51,7 +52,7 @@ export default function ConsultaIndexPage() {
               onClick={() => setComplaint(null)}
               className="px-0 h-auto text-sm text-gray-500 dark:text-gray-400 hover:text-brand-primary dark:hover:text-brand-secondary hover:no-underline"
             >
-              <i className="fa-solid fa-arrow-left text-xs" /> Consultar otro reclamo
+              <ArrowLeft className="h-3 w-3" aria-hidden="true" /> Consultar otro reclamo
             </Button>
             <ComplaintDetailCard complaint={complaint} />
           </div>

@@ -2,7 +2,7 @@
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Check, TriangleAlert, CircleAlert, RotateCw, ArrowLeft, MailCheck, ShieldCheck, Zap } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -73,7 +73,7 @@ function VerifyEmailContent() {
     return (
       <div className="text-center space-y-5 py-4">
         <div className="w-14 h-14 bg-green-100 dark:bg-green-500/20 rounded-full flex items-center justify-center mx-auto border border-green-400">
-          <i className="fa-solid fa-check text-xl text-green-500" />
+          <Check className="h-6 w-6 text-green-500" aria-hidden="true" />
         </div>
         <div>
           <span className="text-[#00E5FF] text-xs tracking-wider uppercase mb-2 block">
@@ -98,7 +98,7 @@ function VerifyEmailContent() {
     <div className="space-y-5 py-2">
       <div className="text-center space-y-3">
         <div className="w-14 h-14 bg-red-100 dark:bg-red-500/20 rounded-full flex items-center justify-center mx-auto border border-red-400">
-          <i className="fa-solid fa-triangle-exclamation text-xl text-red-500" />
+          <TriangleAlert className="h-6 w-6 text-red-500" aria-hidden="true" />
         </div>
         <div>
           <span className="text-red-500 text-xs tracking-wider uppercase mb-2 block">
@@ -126,7 +126,7 @@ function VerifyEmailContent() {
           />
           {errors.email && (
             <p className="text-xs text-red-500 dark:text-red-400 mt-1.5 flex items-center gap-1">
-              <i className="fa-solid fa-circle-exclamation" /> {errors.email.message}
+              <CircleAlert className="h-3.5 w-3.5" aria-hidden="true" /> {errors.email.message}
             </p>
           )}
         </div>
@@ -138,7 +138,7 @@ function VerifyEmailContent() {
           {isSubmitting ? (
             <><Loader2 className="h-4 w-4 animate-spin" /> Enviando...</>
           ) : (
-            <><i className="fa-solid fa-rotate-right text-xs" /> Reenviar email de verificación</>
+            <><RotateCw className="h-3 w-3" aria-hidden="true" /> Reenviar email de verificación</>
           )}
         </button>
       </form>
@@ -148,7 +148,7 @@ function VerifyEmailContent() {
           href="/login"
           className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-[#00E5FF] dark:hover:text-[#00E5FF] transition-colors group"
         >
-          <i className="fa-solid fa-arrow-left mr-2 text-xs group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="h-3 w-3 mr-2 group-hover:-translate-x-1 transition-transform" aria-hidden="true" />
           Volver al inicio
         </Link>
       </div>
@@ -171,7 +171,7 @@ export default function VerifyEmailPage() {
 
             <div className="relative z-10 w-full max-w-sm text-center">
               <div className="w-16 h-16 rounded-full bg-[#00E5FF]/15 border border-[#00E5FF]/40 flex items-center justify-center mx-auto mb-5">
-                <i className="fa-solid fa-envelope-circle-check text-2xl text-[#00E5FF]" />
+                <MailCheck className="h-6 w-6 text-[#00E5FF]" aria-hidden="true" />
               </div>
               <h3 className="text-white text-lg font-semibold mb-2">Verifica tu Email</h3>
               <p className="text-white/60 text-sm leading-relaxed mb-6">
@@ -180,11 +180,11 @@ export default function VerifyEmailPage() {
 
               <div className="space-y-2 text-left">
                 <div className="flex items-center gap-3 bg-white/8 rounded-lg px-3 py-2.5 border border-white/15">
-                  <i className="fa-solid fa-shield-halved text-[#00E5FF] text-sm" />
+                  <ShieldCheck className="h-4 w-4 text-[#00E5FF]" aria-hidden="true" />
                   <span className="text-white/70 text-sm">Cuenta protegida y verificada</span>
                 </div>
                 <div className="flex items-center gap-3 bg-white/8 rounded-lg px-3 py-2.5 border border-white/15">
-                  <i className="fa-solid fa-bolt text-[#D4AF37] text-sm" />
+                  <Zap className="h-4 w-4 text-[#D4AF37]" aria-hidden="true" />
                   <span className="text-white/70 text-sm">Acceso inmediato al dashboard</span>
                 </div>
               </div>

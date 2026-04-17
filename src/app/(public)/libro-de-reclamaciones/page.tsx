@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { BookOpen, Search } from 'lucide-react'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
@@ -40,7 +41,7 @@ export default function LibroDeReclamacionesPage() {
         {/* Page intro */}
         <div className="mb-10 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-primary/5 dark:bg-brand-secondary/10 text-xs font-semibold text-brand-primary dark:text-brand-secondary uppercase tracking-wider mb-4">
-            <i className="fa-solid fa-book" />
+            <BookOpen className="h-3.5 w-3.5" aria-hidden="true" />
             Libro de Reclamaciones
           </div>
           <h1 className="text-3xl sm:text-4xl font-semibold text-brand-text tracking-tight mb-3">
@@ -62,7 +63,7 @@ export default function LibroDeReclamacionesPage() {
             <Card className="mb-6 p-4 rounded-lg bg-brand-card border-gray-100 dark:border-white/6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-none">
               <div className="flex items-start gap-3">
                 <div className="w-9 h-9 rounded-full bg-brand-primary/5 dark:bg-brand-secondary/10 flex items-center justify-center shrink-0">
-                  <i className="fa-solid fa-magnifying-glass text-sm text-brand-primary dark:text-brand-secondary" />
+                  <Search className="h-4 w-4 text-brand-primary dark:text-brand-secondary" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-brand-text">

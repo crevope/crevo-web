@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { Zap, LineChart, Crown, Lock } from 'lucide-react'
 import { LoginForm } from '@/features/auth'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
@@ -48,13 +49,13 @@ export default function LoginPage() {
 
               <div className="flex flex-wrap gap-2 justify-center mt-3">
                 <div className="px-3 py-1 bg-white/8 border border-white/15 rounded-full text-xs font-medium text-white/80">
-                  <i className="fa-solid fa-bolt text-[#00E5FF] mr-1" /> Crevo Express
+                  <Zap className="inline h-3 w-3 text-[#00E5FF] mr-1" aria-hidden="true" /> Crevo Express
                 </div>
                 <div className="px-3 py-1 bg-white/8 border border-white/15 rounded-full text-xs font-medium text-white/80">
-                  <i className="fa-solid fa-chart-line text-[#D4AF37] mr-1" /> Crevo Flex
+                  <LineChart className="inline h-3 w-3 text-[#D4AF37] mr-1" aria-hidden="true" /> Crevo Flex
                 </div>
                 <div className="px-3 py-1 bg-white/8 border border-white/15 rounded-full text-xs font-medium text-white/80">
-                  <i className="fa-solid fa-crown text-[#D4AF37] mr-1" /> Crevo Plus
+                  <Crown className="inline h-3 w-3 text-[#D4AF37] mr-1" aria-hidden="true" /> Crevo Plus
                 </div>
               </div>
             </div>
@@ -97,7 +98,7 @@ export default function LoginPage() {
 
       <footer className="w-full py-6 px-4 text-center">
         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-2">
-          <i className="fa-solid fa-lock" />
+          <Lock className="h-3 w-3" aria-hidden="true" />
           © {CURRENT_YEAR} Crevo. Conexión segura 256-bits • Sujeto Obligado UIF-Perú
         </p>
       </footer>

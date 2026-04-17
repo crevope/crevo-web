@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Check, CircleCheck, Copy, ArrowRight } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import type { FiledComplaintReceipt } from '../api/complaintsRepository'
@@ -45,7 +46,7 @@ export function ComplaintFiledReceiptCard({ receipt, documentNumber }: Props) {
   return (
     <Card className="bg-brand-card rounded-lg border-gray-100 dark:border-white/6 p-8 sm:p-10 text-center shadow-none">
       <div className="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center mb-5">
-        <i className="fa-solid fa-check text-2xl text-green-600 dark:text-green-400" />
+        <Check className="h-7 w-7 text-green-600 dark:text-green-400" aria-hidden="true" />
       </div>
       <h2 className="text-2xl font-semibold text-brand-text mb-2">
         Reclamo registrado
@@ -68,7 +69,7 @@ export function ComplaintFiledReceiptCard({ receipt, documentNumber }: Props) {
           variant="ghost"
           className="mt-1 bg-white/10 hover:bg-white/20 text-white/90 hover:text-white"
         >
-          <i className={`fa-regular ${copied ? 'fa-circle-check' : 'fa-copy'}`} />
+          {copied ? <CircleCheck className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
           {copied ? 'Copiado' : 'Copiar código'}
         </Button>
       </div>
@@ -92,7 +93,7 @@ export function ComplaintFiledReceiptCard({ receipt, documentNumber }: Props) {
           className="bg-brand-secondary hover:bg-brand-secondary-hover text-brand-primary font-semibold"
         >
           <Link href={consultHref}>
-            Consultar mi reclamo <i className="fa-solid fa-arrow-right text-sm" />
+            Consultar mi reclamo <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </Button>
         <Button

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTheme } from 'next-themes'
-import { Zap, TrendingUp, Star, Info, Download, Loader2 } from 'lucide-react'
+import { Zap, TrendingUp, Star, Info, Download, Loader2, Lock } from 'lucide-react'
 import { Skeleton } from '@/shared/ui/skeleton'
 import Link from 'next/link'
 import { simulate, downloadSummary, type SimulationResult, type LoanProductType, type PaymentFrequency } from '../api/simulatorRepository'
@@ -195,7 +195,7 @@ export function LoanSimulator() {
             {/* Plus badge */}
             {product === 'PLUS' && (
               <p className="text-xs text-purple-400 dark:text-purple-300 mt-2 flex items-center gap-1.5">
-                <i className="fa-solid fa-lock text-[10px]" />
+                <Lock className="h-2.5 w-2.5" aria-hidden="true" />
                 Disponible para clientes con 10+ préstamos pagados
               </p>
             )}

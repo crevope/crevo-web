@@ -2,8 +2,15 @@
 import { useEffect, useState, Fragment } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle2, Clock, AlertCircle, RefreshCw } from 'lucide-react'
+import {
+  CheckCircle2, Clock, AlertCircle, RefreshCw, Loader2,
+  FilePen, ClipboardCheck, Signature, Send, Wallet, CircleCheck,
+  ChevronRight, ArrowLeft, Banknote, Check, FileSignature, TriangleAlert,
+  CreditCard, FastForward, FileText, Lock, ArrowDown, FileDown, FileCheck,
+  Download, Receipt, Headphones, X, Info, PiggyBank, ShieldCheck,
+} from 'lucide-react'
 import { toast } from 'sonner'
+import { WhatsAppIcon } from '@/shared/ui/brand-icons'
 import { useLoanStore, loanRepository } from '@/features/request-loan'
 import type { RestructureResult } from '@/features/request-loan'
 import { canSign, isActiveLoan, canPay, LoanStatusBadge } from '@/entities/loan'
@@ -29,12 +36,12 @@ const TABS: { id: TabId; label: string }[] = [
 ]
 
 const TIMELINE_STEPS = [
-  { id: 'requested',  label: 'Solicitado',   icon: 'fa-solid fa-file-pen' },
-  { id: 'approved',   label: 'Aprobado',     icon: 'fa-solid fa-clipboard-check' },
-  { id: 'signed',     label: 'Firmado',      icon: 'fa-solid fa-signature' },
-  { id: 'disbursed',  label: 'Desembolsado', icon: 'fa-solid fa-paper-plane' },
-  { id: 'active',     label: 'Activo',       icon: 'fa-solid fa-wallet' },
-  { id: 'paid',       label: 'Pagado',       icon: 'fa-solid fa-circle-check' },
+  { id: 'requested',  label: 'Solicitado',   icon: FilePen },
+  { id: 'approved',   label: 'Aprobado',     icon: ClipboardCheck },
+  { id: 'signed',     label: 'Firmado',      icon: Signature },
+  { id: 'disbursed',  label: 'Desembolsado', icon: Send },
+  { id: 'active',     label: 'Activo',       icon: Wallet },
+  { id: 'paid',       label: 'Pagado',       icon: CircleCheck },
 ] as const
 
 type TimelineStepId = typeof TIMELINE_STEPS[number]['id']
@@ -276,7 +283,7 @@ export default function LoanDetailPage() {
             <Link href="/loans" className="text-gray-500 dark:text-gray-400 hover:text-[#0A192F] dark:hover:text-[#D4AF37] transition-colors">
               Mis Préstamos
             </Link>
-            <i className="fa-solid fa-chevron-right text-[10px] text-gray-400" />
+            <ChevronRight className="h-3 w-3 text-gray-400" aria-hidden="true" />
             <span className="text-[#0A192F] dark:text-[#D4AF37] font-medium">Detalle #{ref}</span>
           </div>
           <div className="flex items-center gap-3">
@@ -284,7 +291,7 @@ export default function LoanDetailPage() {
               href="/loans"
               className="w-9 h-9 rounded-lg bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors shrink-0"
             >
-              <i className="fa-solid fa-arrow-left text-sm" />
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             </Link>
             <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white">Préstamo Crevo</h1>
             <LoanStatusBadge status={loan.status} />
@@ -297,7 +304,7 @@ export default function LoanDetailPage() {
               href={`/loans/${loan.id}/pay`}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] text-sm font-medium hover:bg-[#0A192F]/90 dark:hover:bg-[#B8941F] transition-colors"
             >
-              <i className="fa-solid fa-money-bill-wave text-sm" />
+              <Banknote className="h-4 w-4" aria-hidden="true" />
               Pagar Cuota
             </Link>
           )}
@@ -326,8 +333,8 @@ export default function LoanDetailPage() {
                             : 'bg-gray-100 dark:bg-[#1E293B] border border-gray-200 dark:border-white/10 text-gray-400 dark:text-gray-500'
                       }`}>
                         {state === 'complete'
-                          ? <i className="fa-solid fa-check text-xs" />
-                          : <i className={`${step.icon} text-xs`} />
+                          ? <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                          : (() => { const StepIcon = step.icon; return <StepIcon className="h-3.5 w-3.5" aria-hidden="true" /> })()
                         }
                       </div>
                       <p className={`text-[10px] font-medium text-center whitespace-nowrap ${
@@ -365,7 +372,7 @@ export default function LoanDetailPage() {
         <div className={`${cardCls} p-4 border-l-2 border-l-[#00E5FF] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4`}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-[#00E5FF]/10 flex items-center justify-center text-[#00E5FF] shrink-0">
-              <i className="fa-solid fa-paper-plane" />
+              <Send className="h-4 w-4" aria-hidden="true" />
             </div>
             <div>
               <p className="font-semibold text-[#0A192F] dark:text-white text-sm">Tu dinero está en camino</p>
@@ -388,7 +395,7 @@ export default function LoanDetailPage() {
         <div className="rounded-lg p-5 border-2 border-[#D4AF37]/60 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-[#D4AF37]/10 dark:to-[#D4AF37]/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-11 h-11 rounded-xl bg-[#D4AF37] flex items-center justify-center text-[#0A192F] shrink-0">
-              <i className="fa-solid fa-file-signature text-lg" />
+              <FileSignature className="h-5 w-5" aria-hidden="true" />
             </div>
             <div>
               <p className="font-bold text-[#0A192F] dark:text-white text-base">¡Tu préstamo fue aprobado!</p>
@@ -405,8 +412,8 @@ export default function LoanDetailPage() {
             className="bg-[#D4AF37] text-[#0A192F] font-semibold px-6 py-2.5 rounded-lg text-sm hover:bg-[#B8941F] transition-colors shrink-0 flex items-center gap-2 disabled:opacity-60"
           >
             {otpSending
-              ? <><i className="fa-solid fa-circle-notch fa-spin" /> Enviando código...</>
-              : <><i className="fa-solid fa-signature" /> Firmar contrato</>
+              ? <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Enviando código...</>
+              : <><Signature className="h-4 w-4" aria-hidden="true" /> Firmar contrato</>
             }
           </button>
         </div>
@@ -418,7 +425,7 @@ export default function LoanDetailPage() {
           {/* Header */}
           <div className="px-5 py-3 bg-red-100 dark:bg-red-900/30 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <i className="fa-solid fa-triangle-exclamation text-red-600 dark:text-red-400" />
+              <TriangleAlert className="h-4 w-4 text-red-600 dark:text-red-400" aria-hidden="true" />
               <span className="font-semibold text-red-700 dark:text-red-300 text-sm">Préstamo en Mora</span>
               {balance.daysOverdue > 0 && (
                 <span className="text-xs bg-red-200 dark:bg-red-800/50 text-red-700 dark:text-red-300 px-2 py-0.5 rounded-full font-medium">
@@ -475,7 +482,7 @@ export default function LoanDetailPage() {
                 onClick={() => { setRestructureStep('confirm'); setRestructureOpen(true) }}
                 className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg bg-white dark:bg-[#1E293B] border border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
               >
-                <i className="fa-solid fa-arrows-rotate" />
+                <RefreshCw className="h-4 w-4" aria-hidden="true" />
                 Solicitar Reestructura
               </button>
               <span className="text-xs text-gray-500 dark:text-gray-400 self-center">
@@ -538,7 +545,7 @@ export default function LoanDetailPage() {
                   href={`/loans/${loan.id}/pay`}
                   className="w-full bg-[#D4AF37] text-[#0A192F] py-2.5 rounded-lg text-center font-medium flex items-center justify-center gap-2 hover:bg-[#B8941F] transition-colors text-sm"
                 >
-                  <i className="fa-solid fa-credit-card text-sm" />
+                  <CreditCard className="h-4 w-4" aria-hidden="true" />
                   Pagar Cuota Actual
                 </Link>
               )}
@@ -547,7 +554,7 @@ export default function LoanDetailPage() {
                   onClick={handleOpenEarlyPayoff}
                   className="w-full bg-white dark:bg-[#0F172A] text-[#0A192F] dark:text-gray-200 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 border border-gray-100 dark:border-white/6 hover:bg-gray-50 dark:hover:bg-[#334155] transition-colors text-sm"
                 >
-                  <i className="fa-solid fa-forward-fast text-sm" />
+                  <FastForward className="h-4 w-4" aria-hidden="true" />
                   Pago Anticipado
                 </button>
               )}
@@ -558,8 +565,8 @@ export default function LoanDetailPage() {
                   className="w-full bg-white dark:bg-[#0F172A] text-[#0A192F] dark:text-gray-200 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 border border-gray-100 dark:border-white/6 hover:bg-gray-50 dark:hover:bg-[#334155] transition-colors text-sm disabled:opacity-60"
                 >
                   {otpSending
-                    ? <><i className="fa-solid fa-circle-notch fa-spin text-sm" /> Enviando...</>
-                    : <><i className="fa-solid fa-signature text-sm" /> Firmar Contrato</>
+                    ? <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Enviando...</>
+                    : <><Signature className="h-4 w-4" aria-hidden="true" /> Firmar Contrato</>
                   }
                 </button>
               )}
@@ -568,7 +575,7 @@ export default function LoanDetailPage() {
                   onClick={handleDownloadContract}
                   className="w-full text-gray-500 dark:text-gray-400 py-2.5 rounded-lg flex items-center justify-center gap-2 text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors"
                 >
-                  <i className="fa-solid fa-file-contract text-sm" />
+                  <FileText className="h-4 w-4" aria-hidden="true" />
                   Ver Contrato
                 </button>
               )}
@@ -693,7 +700,7 @@ export default function LoanDetailPage() {
                                 className="text-[#0A192F] dark:text-[#D4AF37] hover:opacity-70 transition-opacity"
                                 title="Descargar comprobante de cuota"
                               >
-                                <i className="fa-solid fa-file-invoice" />
+                                <FileText className="h-4 w-4" aria-hidden="true" />
                               </button>
                             ) : inst.status === 'OVERDUE' ? (
                               <Link
@@ -704,7 +711,7 @@ export default function LoanDetailPage() {
                               </Link>
                             ) : (
                               <span className="text-gray-300 dark:text-gray-600 cursor-not-allowed text-xs">
-                                <i className="fa-solid fa-lock" />
+                                <Lock className="h-4 w-4" aria-hidden="true" />
                               </span>
                             )}
                           </td>
@@ -730,7 +737,7 @@ export default function LoanDetailPage() {
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 flex items-center justify-center shrink-0">
-                          <i className="fa-solid fa-arrow-down text-xs" />
+                          <ArrowDown className="h-3 w-3" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="font-medium text-[#0A192F] dark:text-white text-sm">Pago Registrado</p>
@@ -748,7 +755,7 @@ export default function LoanDetailPage() {
                           className="text-gray-400 hover:text-[#0A192F] dark:hover:text-white transition-colors"
                           title="Descargar comprobante"
                         >
-                          <i className="fa-solid fa-file-arrow-down text-sm" />
+                          <FileDown className="h-4 w-4" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -845,7 +852,7 @@ export default function LoanDetailPage() {
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${isSigned ? 'bg-green-100 dark:bg-green-900/30 text-green-500 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-500 dark:text-red-400'}`}>
-                        <i className={`fa-solid ${isSigned ? 'fa-file-circle-check' : 'fa-file-pdf'} text-sm`} />
+                        {isSigned ? <FileCheck className="h-4 w-4" aria-hidden="true" /> : <FileText className="h-4 w-4" aria-hidden="true" />}
                       </div>
                       <div>
                         <h3 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Contrato de Préstamo</h3>
@@ -854,7 +861,7 @@ export default function LoanDetailPage() {
                         </p>
                       </div>
                     </div>
-                    <i className="fa-solid fa-download text-gray-400 dark:text-gray-500 text-sm" />
+                    <Download className="h-4 w-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                   </button>
                 )
               })()}
@@ -870,7 +877,7 @@ export default function LoanDetailPage() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 bg-amber-100 dark:bg-amber-900/30 text-amber-500 dark:text-amber-400 rounded-lg flex items-center justify-center shrink-0">
-                        <i className="fa-solid fa-file-lines text-sm" />
+                        <FileText className="h-4 w-4" aria-hidden="true" />
                       </div>
                       <div>
                         <h3 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Hoja Resumen</h3>
@@ -879,7 +886,7 @@ export default function LoanDetailPage() {
                         </p>
                       </div>
                     </div>
-                    <i className="fa-solid fa-download text-gray-400 dark:text-gray-500 text-sm" />
+                    <Download className="h-4 w-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                   </button>
                 )
               })()}
@@ -900,7 +907,7 @@ export default function LoanDetailPage() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 bg-green-100 dark:bg-green-900/30 text-green-500 dark:text-green-400 rounded-lg flex items-center justify-center shrink-0">
-                        <i className="fa-solid fa-file-invoice-dollar text-sm" />
+                        <Receipt className="h-4 w-4" aria-hidden="true" />
                       </div>
                       <div>
                         <h3 className="text-gray-800 dark:text-gray-200 font-medium text-sm">Cronograma de Pagos</h3>
@@ -909,7 +916,7 @@ export default function LoanDetailPage() {
                         </p>
                       </div>
                     </div>
-                    <i className="fa-solid fa-download text-gray-400 dark:text-gray-500 text-sm" />
+                    <Download className="h-4 w-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                   </button>
                 )
               })()}
@@ -923,7 +930,7 @@ export default function LoanDetailPage() {
       <div className={`${cardCls} p-5 flex flex-col md:flex-row items-center justify-between gap-5`}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center border border-blue-100 dark:border-blue-700/30 shrink-0">
-            <i className="fa-solid fa-headset text-[#0A192F] dark:text-[#00E5FF]" />
+            <Headphones className="h-4 w-4 text-[#0A192F] dark:text-[#00E5FF]" aria-hidden="true" />
           </div>
           <div>
             <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">¿Problemas con este préstamo?</h3>
@@ -932,7 +939,7 @@ export default function LoanDetailPage() {
         </div>
         <div className="flex gap-3 w-full md:w-auto shrink-0">
           <button className="flex-1 md:flex-none px-5 py-2 rounded-lg cursor-pointer border border-gray-100 dark:border-white/6 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors text-sm font-medium flex items-center justify-center gap-2">
-            <i className="fa-brands fa-whatsapp text-green-500" />
+            <WhatsAppIcon className="h-4 w-4 text-green-500" />
             Chat
           </button>
           <button className="flex-1 md:flex-none px-5 py-2 rounded-lg cursor-pointer bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] hover:bg-[#0A192F]/90 dark:hover:bg-[#B8941F] transition-colors text-sm font-medium">
@@ -952,7 +959,7 @@ export default function LoanDetailPage() {
                 <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/6">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center text-orange-600 dark:text-orange-400 shrink-0">
-                      <i className="fa-solid fa-arrows-rotate" />
+                      <RefreshCw className="h-4 w-4" aria-hidden="true" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">Reestructuración de Deuda</h3>
@@ -963,7 +970,7 @@ export default function LoanDetailPage() {
                     onClick={() => setRestructureOpen(false)}
                     className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 transition-colors"
                   >
-                    <i className="fa-solid fa-xmark text-sm" />
+                    <X className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </div>
 
@@ -1020,7 +1027,7 @@ export default function LoanDetailPage() {
 
                   {/* Warning */}
                   <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/4 rounded-lg p-3">
-                    <i className="fa-solid fa-circle-info text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
+                    <Info className="h-4 w-4 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" aria-hidden="true" />
                     <p>
                       Esta acción es <strong className="text-gray-700 dark:text-gray-300">irreversible</strong>. Contará como{' '}
                       <strong className="text-gray-700 dark:text-gray-300">reestructuración {loan.restructureCount + 1} de 3</strong>.
@@ -1044,12 +1051,12 @@ export default function LoanDetailPage() {
                   >
                     {restructureLoading ? (
                       <>
-                        <i className="fa-solid fa-spinner animate-spin text-xs" />
+                        <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
                         Procesando...
                       </>
                     ) : (
                       <>
-                        <i className="fa-solid fa-arrows-rotate text-xs" />
+                        <RefreshCw className="h-3 w-3" aria-hidden="true" />
                         Confirmar reestructura
                       </>
                     )}
@@ -1063,7 +1070,7 @@ export default function LoanDetailPage() {
                 {/* Header */}
                 <div className="p-5 border-b border-gray-100 dark:border-white/6 text-center">
                   <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 mx-auto mb-3">
-                    <i className="fa-solid fa-check text-lg" />
+                    <Check className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <h3 className="font-semibold text-[#0A192F] dark:text-white">¡Reestructuración completada!</h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Tu nuevo plan de pagos está activo</p>
@@ -1110,7 +1117,7 @@ export default function LoanDetailPage() {
                 <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/6">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-lg bg-green-100 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 shrink-0">
-                      <i className="fa-solid fa-forward-fast" />
+                      <FastForward className="h-4 w-4" aria-hidden="true" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">Pago Anticipado Total</h3>
@@ -1121,7 +1128,7 @@ export default function LoanDetailPage() {
                     onClick={() => setEarlyPayoffOpen(false)}
                     className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 transition-colors"
                   >
-                    <i className="fa-solid fa-xmark text-sm" />
+                    <X className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </div>
 
@@ -1129,7 +1136,7 @@ export default function LoanDetailPage() {
                 <div className="p-5 space-y-4">
                   {earlyPayoffQuoteLoading ? (
                     <div className="flex flex-col items-center justify-center py-8 gap-3">
-                      <i className="fa-solid fa-spinner animate-spin text-2xl text-[#0A192F] dark:text-[#D4AF37]" />
+                      <Loader2 className="h-7 w-7 animate-spin text-[#0A192F] dark:text-[#D4AF37]" aria-hidden="true" />
                       <p className="text-sm text-gray-500 dark:text-gray-400">Calculando tu cotización...</p>
                     </div>
                   ) : earlyPayoffQuote && (
@@ -1182,7 +1189,7 @@ export default function LoanDetailPage() {
                       {earlyPayoffQuote.interestSaved > 0 && (
                         <div className="flex items-center justify-between bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-700/30 rounded-lg px-4 py-2.5">
                           <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-400">
-                            <i className="fa-solid fa-piggy-bank" />
+                            <PiggyBank className="h-4 w-4" aria-hidden="true" />
                             <span>Ahorro en intereses futuros</span>
                           </div>
                           <span className="font-semibold text-green-700 dark:text-green-400 text-sm">
@@ -1193,7 +1200,7 @@ export default function LoanDetailPage() {
 
                       {/* Info */}
                       <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/4 rounded-lg p-3">
-                        <i className="fa-solid fa-circle-info text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" />
+                        <Info className="h-4 w-4 text-gray-400 dark:text-gray-500 mt-0.5 shrink-0" aria-hidden="true" />
                         <p>Al confirmar, tu préstamo quedará <strong className="text-gray-700 dark:text-gray-300">completamente liquidado</strong>. Esta acción es irreversible.</p>
                       </div>
                     </>
@@ -1217,12 +1224,12 @@ export default function LoanDetailPage() {
                       >
                         {earlyPayoffLoading ? (
                           <>
-                            <i className="fa-solid fa-spinner animate-spin text-xs shrink-0" />
+                            <Loader2 className="h-3 w-3 animate-spin shrink-0" aria-hidden="true" />
                             <span className="text-sm">Procesando...</span>
                           </>
                         ) : (
                           <>
-                            <i className="fa-solid fa-lock text-xs shrink-0" />
+                            <Lock className="h-3 w-3 shrink-0" aria-hidden="true" />
                             <span className="flex flex-col items-start leading-tight">
                               <span className="text-[11px] opacity-80 font-medium">Pagar anticipado</span>
                               <span className="text-sm">{formatCurrency(earlyPayoffQuote.payoffAmount)}</span>
@@ -1232,7 +1239,7 @@ export default function LoanDetailPage() {
                       </button>
                     </div>
                     <p className="text-center text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-1">
-                      <i className="fa-solid fa-shield-halved" />
+                      <ShieldCheck className="h-4 w-4" aria-hidden="true" />
                       Pago seguro procesado por Culqi · Cifrado 256-bit
                     </p>
                   </div>
@@ -1244,7 +1251,7 @@ export default function LoanDetailPage() {
               <>
                 <div className="p-8 text-center space-y-4">
                   <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 mx-auto">
-                    <i className="fa-solid fa-circle-check text-3xl" />
+                    <CircleCheck className="h-9 w-9" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="font-bold text-[#0A192F] dark:text-white text-lg">¡Préstamo liquidado!</h3>
@@ -1255,7 +1262,7 @@ export default function LoanDetailPage() {
                   {earlyPayoffQuote && earlyPayoffQuote.interestSaved > 0 && (
                     <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-700/30 rounded-lg p-3">
                       <p className="text-sm text-green-700 dark:text-green-400 font-medium">
-                        <i className="fa-solid fa-piggy-bank mr-1.5" />
+                        <PiggyBank className="inline h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
                         Ahorraste {formatCurrency(earlyPayoffQuote.interestSaved)} en intereses
                       </p>
                     </div>
@@ -1285,7 +1292,7 @@ export default function LoanDetailPage() {
             <div className="bg-gradient-to-r from-[#1A56FF] to-[#0A40CC] rounded-t-2xl px-6 py-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-                  <i className="fa-solid fa-file-signature text-white text-xl" />
+                  <FileSignature className="h-6 w-6 text-white" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="font-bold text-white text-base">Firma Electrónica</p>
@@ -1296,7 +1303,7 @@ export default function LoanDetailPage() {
                 onClick={() => setOtpModalOpen(false)}
                 className="text-white/60 hover:text-white transition-colors"
               >
-                <i className="fa-solid fa-xmark text-xl" />
+                <X className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
 
@@ -1356,7 +1363,7 @@ export default function LoanDetailPage() {
               {/* Legal notice */}
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl p-3">
                 <p className="text-amber-800 dark:text-amber-300 text-xs leading-relaxed">
-                  <i className="fa-solid fa-triangle-exclamation mr-1.5" />
+                  <TriangleAlert className="inline h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
                   Al confirmar este código, <strong>aceptas los términos del contrato</strong> y autorizas
                   la firma electrónica equivalente a una firma manuscrita.
                 </p>
@@ -1376,8 +1383,8 @@ export default function LoanDetailPage() {
                   className="flex-1 py-2.5 rounded-xl bg-[#1A56FF] text-white text-sm font-bold hover:bg-[#0A40CC] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {otpConfirming
-                    ? <><i className="fa-solid fa-circle-notch fa-spin" /> Firmando...</>
-                    : <><i className="fa-solid fa-check" /> Confirmar firma</>
+                    ? <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Firmando...</>
+                    : <><Check className="h-4 w-4" aria-hidden="true" /> Confirmar firma</>
                   }
                 </button>
               </div>

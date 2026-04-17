@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { Check, ShieldCheck, Headphones, Lock } from 'lucide-react'
 import { RegisterForm } from '@/features/auth'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
@@ -44,19 +45,19 @@ export default function RegisterPage() {
               <div className="space-y-4 mt-8">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
-                    <i className="fa-solid fa-check text-sm text-[#00E5FF]" />
+                    <Check className="h-4 w-4 text-[#00E5FF]" aria-hidden="true" />
                   </div>
                   <span className="text-gray-200 font-medium">Aprobación en minutos en S/</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
-                    <i className="fa-solid fa-shield-halved text-sm text-[#00E5FF]" />
+                    <ShieldCheck className="h-4 w-4 text-[#00E5FF]" aria-hidden="true" />
                   </div>
                   <span className="text-gray-200 font-medium">Seguridad bancaria 256-bit</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
-                    <i className="fa-solid fa-headset text-sm text-[#00E5FF]" />
+                    <Headphones className="h-4 w-4 text-[#00E5FF]" aria-hidden="true" />
                   </div>
                   <span className="text-gray-200 font-medium">Soporte local 24/7</span>
                 </div>
@@ -100,7 +101,7 @@ export default function RegisterPage() {
 
       <footer className="w-full py-5 px-4 text-center">
         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-2">
-          <i className="fa-solid fa-lock" />
+          <Lock className="h-3 w-3" aria-hidden="true" />
           © {CURRENT_YEAR} Crevo. Conexión segura 256-bits • Sujeto Obligado UIF-Perú
         </p>
       </footer>
