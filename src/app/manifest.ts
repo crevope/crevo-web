@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { SITE, BRAND_COLORS } from '@/shared/config/seo'
+import { SITE, SITE_URL, BRAND_COLORS } from '@/shared/config/seo'
 
 /**
  * Web App Manifest — describes the site as installable on mobile.
@@ -94,23 +94,32 @@ export default function manifest(): MetadataRoute.Manifest {
         url: '/profile',
       },
     ],
+    // Tells browsers we want users on our PWA, not pushing them toward a
+    // native app store install (we don't have one). Removes a "should I
+    // install the app?" prompt PWA Builder flags as missing.
+    prefer_related_applications: false,
+    // Absolute URLs throughout. The W3C spec allows relative URLs (resolved
+    // against the manifest URL) and browsers handle them fine, but PWA
+    // Builder + several native install validators are stricter and flag
+    // relative paths as broken. Using the canonical SITE_URL prefix makes
+    // every icon entry unambiguously correct.
     icons: [
       // Scalable vector — preferred when the browser supports it.
       {
-        src: '/icon.svg',
+        src: `${SITE_URL}/icon.svg`,
         sizes: 'any',
         type: 'image/svg+xml',
         purpose: 'any',
       },
       // Standard rasters — Android home screen + browser favicons.
       {
-        src: '/icon0',
+        src: `${SITE_URL}/icon0`,
         sizes: '192x192',
         type: 'image/png',
         purpose: 'any',
       },
       {
-        src: '/icon1',
+        src: `${SITE_URL}/icon1`,
         sizes: '512x512',
         type: 'image/png',
         purpose: 'any',
@@ -118,13 +127,13 @@ export default function manifest(): MetadataRoute.Manifest {
       // Maskable — adaptive icons on Android. Mark within the safe zone
       // so circle/squircle masks never crop the brand.
       {
-        src: '/icons/maskable-192',
+        src: `${SITE_URL}/icons/maskable-192`,
         sizes: '192x192',
         type: 'image/png',
         purpose: 'maskable',
       },
       {
-        src: '/icons/maskable-512',
+        src: `${SITE_URL}/icons/maskable-512`,
         sizes: '512x512',
         type: 'image/png',
         purpose: 'maskable',
@@ -132,14 +141,14 @@ export default function manifest(): MetadataRoute.Manifest {
       // Monochrome — Android 13+ Material You themed icons. Transparent
       // background; the OS tints the silhouette with the user's theme color.
       {
-        src: '/icons/monochrome-512',
+        src: `${SITE_URL}/icons/monochrome-512`,
         sizes: '512x512',
         type: 'image/png',
         purpose: 'monochrome',
       },
       // iOS home-screen icon.
       {
-        src: '/apple-icon',
+        src: `${SITE_URL}/apple-icon`,
         sizes: '180x180',
         type: 'image/png',
         purpose: 'any',
