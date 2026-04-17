@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { toast } from 'sonner'
 import {
   Loader2, Mail, IdCard, HandCoins, Bell, Plus, ShieldCheck, Rocket,
@@ -10,7 +11,16 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { authRepository } from '@/features/auth'
-import { useLoanStore, RequestLoanModal } from '@/features/request-loan'
+import { useLoanStore } from '@/features/request-loan'
+
+// Heavy client-side form (form state, amount slider, installment calculator,
+// bank account picker, legal consent) — only needed the moment the user clicks
+// "Solicitar préstamo", which typically happens at most once per session. Defer
+// the chunk until then to keep the dashboard TTI low.
+const RequestLoanModal = dynamic(
+  () => import('@/features/request-loan').then(m => ({ default: m.RequestLoanModal })),
+  { ssr: false },
+)
 import { useNotificationStore } from '@/features/notifications'
 import { kycRepository } from '@/features/upload-kyc'
 import { formatCurrency, formatDate, loanRef } from '@/shared/lib/utils'

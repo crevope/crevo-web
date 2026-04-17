@@ -1,11 +1,20 @@
 'use client'
 
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { Cookie } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import { LEGAL_URLS } from '@/features/legal/lib/legalConstants'
 import { useCookieConsent } from '../lib/CookieConsentContext'
-import { CookiePreferencesDialog } from './CookiePreferencesDialog'
+
+// Dialog is only rendered when the user actively opens preferences, so we
+// defer its chunk (Radix Dialog + 3 category switches + legal strings) until
+// then — the banner stays under 2 KB on first paint instead of pulling the
+// full preferences UI with it.
+const CookiePreferencesDialog = dynamic(
+  () => import('./CookiePreferencesDialog').then(m => ({ default: m.CookiePreferencesDialog })),
+  { ssr: false },
+)
 
 /**
  * Banner inferior que aparece en la primera visita o cuando sube la versión

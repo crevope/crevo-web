@@ -9,6 +9,7 @@ import './globals.css'
 import { cn } from '@/shared/lib/utils'
 import { CookieConsentProvider } from '@/features/cookie-consent/lib/CookieConsentContext'
 import { CookieBanner } from '@/features/cookie-consent/ui/CookieBanner'
+import { ServiceWorkerRegister } from '@/shared/ui/service-worker-register'
 import { JsonLd } from '@/shared/seo/JsonLd'
 import { organizationSchema } from '@/shared/seo/schemas/organization'
 import { websiteSchema } from '@/shared/seo/schemas/website'
@@ -201,6 +202,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             {children}
             <CookieBanner />
             <Toaster richColors position="top-right" />
+            <ServiceWorkerRegister />
           </CookieConsentProvider>
         </ThemeProvider>
         {/* Structured data — site-wide identity. Per-page schemas (FAQPage,

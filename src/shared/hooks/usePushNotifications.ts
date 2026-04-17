@@ -43,11 +43,12 @@ export function usePushNotifications() {
         const permission = await Notification.requestPermission()
         if (permission !== 'granted' || cancelled) return
 
-        // Registrar SW mediante API route (inyecta Firebase config desde env vars)
-        const registration = await navigator.serviceWorker.register(
-          '/api/firebase-messaging-sw',
-          { scope: '/' },
-        )
+        // The Service Worker is already registered at mount by
+        // `ServiceWorkerRegister` (root layout), so we reuse that
+        // registration — registering twice would be a no-op but wait on
+        // `.ready` guarantees the SW is active before we ask Firebase for
+        // a token against it.
+        const registration = await navigator.serviceWorker.ready
 
         const messaging = getFirebaseMessaging()
         if (!messaging || cancelled) return

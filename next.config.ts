@@ -1,5 +1,14 @@
 import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs'
+import withBundleAnalyzer from '@next/bundle-analyzer'
+
+// Bundle analyzer only activates when `ANALYZE=true yarn build`. The wrapper
+// is a no-op otherwise, so it costs nothing in normal builds. Use it to hunt
+// heavy deps: it writes two HTML reports under `.next/analyze/` (one per
+// runtime) that open in the browser automatically.
+const bundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
 
 /**
  * Backend upstream for the `/api/*` rewrite.
@@ -31,7 +40,7 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(bundleAnalyzer(nextConfig), {
   // URL de tu organización/proyecto en Sentry (para source maps)
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
