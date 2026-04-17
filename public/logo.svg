@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64" role="img" aria-label="Crevo">
+  <rect width="64" height="64" rx="14" fill="#0A192F"/>
+  <path d="M 46 22 A 18 18 0 1 0 46 42" stroke="#D4AF37" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path d="M 50 18 L 38 32 L 46 32 L 30 46 L 50 30 L 42 30 Z" fill="#00E5FF"/>
+  <text x="84" y="44" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="36" font-weight="700" letter-spacing="-0.02em" fill="#0A192F">Crevo</text>
+</svg>
