@@ -67,21 +67,29 @@ export function Logo({
 
   // ── Wordmark composition: mark + "revo" ─────────────────────────────────
   //
-  // The mark's bounding box is 64×64, but the visible C body fills (4, 12)
-  // to (60, 52) — visual height ≈ 40, with the arrow tip at (60, 32).
+  // The mark's bounding box is 64×64; visible body fills (4, 12)–(60, 52),
+  // visual height ≈ 40, with the arrow tip at (60, 32).
   //
-  // We position "revo" so its cap-height (~40 units in viewBox) aligns with
-  // the mark's visible top/bottom (y=12 to y=52). For Plus Jakarta Sans
-  // Bold, cap-height ≈ 0.71 of font-size, so font-size = 40 / 0.71 ≈ 56.
+  // Two deliberate proportion choices for hierarchy:
   //
-  // The "r" begins at x=68 — 8 units past the arrow tip at x=60 — so the
-  // arrow visually leads INTO the rest of the word without colliding with
-  // the "r"'s vertical stem.
-  const aspectRatio = 184 / 64 // wordmark viewBox is 0 0 184 64
+  //   1. SIZE: text font-size is 44 (cap-height ≈ 31), notably smaller than
+  //      the mark's visible height (40). The mark "rises above" the text
+  //      and reads as the primary brand element — the wordmark "revo" is
+  //      the supporting context.
+  //
+  //   2. SPACING: text starts at x=60, exactly where the arrow tip lives.
+  //      The 'r' glyph's natural left-side bearing (~3 units of internal
+  //      padding) places its visible stem at x≈63, so the arrow tip just
+  //      brushes the leading edge of the "r". Reads as a single word, no
+  //      "icon + label" gap.
+  //
+  // Baseline at y=52 — same as the mark's visible bottom — so the entire
+  // wordmark sits on a single optical baseline.
+  const aspectRatio = 160 / 64 // wordmark viewBox is 0 0 160 64
   const totalWidth = size * aspectRatio
   const textStyle: CSSProperties = {
     fontFamily: 'var(--font-sans), "Plus Jakarta Sans", system-ui, sans-serif',
-    fontSize: 56,
+    fontSize: 44,
     fontWeight: 700,
     letterSpacing: '-0.025em',
     fill: finalTextColor,
@@ -89,7 +97,7 @@ export function Logo({
 
   return (
     <svg
-      viewBox="0 0 184 64"
+      viewBox="0 0 160 64"
       width={totalWidth}
       height={size}
       xmlns="http://www.w3.org/2000/svg"
@@ -97,7 +105,7 @@ export function Logo({
       {...a11yProps}
     >
       <Mark color={markColor} />
-      <text x={68} y={52} style={textStyle}>
+      <text x={60} y={52} style={textStyle}>
         revo
       </text>
     </svg>

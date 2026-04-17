@@ -16,9 +16,13 @@ automatically.
 | `mark-gold.svg` | `#D4AF37` | Premium contexts. Pair with light/cream backgrounds. |
 | `mark-cyan.svg` | `#00E5FF` | High-contrast tech / event materials. Use sparingly. |
 
-## Wordmark (mark + "revo", 184×64 viewBox)
+## Wordmark (mark + "revo", 160×64 viewBox)
 
 The mark IS the "C" of "Crevo" — no double-C redundancy.
+
+**Proportion intent:** the mark visually dominates (visible height 40 vs
+"revo" cap-height ~31, ratio ~1.3:1). The arrow tip sits exactly where
+the "r" begins — they read as a single word, not "icon + label".
 
 | File | Mark color | "revo" color | When to use |
 |---|---|---|---|
@@ -41,7 +45,8 @@ ViewBox 64×64 for the mark:
   M 36 16 A 20 20 0 1 0 36 48 L 60 32 L 30 40 A 10 10 0 1 1 30 24 Z
   ```
 
-Wordmark: mark at (0, 0)–(64, 64), "revo" text at x=68 with font-size 56
-(cap-height ≈ 40 to match mark visible height).
+Wordmark: mark at (0, 0)–(64, 64), "revo" text at x=60 with font-size 44
+(cap-height ≈ 31 — smaller than the mark's visible height of 40 so the
+mark visually dominates). Baseline at y=52 matches the mark's bottom.
 
 Typography: Plus Jakarta Sans Bold, letter-spacing -0.025em.
