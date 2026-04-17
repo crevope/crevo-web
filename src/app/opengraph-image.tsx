@@ -61,20 +61,15 @@ export default function OpenGraphImage() {
           }}
         />
 
-        {/* Top: brand mark + name */}
+        {/* Top: brand mark + name. The mark is the new "Forward-Arrow C" —
+            single navy path on the existing navy gradient backdrop, so we
+            render it in white for contrast (gold/cyan reserved as accents
+            elsewhere on the card). */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <svg viewBox="0 0 64 64" width={88} height={88}>
-            <rect width="64" height="64" rx="14" fill={BRAND_COLORS.primary} />
             <path
-              d="M 46 22 A 18 18 0 1 0 46 42"
-              stroke={BRAND_COLORS.secondary}
-              strokeWidth={7}
-              fill="none"
-              strokeLinecap="round"
-            />
-            <path
-              d="M 50 18 L 38 32 L 46 32 L 30 46 L 50 30 L 42 30 Z"
-              fill={BRAND_COLORS.accent}
+              d="M 36 16 A 20 20 0 1 0 36 48 L 60 32 L 30 40 A 10 10 0 1 1 30 24 Z"
+              fill={BRAND_COLORS.white}
             />
           </svg>
           <span
