@@ -6,6 +6,7 @@ import { DashboardSidebar } from '@/widgets/dashboard-sidebar'
 import { useAuthStore } from '@/features/auth'
 import { useNotificationStore } from '@/features/notifications'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { Logo } from '@/shared/ui/Logo'
 import { usePushNotifications } from '@/shared/hooks/usePushNotifications'
 
 export default function PrivateLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -44,12 +45,9 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
 
       {/* Mobile Header */}
       <header className="lg:hidden w-full py-3.5 px-5 flex justify-between items-center bg-[#0A192F] border-b border-white/5 sticky top-0 z-30">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 bg-linear-to-br from-[#D4AF37] to-[#D4AF37]/80 rounded-lg flex items-center justify-center">
-            <i className="fa-solid fa-bolt text-[#0A192F] text-xs" />
-          </div>
-          <span className="text-base font-semibold text-white tracking-tight">Crevo</span>
-        </div>
+        {/* Mobile header is always navy bg → white mark + gold "revo" */}
+        <Logo size={28} markColor="#FFFFFF" textColor="#D4AF37" />
+
         <div className="flex items-center gap-1">
           <Link href="/notifications" className="relative p-1 text-gray-300 hover:text-white transition-colors">
             <i className="fa-regular fa-bell text-lg" />

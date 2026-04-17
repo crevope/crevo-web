@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { useAuthStore } from '@/features/auth'
 import { LandingThemeToggle } from './landing-theme-toggle'
+import { Logo } from './Logo'
 import { shortName } from '@/shared/lib/utils'
 
 export function LandingHeader() {
@@ -15,13 +16,9 @@ export function LandingHeader() {
   return (
     <header className="w-full py-5 px-4 sm:px-8 lg:px-16 xl:px-20 flex justify-between items-center fixed top-0 left-0 z-50 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md border-b border-gray-200/50 dark:border-[#334155]/50">
 
-      {/* Logo */}
-      <Link href="/" className="flex items-center gap-2.5">
-        <div className="w-8 h-8 bg-linear-to-br from-[#0A192F] to-[#0A192F]/80 rounded-lg flex items-center justify-center text-[#D4AF37]">
-          <i className="fa-solid fa-bolt text-sm" />
-        </div>
-        <span className="text-lg font-semibold text-[#0A192F] dark:hidden tracking-tight">Crevo</span>
-        <span className="text-lg font-semibold text-white hidden dark:block tracking-tight">Crevo</span>
+      {/* Logo — currentColor inherited from text-* class auto-switches navy ↔ white */}
+      <Link href="/" className="flex items-center text-[#0A192F] dark:text-white">
+        <Logo size={32} />
       </Link>
 
       {/* Nav */}

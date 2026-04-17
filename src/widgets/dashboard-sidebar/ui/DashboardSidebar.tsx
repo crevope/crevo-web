@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/features/auth'
 import { useNotificationStore } from '@/features/notifications'
+import { Logo } from '@/shared/ui/Logo'
 import { shortName } from '@/shared/lib/utils'
 
 interface NavItem {
@@ -80,12 +81,10 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
-        {/* Logo */}
-        <div className="hidden lg:flex items-center gap-2.5 mb-8 px-1">
-          <div className="w-7 h-7 bg-linear-to-br from-[#D4AF37] to-[#D4AF37]/80 rounded-lg flex items-center justify-center">
-            <i className="fa-solid fa-bolt text-[#0A192F] text-xs" />
-          </div>
-          <span className="text-base font-semibold text-white tracking-tight">Crevo</span>
+        {/* Logo — sidebar is always navy bg, so use white mark + gold "revo"
+            via two-tone for premium contrast. */}
+        <div className="hidden lg:flex items-center mb-8 px-1">
+          <Logo size={28} markColor="#FFFFFF" textColor="#D4AF37" />
         </div>
 
         {/* User card */}

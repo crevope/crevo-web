@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { LandingThemeToggle } from './landing-theme-toggle'
+import { Logo } from './Logo'
 
 interface AuthHeaderProps {
   cta?: { label: string; href: string }
@@ -9,11 +10,8 @@ interface AuthHeaderProps {
 export function AuthHeader({ cta }: AuthHeaderProps) {
   return (
     <header className="w-full py-4 px-4 sm:px-8 lg:px-16 xl:px-20 flex justify-between items-center absolute top-0 left-0 z-50">
-      <Link href="/" className="flex items-center gap-2.5">
-        <div className="w-8 h-8 bg-linear-to-br from-[#0A192F] to-[#0A192F]/80 rounded-lg flex items-center justify-center text-[#D4AF37]">
-          <i className="fa-solid fa-bolt text-sm" />
-        </div>
-        <span className="text-lg font-semibold text-[#0A192F] dark:text-white tracking-tight">Crevo</span>
+      <Link href="/" className="flex items-center text-[#0A192F] dark:text-white">
+        <Logo size={32} />
       </Link>
 
       <div className="flex items-center gap-4 sm:gap-5">

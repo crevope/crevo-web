@@ -4,6 +4,7 @@ import { LoanSimulator } from '@/features/simulator/ui/LoanSimulator'
 import { RepresentativeExample } from '@/features/simulator/ui/RepresentativeExample'
 import { FaqSection, faqJsonLd } from '@/features/faq'
 import { LandingHeader } from '@/shared/ui/landing-header'
+import { Logo } from '@/shared/ui/Logo'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
 import { buildMetadata } from '@/shared/seo/buildMetadata'
 import { JsonLd } from '@/shared/seo/JsonLd'
@@ -496,11 +497,9 @@ export default function LandingPage() {
 
             {/* Brand column — wider on desktop */}
             <div className="lg:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-linear-to-br from-[#D4AF37] to-[#D4AF37]/80 rounded-lg flex items-center justify-center">
-                  <i className="fa-solid fa-bolt text-[#0A192F] text-lg" />
-                </div>
-                <span className="text-xl font-semibold text-white tracking-tight">Crevo</span>
+              <div className="mb-4">
+                {/* Footer is always navy bg → white mark + gold "revo" */}
+                <Logo size={36} markColor="#FFFFFF" textColor="#D4AF37" />
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-4 max-w-sm">
                 Préstamos online rápidos, transparentes y 100% digitales para todos
