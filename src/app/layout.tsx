@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Plus_Jakarta_Sans, Geist } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/shared/ui/sonner'
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </ThemeProvider>
         <Script src="https://checkout.culqi.com/js/v4" strategy="lazyOnload" />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
