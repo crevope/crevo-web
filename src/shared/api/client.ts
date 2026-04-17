@@ -2,13 +2,30 @@ import axios, { AxiosError } from 'axios'
 import { env } from '@/shared/config/env'
 import { clearAuthLocalStorage } from '@/shared/lib/sessionStorage'
 
-// ─── Cookie names shared with the backend ────────────────────────────────────
+// ─── Cookie / header / storage names shared with the backend ────────────────
 // Must stay in sync with `src/shared/utils/authCookies.ts` on the server.
 
-/** Readable CSRF cookie (non-HttpOnly). The SPA reads it and echoes it back
- *  in the `X-CSRF-Token` header on every mutating request. */
+/** Readable CSRF cookie (non-HttpOnly). Used as a fallback source when the
+ *  SPA is same-origin with the API. */
 const CSRF_COOKIE_NAME = 'crevo_csrf'
 const CSRF_HEADER_NAME = 'X-CSRF-Token'
+
+/** sessionStorage key for the CSRF token. We persist it here so that:
+ *
+ *  1. CROSS-ORIGIN setups work — when the SPA lives on `crevo.pe` and hits
+ *     `api.crevo.pe` directly, JS can NOT read the CSRF cookie that was set
+ *     by the API origin (Same-Origin Policy on document.cookie). The backend
+ *     also returns the token in the response body of every auth call, and we
+ *     stash it here so the request interceptor can echo it on subsequent
+ *     mutating requests.
+ *
+ *  2. Page reloads work — sessionStorage survives F5 within the same tab,
+ *     so we don't lose CSRF state mid-session.
+ *
+ *  Cleared on logout. Loose new tabs get a fresh CSRF on the first /auth/me
+ *  call (the server rotates and returns it on every meHandler hit).
+ */
+const CSRF_STORAGE_KEY = 'crevo_csrf_token'
 
 /** Key under which we cache the user profile for client-side hydration. The
  *  auth token itself is never stored — it lives in an HttpOnly cookie only. */
@@ -25,6 +42,62 @@ export const apiClient = axios.create({
   withCredentials: true,
 })
 
+// ─── CSRF token storage ─────────────────────────────────────────────────────
+
+let csrfTokenCache: string | null = null
+
+/** Stores a fresh CSRF token after login/register/refresh/me. */
+export function setCsrfToken(token: string | null | undefined): void {
+  if (!token) return
+  csrfTokenCache = token
+  if (typeof window !== 'undefined') {
+    try {
+      window.sessionStorage.setItem(CSRF_STORAGE_KEY, token)
+    } catch {
+      // sessionStorage can be blocked in some privacy modes — tolerate it.
+    }
+  }
+}
+
+/** Reads the CSRF token. Order: in-memory → sessionStorage → document.cookie.
+ *  The cookie path only works for same-origin SPAs; for cross-origin it'll be
+ *  null but the in-memory / sessionStorage path covers it. */
+export function getCsrfToken(): string | null {
+  if (csrfTokenCache) return csrfTokenCache
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = window.sessionStorage.getItem(CSRF_STORAGE_KEY)
+      if (stored) {
+        csrfTokenCache = stored
+        return stored
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  return readCookie(CSRF_COOKIE_NAME)
+}
+
+function clearCsrfToken(): void {
+  csrfTokenCache = null
+  if (typeof window !== 'undefined') {
+    try {
+      window.sessionStorage.removeItem(CSRF_STORAGE_KEY)
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+/** Reads csrfToken from a successful auth response payload (login, register,
+ *  refresh, /auth/me) and stores it. Tolerant of missing field. */
+export function captureCsrfFromResponse(payload: unknown): void {
+  if (payload && typeof payload === 'object' && 'csrfToken' in payload) {
+    const token = (payload as { csrfToken?: unknown }).csrfToken
+    if (typeof token === 'string') setCsrfToken(token)
+  }
+}
+
 // ─── Request interceptor: attach CSRF header ─────────────────────────────────
 
 apiClient.interceptors.request.use((config) => {
@@ -35,7 +108,7 @@ apiClient.interceptors.request.use((config) => {
   const isSafe = method === 'get' || method === 'head' || method === 'options'
   if (isSafe) return config
 
-  const csrfToken = readCookie(CSRF_COOKIE_NAME)
+  const csrfToken = getCsrfToken()
   if (csrfToken) {
     config.headers = config.headers ?? {}
     ;(config.headers as Record<string, string>)[CSRF_HEADER_NAME] = csrfToken
@@ -43,10 +116,7 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
-// ─── Response interceptor: transparent refresh on 401 ────────────────────────
-//
-// Prevents a thundering herd: while one request is refreshing, every other
-// 401 is queued and replayed against the new cookie.
+// ─── Response interceptor: capture rotated CSRF + transparent refresh on 401 ─
 
 let isRefreshing = false
 let refreshSubscribers: Array<() => void> = []
@@ -61,7 +131,13 @@ function notifyRefreshCompleted() {
 }
 
 apiClient.interceptors.response.use(
-  (r) => r,
+  (r) => {
+    // Capture rotated CSRF from any auth-bearing response body. The backend
+    // includes `csrfToken` in login/register/refresh/me responses; for other
+    // endpoints `data?.csrfToken` is just absent and this is a no-op.
+    captureCsrfFromResponse(r.data?.data)
+    return r
+  },
   async (error: AxiosError) => {
     const originalRequest = error.config as typeof error.config & { _retry?: boolean }
 
@@ -95,8 +171,10 @@ apiClient.interceptors.response.use(
         // The browser sends the refresh cookie automatically thanks to
         // `withCredentials: true`. Body is empty — the server reads the
         // `crevo_rt` cookie, rotates the access cookie, and also rotates the
-        // CSRF cookie so our next request picks up the fresh value.
-        await apiClient.post('/auth/refresh', {})
+        // CSRF cookie + returns the new token in the body so we can pick it
+        // up here even when document.cookie is unreadable (cross-origin).
+        const refreshRes = await apiClient.post('/auth/refresh', {})
+        captureCsrfFromResponse(refreshRes.data?.data)
 
         isRefreshing = false
         notifyRefreshCompleted()
@@ -151,12 +229,13 @@ apiClient.interceptors.response.use(
  *
  * HttpOnly cookies (`crevo_at`, `crevo_rt`) can only be cleared by a server
  * `Set-Cookie` response — that's handled by the `/auth/logout` call above.
- * Here we clear the non-HttpOnly CSRF cookie and wipe localStorage —
- * preserving long-lived user preferences (cookie consent, theme) per
- * `clearAuthLocalStorage()`.
+ * Here we clear the non-HttpOnly CSRF cookie, the in-memory + sessionStorage
+ * CSRF token cache, and wipe localStorage — preserving long-lived user
+ * preferences (cookie consent, theme) per `clearAuthLocalStorage()`.
  */
-function clearClientSession() {
+export function clearClientSession(): void {
   clearAuthLocalStorage()
+  clearCsrfToken()
   if (typeof document !== 'undefined') {
     document.cookie = `${CSRF_COOKIE_NAME}=; Path=/; Max-Age=0`
   }

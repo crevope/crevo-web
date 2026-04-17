@@ -1,5 +1,4 @@
-import { apiClient, USER_STORAGE_KEY } from '@/shared/api/client'
-import { clearAuthLocalStorage } from '@/shared/lib/sessionStorage'
+import { apiClient, USER_STORAGE_KEY, clearClientSession } from '@/shared/api/client'
 import type { AuthUser } from '@/entities/user'
 
 /**
@@ -95,8 +94,9 @@ export const authRepository = {
   // HttpOnly auth cookie.
 
   saveUser(user: AuthUser) { localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user)) },
-  /** Wipes localStorage on logout while preserving cookie consent + theme. */
-  clearUser() { clearAuthLocalStorage() },
+  /** Full client-side cleanup on logout: localStorage (preserves cookie
+   *  consent + theme), sessionStorage CSRF, and the readable CSRF cookie. */
+  clearUser() { clearClientSession() },
   getStoredUser(): AuthUser | null {
     if (typeof window === 'undefined') return null
     const raw = localStorage.getItem(USER_STORAGE_KEY)
