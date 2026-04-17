@@ -124,3 +124,22 @@ export const VERIFICATION = {
   google: undefined as string | undefined, // TODO: set after Google Search Console verification
   bing: undefined as string | undefined,   // TODO: set after Bing Webmaster Tools verification
 } as const
+
+/** Facebook App ID — optional. Emits `<meta property="fb:app_id">` when set,
+ *  which unlocks:
+ *    - Facebook Insights (analytics on URL shares/comments/reactions)
+ *    - Official `Like` button integration
+ *    - Domain ownership claim in Facebook Business Manager
+ *
+ *  NOT required for link previews to work correctly. If unset, Facebook's
+ *  debugger shows a warning but the preview card still renders fine.
+ *
+ *  To obtain: https://developers.facebook.com/apps/ → Create App →
+ *  Business type → copy the App ID (15–16 digits). Then add it as the
+ *  env var NEXT_PUBLIC_FB_APP_ID (public because it's rendered client-side
+ *  in a meta tag — no secret involved).
+ */
+export const FB_APP_ID =
+  process.env.NEXT_PUBLIC_FB_APP_ID && process.env.NEXT_PUBLIC_FB_APP_ID.length > 0
+    ? process.env.NEXT_PUBLIC_FB_APP_ID
+    : undefined

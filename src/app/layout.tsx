@@ -20,6 +20,7 @@ import {
   OG_IMAGE_WIDTH,
   OG_IMAGE_HEIGHT,
   OG_IMAGE_ALT,
+  FB_APP_ID,
 } from '@/shared/config/seo'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
@@ -123,13 +124,16 @@ export const metadata: Metadata = {
       : undefined,
   },
 
-  // Lets the browser pre-warm the connection to the API origin on first
-  // paint — a small win on Largest Contentful Paint when the landing
-  // simulator fires its first /loans/simulate POST.
+  // Misc <meta> tags that don't have a typed slot in Next.js Metadata.
+  // - apple-mobile-web-app-*: PWA hints for iOS Safari.
+  // - fb:app_id: optional Facebook App linkage. Only emitted when
+  //   NEXT_PUBLIC_FB_APP_ID is set in the environment. Without it the
+  //   FB Sharing Debugger flags a warning, but link previews still work.
   other: {
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
     'apple-mobile-web-app-title': SITE.name,
+    ...(FB_APP_ID ? { 'fb:app_id': FB_APP_ID } : {}),
   },
 }
 
