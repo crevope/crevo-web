@@ -13,7 +13,6 @@ import { SITE, SITE_URL, BRAND_COLORS } from '@/shared/config/seo'
  * Lives at /manifest.webmanifest.
  *
  * Icon strategy — covers every install path:
- *   - SVG (`/icon.svg`): scalable, picked by browsers that prefer vectors.
  *   - 192/512 PNG (`purpose: 'any'`): minimum required by Android. The 192
  *     is for the home screen; the 512 powers the splash screen and the
  *     OS icon picker.
@@ -104,13 +103,16 @@ export default function manifest(): MetadataRoute.Manifest {
     // relative paths as broken. Using the canonical SITE_URL prefix makes
     // every icon entry unambiguously correct.
     icons: [
-      // Scalable vector — preferred when the browser supports it.
-      {
-        src: `${SITE_URL}/icon.svg`,
-        sizes: 'any',
-        type: 'image/svg+xml',
-        purpose: 'any',
-      },
+      // NOTE: we deliberately omit the SVG icon from the manifest, even
+      // though /icon.svg is served correctly with image/svg+xml. PWA Builder
+      // and several native install validators flag SVG manifest icons as
+      // "image doesn't exist" — a known false positive in their fetch +
+      // type-validation flow. Stripe, Revolut and most fintech PWAs do the
+      // same: PNG-only manifests, SVG only as the standalone favicon (which
+      // Next.js auto-emits a <link rel="icon"> for from app/icon.svg).
+      // The browser still gets the scalable favicon; only the manifest
+      // entry — which the install dialog reads — uses raster sizes.
+
       // Standard rasters — Android home screen + browser favicons.
       {
         src: `${SITE_URL}/icon0`,
