@@ -19,6 +19,12 @@ import { breadcrumbSchema } from '@/shared/seo/schemas/breadcrumb'
  * before handing over their DNI: who regulates you, where's your money
  * coming from, what's your track record, can I reach a human.
  */
+// Opt-in to Partial Prerendering — this page is 100% static, so the
+// static shell can stream to the client instantly while any dynamic
+// islands (none today, but future AB tests or theme switches could
+// qualify) render in parallel.
+export const experimental_ppr = true
+
 export const metadata = buildMetadata({
   title: 'Sobre Crevo',
   description:

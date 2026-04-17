@@ -25,6 +25,8 @@ interface Props {
  * runtime cost and we still get per-city `generateMetadata`.
  */
 
+export const experimental_ppr = true
+
 export async function generateStaticParams() {
   return CITIES.map((c) => ({ city: c.slug }))
 }

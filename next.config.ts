@@ -29,6 +29,87 @@ const bundleAnalyzer = withBundleAnalyzer({
 const BACKEND_UPSTREAM_URL = process.env.BACKEND_UPSTREAM_URL?.replace(/\/+$/, '')
 
 const nextConfig: NextConfig = {
+  // ─── Image optimization ────────────────────────────────────────────────
+  //
+  // Serve AVIF when the browser accepts it (≈50% smaller than WebP, ≈75%
+  // smaller than JPEG at equal quality); fall back to WebP for older UAs
+  // and to the original format as the last resort. `minimumCacheTTL` of
+  // 31 days matches the typical product shelf life of a hero image and
+  // matches Vercel's Image Optimization recommended default.
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60 * 60 * 24 * 31,
+  },
+
+  // ─── Experimental flags ────────────────────────────────────────────────
+  //
+  // Partial Prerendering (PPR): serves static shells instantly while the
+  // dynamic parts (auth-gated chrome, A/B experiments) stream in. With
+  // `ppr: 'incremental'` pages opt in with `export const experimental_ppr
+  // = true`, so we can migrate the landing and legal pages first — where
+  // the TTFB win is largest — without risking behavior changes on the
+  // authenticated area.
+  experimental: {
+    ppr: 'incremental',
+  },
+
+  // ─── Response headers ──────────────────────────────────────────────────
+  //
+  // Cache-Control policies tuned per route family. The shared security
+  // headers already ship from `src/middleware.ts` (CSP, HSTS, XFO,
+  // Permissions-Policy); we only wire Cache-Control here because it's
+  // route-scoped and belongs closer to the route definitions.
+  async headers() {
+    return [
+      {
+        // Legal documents almost never change between deploys; 1-day
+        // CDN cache with a long stale-while-revalidate keeps them
+        // blazing fast without blocking urgent updates.
+        source:
+          '/(terminos-y-condiciones|politica-de-privacidad|politica-de-cookies|politica-de-cobranza|derechos-del-usuario|sobre-nosotros)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        // Blog posts + FAQ refresh hourly; longer SWR so the edge can
+        // still serve stale while a new deploy regenerates.
+        source: '/(blog|preguntas-frecuentes)(/.*)?',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        // Tarifas + simulador depend on the BCRP rate that syncs
+        // every ~24h, so a 1h s-maxage with 1d SWR is right-sized.
+        source: '/(tarifas|simulador)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        // City landing pages are effectively static — recompute once
+        // a day, cache for a week on the edge.
+        source: '/prestamos-en-(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, s-maxage=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+    ]
+  },
+
   async rewrites() {
     if (!BACKEND_UPSTREAM_URL) return []
     return [

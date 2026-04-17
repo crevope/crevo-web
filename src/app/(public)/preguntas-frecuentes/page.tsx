@@ -17,6 +17,8 @@ import { FaqSection, faqJsonLd } from '@/features/faq'
  * a subsection. Same `FaqSection` component + same `faqJsonLd` — the
  * single source of truth stays in `features/faq/data/faqs.ts`.
  */
+export const experimental_ppr = true
+
 export const metadata = buildMetadata({
   title: 'Preguntas frecuentes',
   description:
