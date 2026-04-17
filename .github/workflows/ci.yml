@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel an in-progress run if a new commit lands on the same PR so we
+# don't queue stale jobs when someone push-force-fixes a review.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Vercel's production build also runs typecheck + lint, so these match.
+  NODE_VERSION: '20'
+
+jobs:
+  lint-typecheck:
+    name: Lint + Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: ESLint
+        run: yarn lint
+
+      - name: Typecheck
+        run: yarn tsc --noEmit
+
+      - name: Prettier check
+        run: yarn format:check
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # The build is the most expensive step and catches everything the
+    # lint/type jobs can miss (runtime imports, env-schema failures, SWC
+    # errors). Gate it behind the cheap checks so we fail fast.
+    needs: lint-typecheck
+    env:
+      # Minimal env vars the app needs at build time. CI uses dummy
+      # values — the build only exercises code paths, not external APIs.
+      NEXT_PUBLIC_API_URL: /api
+      NEXT_PUBLIC_SUPABASE_URL: https://ci.placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build (no source maps, no Sentry upload)
+        run: yarn build
+        env:
+          # Skip Sentry source map upload in CI — the auth token is only
+          # set in Vercel, not in GitHub Actions.
+          SENTRY_AUTH_TOKEN: ''
+
+  e2e:
+    name: Playwright smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: lint-typecheck
+    env:
+      NEXT_PUBLIC_API_URL: /api
+      NEXT_PUBLIC_SUPABASE_URL: https://ci.placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: yarn playwright install --with-deps chromium
+
+      - name: Run smoke tests
+        run: yarn test:e2e --project=chromium
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

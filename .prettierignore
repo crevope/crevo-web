@@ -1,0 +1,12 @@
+.next
+node_modules
+public
+coverage
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+.vercel
+src/app/fonts
+src/app/**/icon.svg
+src/app/**/opengraph-image.tsx
+src/app/**/apple-icon.tsx
