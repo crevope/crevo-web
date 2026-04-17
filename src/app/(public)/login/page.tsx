@@ -2,6 +2,17 @@ import Link from 'next/link'
 import { LoginForm } from '@/features/auth'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
+import { buildMetadata } from '@/shared/seo/buildMetadata'
+
+// noindex: login pages have no SEO value (they're transactional, not
+// informational) and indexing them dilutes the home page's ranking signal
+// for branded queries like "iniciar sesión crevo".
+export const metadata = buildMetadata({
+  title: 'Iniciar sesión',
+  description: 'Accede a tu cuenta de Crevo para gestionar tus préstamos, pagos y cuotas.',
+  path: '/login',
+  index: false,
+})
 
 export default function LoginPage() {
   return (

@@ -1,13 +1,13 @@
-import type { Metadata } from 'next'
 import { LegalPageLayout } from '@/features/legal/ui/LegalPageLayout'
 import { LEGAL_VERSIONS, LEGAL_COMPANY, LEGAL_URLS } from '@/features/legal/lib/legalConstants'
+import { buildMetadata } from '@/shared/seo/buildMetadata'
 
-export const metadata: Metadata = {
-  title: 'Política de Cookies | Crevo',
+export const metadata = buildMetadata({
+  title: 'Política de Cookies',
   description:
     'Información sobre el uso de cookies y tecnologías similares en la plataforma Crevo.',
-  robots: { index: true, follow: true },
-}
+  path: '/politica-de-cookies',
+})
 
 export default function CookiesPolicyPage() {
   return (

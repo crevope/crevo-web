@@ -1,13 +1,14 @@
-import type { Metadata } from 'next'
 import { LegalPageLayout } from '@/features/legal/ui/LegalPageLayout'
 import { LEGAL_COMPANY, LEGAL_URLS } from '@/features/legal/lib/legalConstants'
+import { buildMetadata } from '@/shared/seo/buildMetadata'
 
-export const metadata: Metadata = {
-  title: 'Política de cobranza | Crevo',
+export const metadata = buildMetadata({
+  title: 'Política de cobranza',
   description:
     'Política de cobranza de Crevo: horarios permitidos de contacto, límites diarios, canales y compromiso de trato digno según la Ley 27598 (prohibición del hostigamiento en cobranzas).',
-  robots: { index: true, follow: true },
-}
+  path: '/politica-de-cobranza',
+  keywords: ['política de cobranza', 'ley 27598', 'cobranzas perú'],
+})
 
 /**
  * Política de cobranza pública.

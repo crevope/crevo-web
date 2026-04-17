@@ -1,13 +1,14 @@
-import type { Metadata } from 'next'
 import { LegalPageLayout } from '@/features/legal/ui/LegalPageLayout'
 import { TariffTable } from '@/features/tariff/ui/TariffTable'
+import { buildMetadata } from '@/shared/seo/buildMetadata'
 
-export const metadata: Metadata = {
-  title: 'Tarifario | Crevo',
+export const metadata = buildMetadata({
+  title: 'Tarifario',
   description:
-    'Tarifario público de Crevo: TEA por producto, comisiones, IGV, techo BCRP vigente y gastos de cobranza. SBS Res. 3274-2017 y Ley 28587.',
-  robots: { index: true, follow: true },
-}
+    'Tarifario público de Crevo: TEA por producto, comisiones, IGV, techo BCRP vigente y gastos de cobranza. Cumple SBS Res. 3274-2017 y Ley 28587.',
+  path: '/tarifas',
+  keywords: ['tarifas crevo', 'tea préstamos perú', 'comisiones préstamos', 'tasa máxima bcrp'],
+})
 
 /**
  * Tarifario público. Obligatorio bajo:

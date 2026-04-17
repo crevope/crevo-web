@@ -1,13 +1,13 @@
-import type { Metadata } from 'next'
 import { LegalPageLayout } from '@/features/legal/ui/LegalPageLayout'
 import { LEGAL_VERSIONS, LEGAL_COMPANY, LEGAL_URLS } from '@/features/legal/lib/legalConstants'
+import { buildMetadata } from '@/shared/seo/buildMetadata'
 
-export const metadata: Metadata = {
-  title: 'Términos y Condiciones | Crevo',
+export const metadata = buildMetadata({
+  title: 'Términos y Condiciones',
   description:
     'Términos y Condiciones de uso de la plataforma Crevo para préstamos digitales en Perú.',
-  robots: { index: true, follow: true },
-}
+  path: '/terminos-y-condiciones',
+})
 
 export default function TermsAndConditionsPage() {
   return (

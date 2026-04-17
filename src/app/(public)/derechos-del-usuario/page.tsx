@@ -1,13 +1,14 @@
-import type { Metadata } from 'next'
 import { LegalPageLayout } from '@/features/legal/ui/LegalPageLayout'
 import { LEGAL_COMPANY, LEGAL_URLS } from '@/features/legal/lib/legalConstants'
+import { buildMetadata } from '@/shared/seo/buildMetadata'
 
-export const metadata: Metadata = {
-  title: 'Derechos del usuario | Crevo',
+export const metadata = buildMetadata({
+  title: 'Derechos del usuario',
   description:
     'Resumen práctico de tus derechos como consumidor financiero y como titular de datos personales en Crevo: derechos ARCO (Ley 29733), derechos bajo el Código del Consumidor (Ley 29571) y cómo ejercerlos paso a paso.',
-  robots: { index: true, follow: true },
-}
+  path: '/derechos-del-usuario',
+  keywords: ['derechos arco', 'derechos del consumidor financiero', 'ley 29571'],
+})
 
 /**
  * Página orientada a usabilidad — NO reemplaza las cláusulas legales de la

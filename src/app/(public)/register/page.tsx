@@ -2,6 +2,16 @@ import Link from 'next/link'
 import { RegisterForm } from '@/features/auth'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
+import { buildMetadata } from '@/shared/seo/buildMetadata'
+
+// noindex: account creation flow. Same rationale as /login.
+export const metadata = buildMetadata({
+  title: 'Crear cuenta',
+  description:
+    'Regístrate en Crevo en menos de 2 minutos y solicita tu primer préstamo online.',
+  path: '/register',
+  index: false,
+})
 
 export default function RegisterPage() {
   return (

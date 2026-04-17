@@ -3,6 +3,36 @@ import { LoanSimulator } from '@/features/simulator/ui/LoanSimulator'
 import { RepresentativeExample } from '@/features/simulator/ui/RepresentativeExample'
 import { LandingHeader } from '@/shared/ui/landing-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
+import { buildMetadata } from '@/shared/seo/buildMetadata'
+
+// SEO money page. Title leads with "Crevo" (brand awareness) + the head
+// keyword "préstamos online en Perú" + qualifiers ("rápidos", "100% digital")
+// that Spanish-speaking borrowers use in long-tail searches.
+//
+// Description is engineered for the SERP snippet (~155 chars): leads with
+// the value prop (S/. 200–S/. 2,000), reinforces speed (aprobación en
+// minutos) and the digital-native angle (sin papeleo).
+export const metadata = buildMetadata({
+  title: 'Crevo — Préstamos online rápidos y seguros en Perú',
+  titleAbsolute: true, // skip "%s | Crevo" template — brand already in title
+  description:
+    'Mini préstamos online de S/. 200 a S/. 2,000 en Perú. 100% digital, ' +
+    'aprobación en minutos, sin papeleo. Solicita tu préstamo personal ' +
+    'con Crevo y recíbelo en tu cuenta bancaria el mismo día.',
+  path: '/',
+  keywords: [
+    'préstamos online perú',
+    'mini préstamos digitales',
+    'préstamos rápidos perú',
+    'préstamos por internet',
+    'crédito rápido lima',
+    'crevo préstamos',
+    'préstamos personales online',
+    'préstamos sin papeleo',
+    'préstamos inmediatos',
+    'fintech perú',
+  ],
+})
 
 export default function LandingPage() {
   return (

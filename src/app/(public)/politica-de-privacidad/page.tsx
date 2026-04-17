@@ -1,13 +1,14 @@
-import type { Metadata } from 'next'
 import { LegalPageLayout } from '@/features/legal/ui/LegalPageLayout'
 import { LEGAL_VERSIONS, LEGAL_COMPANY, LEGAL_URLS } from '@/features/legal/lib/legalConstants'
+import { buildMetadata } from '@/shared/seo/buildMetadata'
 
-export const metadata: Metadata = {
-  title: 'Política de Privacidad | Crevo',
+export const metadata = buildMetadata({
+  title: 'Política de Privacidad',
   description:
     'Política de Privacidad de Crevo conforme a la Ley N° 29733 de Protección de Datos Personales del Perú.',
-  robots: { index: true, follow: true },
-}
+  path: '/politica-de-privacidad',
+  keywords: ['política de privacidad', 'datos personales perú', 'ley 29733'],
+})
 
 export default function PrivacyPolicyPage() {
   return (
