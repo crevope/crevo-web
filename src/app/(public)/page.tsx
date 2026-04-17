@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { LoanSimulator } from '@/features/simulator/ui/LoanSimulator'
 import { RepresentativeExample } from '@/features/simulator/ui/RepresentativeExample'
 import { FaqSection, faqJsonLd } from '@/features/faq'
@@ -138,15 +139,13 @@ export default function LandingPage() {
                 </Link>
               </div>
 
-              {/* Social proof — light */}
+              {/* Social proof — light. Avatars are decorative (the meaningful
+                  signal is the rating + count), so alt="" is correct semantically. */}
               <div className="flex items-center gap-5 pt-5 border-t border-gray-200 dark:hidden">
                 <div className="flex -space-x-2.5">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="w-9 h-9 rounded-full border-2 border-white" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="User" />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="w-9 h-9 rounded-full border-2 border-white" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="User" />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="w-9 h-9 rounded-full border-2 border-white" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="User" />
+                  <Image className="w-9 h-9 rounded-full border-2 border-white object-cover" src="/images/avatars/avatar-1.jpg" alt="" width={36} height={36} />
+                  <Image className="w-9 h-9 rounded-full border-2 border-white object-cover" src="/images/avatars/avatar-2.jpg" alt="" width={36} height={36} />
+                  <Image className="w-9 h-9 rounded-full border-2 border-white object-cover" src="/images/avatars/avatar-3.jpg" alt="" width={36} height={36} />
                   <div className="w-9 h-9 rounded-full border-2 border-white bg-[#0A192F] flex items-center justify-center text-[10px] font-bold text-[#D4AF37]">+1M</div>
                 </div>
                 <div className="text-sm">
@@ -159,12 +158,9 @@ export default function LandingPage() {
               {/* Social proof — dark */}
               <div className="hidden dark:flex items-center gap-5 pt-5 border-t border-[#334155]">
                 <div className="flex -space-x-2.5">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="w-9 h-9 rounded-full border-2 border-[#0F172A]" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="User" />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="w-9 h-9 rounded-full border-2 border-[#0F172A]" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="User" />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="w-9 h-9 rounded-full border-2 border-[#0F172A]" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="User" />
+                  <Image className="w-9 h-9 rounded-full border-2 border-[#0F172A] object-cover" src="/images/avatars/avatar-1.jpg" alt="" width={36} height={36} />
+                  <Image className="w-9 h-9 rounded-full border-2 border-[#0F172A] object-cover" src="/images/avatars/avatar-2.jpg" alt="" width={36} height={36} />
+                  <Image className="w-9 h-9 rounded-full border-2 border-[#0F172A] object-cover" src="/images/avatars/avatar-3.jpg" alt="" width={36} height={36} />
                   <div className="w-9 h-9 rounded-full border-2 border-[#0F172A] bg-[#D4AF37] flex items-center justify-center text-[10px] font-bold text-[#0A192F]">+1M</div>
                 </div>
                 <div className="text-sm">
@@ -194,8 +190,17 @@ export default function LandingPage() {
             <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-[#0A192F]/5 via-transparent to-[#00E5FF]/5 rounded-bl-[120px]" />
 
             <div className="relative w-full max-w-xl aspect-4/5 rounded-lg overflow-hidden shadow-md border border-gray-200/80 z-10">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/6bfffd2085-d403cbf49c2f84257448.png" alt="Crevo app en teléfono" />
+              {/* `priority` because this is above-the-fold and the largest LCP
+                  candidate on first paint. `sizes` matches the parent's
+                  responsive width (full-width mobile → half-width desktop). */}
+              <Image
+                className="object-cover"
+                src="/images/landing/app-light.png"
+                alt="Pantalla de la app móvil de Crevo en modo claro mostrando un préstamo activo"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                priority
+              />
 
               {/* Security badge */}
               <div className="absolute top-5 right-5 glass-effect rounded-lg px-3 py-2.5 shadow-lg flex items-center gap-2.5 animate-[bounce_4s_ease-in-out_infinite]">
@@ -213,8 +218,7 @@ export default function LandingPage() {
                   <div>
                     <p className="text-xs text-gray-700 leading-snug mb-2.5">&quot;Solicité S/ 5,000 con Crevo Express y en 15 minutos ya estaba en mi CCI del BCP.&quot;</p>
                     <div className="flex items-center gap-1.5">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" className="w-6 h-6 rounded-full" alt="Reviewer" />
+                      <Image src="/images/avatars/avatar-5.jpg" className="w-6 h-6 rounded-full object-cover" alt="" width={24} height={24} />
                       <span className="text-xs font-medium text-gray-800">María S.</span>
                       <span className="text-xs text-gray-400">• Lima</span>
                     </div>
@@ -241,8 +245,14 @@ export default function LandingPage() {
             <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-[#00E5FF]/10 via-transparent to-[#D4AF37]/5 rounded-bl-[120px]" />
 
             <div className="relative w-full max-w-xl aspect-4/5 rounded-lg overflow-hidden shadow-md border border-white/10 z-10">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/6bfffd2085-100b02fa95aedfb56c0e.png" alt="Crevo app dark mode" />
+              <Image
+                className="object-cover"
+                src="/images/landing/app-dark.png"
+                alt="Pantalla de la app móvil de Crevo en modo oscuro mostrando un préstamo activo"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                priority
+              />
 
               <div className="absolute top-5 right-5 glass-effect-dark rounded-lg px-3 py-2.5 shadow-lg border border-white/10 flex items-center gap-2.5 animate-[bounce_4s_ease-in-out_infinite]">
                 <i className="fa-solid fa-shield-halved text-[#00E5FF]" />
@@ -258,8 +268,7 @@ export default function LandingPage() {
                   <div>
                     <p className="text-xs text-gray-200 leading-snug mb-2.5">&quot;Solicité S/ 5,000 con Crevo Express y en 15 minutos ya estaba en mi CCI del BCP.&quot;</p>
                     <div className="flex items-center gap-1.5">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-5.jpg" className="w-6 h-6 rounded-full" alt="Reviewer" />
+                      <Image src="/images/avatars/avatar-5.jpg" className="w-6 h-6 rounded-full object-cover" alt="" width={24} height={24} />
                       <span className="text-xs font-medium text-white">María S.</span>
                       <span className="text-xs text-gray-400">• Lima</span>
                     </div>
@@ -394,8 +403,7 @@ export default function LandingPage() {
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 relative z-10 leading-relaxed">&quot;Necesitaba capital para mi bodega. Con Crevo Flex me aprobaron súper rápido y pude pagar en 3 meses. El proceso es muy transparente.&quot;</p>
                 <div className="flex items-center gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg" className="w-9 h-9 rounded-full border border-gray-100 dark:border-white/10" alt="Cliente" />
+                  <Image src="/images/avatars/avatar-6.jpg" className="w-9 h-9 rounded-full border border-gray-100 dark:border-white/10 object-cover" alt="" width={36} height={36} />
                   <div>
                     <h4 className="font-medium text-sm text-[#0A192F] dark:text-white">Carmen R.</h4>
                     <p className="text-xs text-gray-400">Emprendedora, Arequipa</p>
@@ -411,8 +419,7 @@ export default function LandingPage() {
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 relative z-10 leading-relaxed">&quot;Tuve una emergencia médica y necesitaba liquidez urgente. Crevo Express me salvó. En menos de media hora ya tenía la plata en mi banco.&quot;</p>
                 <div className="flex items-center gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" className="w-9 h-9 rounded-full border border-gray-100 dark:border-white/10" alt="Cliente" />
+                  <Image src="/images/avatars/avatar-3.jpg" className="w-9 h-9 rounded-full border border-gray-100 dark:border-white/10 object-cover" alt="" width={36} height={36} />
                   <div>
                     <h4 className="font-medium text-sm text-[#0A192F] dark:text-white">Luis M.</h4>
                     <p className="text-xs text-gray-400">Ingeniero, Lima</p>
@@ -428,8 +435,7 @@ export default function LandingPage() {
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 relative z-10 leading-relaxed">&quot;La app es muy fácil de usar. Puedo ver exactamente cuánto voy a pagar desde el principio, sin sorpresas al final de mes.&quot;</p>
                 <div className="flex items-center gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-7.jpg" className="w-9 h-9 rounded-full border border-gray-100 dark:border-white/10" alt="Cliente" />
+                  <Image src="/images/avatars/avatar-7.jpg" className="w-9 h-9 rounded-full border border-gray-100 dark:border-white/10 object-cover" alt="" width={36} height={36} />
                   <div>
                     <h4 className="font-medium text-sm text-[#0A192F] dark:text-white">Andrea V.</h4>
                     <p className="text-xs text-gray-400">Diseñadora, Trujillo</p>
@@ -480,61 +486,85 @@ export default function LandingPage() {
       </main>
 
       {/* ═══════════════════════════ FOOTER ═══════════════════════════════════ */}
+      {/* Internal-linking value: every legal page (which Google indexes) gets
+          a link from the home, and the home gets a link FROM every legal page
+          via the "Volver al inicio" + cross-links — that's the link graph
+          search engines reward. */}
       <footer className="w-full py-12 px-6 sm:px-10 lg:px-16 xl:px-24 bg-[#0A192F] dark:bg-[#1E293B] border-t border-[#0A192F]/20 dark:border-[#334155]">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
 
-            <div>
+            {/* Brand column — wider on desktop */}
+            <div className="lg:col-span-2">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-linear-to-br from-[#D4AF37] to-[#D4AF37]/80 rounded-lg flex items-center justify-center">
                   <i className="fa-solid fa-bolt text-[#0A192F] text-lg" />
                 </div>
                 <span className="text-xl font-semibold text-white tracking-tight">Crevo</span>
               </div>
-              <p className="text-gray-400 text-sm">Préstamos digitales rápidos y transparentes para todos los peruanos.</p>
+              <p className="text-gray-400 text-sm leading-relaxed mb-4 max-w-sm">
+                Préstamos online rápidos, transparentes y 100% digitales para todos
+                los peruanos. Regulados, seguros y sin papeleo.
+              </p>
+              <p className="text-xs text-gray-500">
+                <i className="fa-solid fa-shield-halved text-[#00E5FF] mr-1.5" />
+                Sujeto Obligado UIF-Perú · Cumple Ley 29733
+              </p>
             </div>
 
+            {/* Productos */}
             <div>
               <h4 className="text-white font-semibold mb-4 text-sm">Productos</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Crevo Express</Link></li>
-                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Crevo Flex</Link></li>
-                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Crevo Plus</Link></li>
+                <li><Link href="/#simulador" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Simulador de préstamos</Link></li>
+                <li><Link href="/tarifas" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Tarifario (TEA · TCEA)</Link></li>
+                <li><Link href="/#faq" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Preguntas frecuentes</Link></li>
+                <li><Link href="/register" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Solicitar préstamo</Link></li>
               </ul>
             </div>
 
+            {/* Atención al cliente */}
             <div>
-              <h4 className="text-white font-semibold mb-4 text-sm">Empresa</h4>
+              <h4 className="text-white font-semibold mb-4 text-sm">Atención al cliente</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="#nosotros" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Nosotros</Link></li>
+                <li>
+                  <a href="mailto:soporte@crevo.pe" className="text-gray-400 hover:text-[#D4AF37] transition-colors">
+                    soporte@crevo.pe
+                  </a>
+                </li>
+                <li><Link href="/libro-de-reclamaciones" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Libro de Reclamaciones</Link></li>
+                <li><Link href="/libro-de-reclamaciones/consulta" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Consultar mi reclamo</Link></li>
+                <li><Link href="/derechos-del-usuario" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Tus derechos</Link></li>
+              </ul>
+            </div>
+
+            {/* Legales */}
+            <div>
+              <h4 className="text-white font-semibold mb-4 text-sm">Información legal</h4>
+              <ul className="space-y-2 text-sm">
                 <li><Link href="/terminos-y-condiciones" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Términos y Condiciones</Link></li>
                 <li><Link href="/politica-de-privacidad" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Política de Privacidad</Link></li>
                 <li><Link href="/politica-de-cookies" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Política de Cookies</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-semibold mb-4 text-sm">Soporte</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="#ayuda" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Ayuda y Soporte</Link></li>
-                <li><Link href="#" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Preguntas Frecuentes</Link></li>
-                <li><Link href="/libro-de-reclamaciones" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Libro de Reclamaciones</Link></li>
+                <li><Link href="/politica-de-cobranza" className="text-gray-400 hover:text-[#D4AF37] transition-colors">Política de Cobranza</Link></li>
               </ul>
             </div>
           </div>
 
           <div className="pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">© {CURRENT_YEAR} Crevo. Todos los derechos reservados. Sujeto Obligado UIF-Perú.</p>
-            <div className="flex items-center gap-4">
-              <Link href="#" className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-[#D4AF37] hover:bg-gray-700 transition-all">
+            <p className="text-gray-400 text-sm">© {CURRENT_YEAR} Crevo. Todos los derechos reservados.</p>
+            <div className="flex items-center gap-3">
+              <a
+                href="https://www.facebook.com/crevoperu"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Crevo en Facebook"
+                className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-[#D4AF37] hover:bg-gray-700 transition-all"
+              >
                 <i className="fa-brands fa-facebook-f" />
-              </Link>
-              <Link href="#" className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-[#D4AF37] hover:bg-gray-700 transition-all">
-                <i className="fa-brands fa-instagram" />
-              </Link>
-              <Link href="#" className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-[#D4AF37] hover:bg-gray-700 transition-all">
-                <i className="fa-brands fa-linkedin-in" />
-              </Link>
+              </a>
+              {/* Instagram + LinkedIn pendientes — placeholders comentados para
+                  agregar cuando los handles existan. Mejor no renderizar links
+                  rotos: rompen la confianza y son señales SEO negativas. */}
             </div>
           </div>
         </div>

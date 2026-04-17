@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { RegisterForm } from '@/features/auth'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
@@ -64,12 +65,10 @@ export default function RegisterPage() {
 
             <div className="relative z-10 mt-10">
               <div className="flex -space-x-2.5 mb-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="w-9 h-9 rounded-full border-2 border-[#0A192F] object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="Usuario" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="w-9 h-9 rounded-full border-2 border-[#0A192F] object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="Usuario" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="w-9 h-9 rounded-full border-2 border-[#0A192F] object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="Usuario" />
+                {/* Decorative avatars — meaningful signal is the "+1M Peruanos" badge. */}
+                <Image className="w-9 h-9 rounded-full border-2 border-[#0A192F] object-cover" src="/images/avatars/avatar-1.jpg" alt="" width={36} height={36} />
+                <Image className="w-9 h-9 rounded-full border-2 border-[#0A192F] object-cover" src="/images/avatars/avatar-2.jpg" alt="" width={36} height={36} />
+                <Image className="w-9 h-9 rounded-full border-2 border-[#0A192F] object-cover" src="/images/avatars/avatar-3.jpg" alt="" width={36} height={36} />
                 <div className="w-9 h-9 rounded-full border-2 border-[#0A192F] bg-[#D4AF37] text-[#0A192F] flex items-center justify-center text-xs font-bold">
                   +1M
                 </div>

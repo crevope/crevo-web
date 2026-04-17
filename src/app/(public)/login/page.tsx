@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { LoginForm } from '@/features/auth'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
@@ -29,11 +30,13 @@ export default function LoginPage() {
 
             <div className="relative z-10 text-center text-white flex flex-col items-center">
               <div className="w-44 h-44 mb-6">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   className="w-full h-full object-contain"
-                  src="https://storage.googleapis.com/uxpilot-auth.appspot.com/db7fc53ea7-e2114358354bbbf35766.png"
-                  alt="Crevo app"
+                  src="/images/landing/login-hero.png"
+                  alt="Ilustración de la app móvil de Crevo"
+                  width={176}
+                  height={176}
+                  priority
                 />
               </div>
 
