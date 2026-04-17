@@ -12,7 +12,7 @@ import { SITE, BRAND_COLORS } from '@/shared/config/seo'
  *
  * Lives at /manifest.webmanifest.
  *
- * Icon strategy — six entries covering every install path:
+ * Icon strategy — covers every install path:
  *   - SVG (`/icon.svg`): scalable, picked by browsers that prefer vectors.
  *   - 192/512 PNG (`purpose: 'any'`): minimum required by Android. The 192
  *     is for the home screen; the 512 powers the splash screen and the
@@ -21,10 +21,18 @@ import { SITE, BRAND_COLORS } from '@/shared/config/seo'
  *     Android Pixel / Samsung One UI etc. that crop into circle/squircle.
  *     Mark sits inside the W3C safe zone (radius 0.4 × size) so any mask
  *     shape preserves the brand.
+ *   - 512 PNG (`purpose: 'monochrome'`): silhouette on transparent for
+ *     Android 13+ Material You themed icons. The OS tints it to match the
+ *     user's wallpaper colors so Crevo blends into a personalized theme
+ *     instead of standing out with a fixed-color square.
  *   - 180×180 PNG (`/apple-icon`): iOS home-screen icon. Safari uses the
  *     `<link rel="apple-touch-icon">` head tag (auto-emitted by Next.js
  *     from app/apple-icon.tsx); this entry covers manifest-aware browsers
  *     that ignore the link.
+ *
+ * `app/favicon.ico` covers legacy `/favicon.ico` requests separately
+ * (Next.js auto-serves it from the file convention) — it bundles 16/32/48
+ * raster sizes for browsers that fetch the .ico before reading <link> tags.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -72,6 +80,14 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: '512x512',
         type: 'image/png',
         purpose: 'maskable',
+      },
+      // Monochrome — Android 13+ Material You themed icons. Transparent
+      // background; the OS tints the silhouette with the user's theme color.
+      {
+        src: '/icons/monochrome-512',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'monochrome',
       },
       // iOS home-screen icon.
       {
