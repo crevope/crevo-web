@@ -1,0 +1,22 @@
+Contact: mailto:seguridad@crevo.pe
+Expires: 2027-01-01T00:00:00.000Z
+Preferred-Languages: es, en
+Canonical: https://crevo.pe/.well-known/security.txt
+Policy: https://crevo.pe/politica-de-privacidad
+
+# Crevo — Reporte responsable de vulnerabilidades
+#
+# Si encontraste una vulnerabilidad en crevo.pe o en nuestras aplicaciones
+# móviles, escríbenos a seguridad@crevo.pe. Agradecemos informes que
+# incluyan pasos para reproducir, impacto potencial y, cuando sea posible,
+# una prueba de concepto.
+#
+# Nuestro compromiso:
+# - Acusar recibo en menos de 48 horas hábiles.
+# - Investigar y coordinar una ventana de divulgación responsable.
+# - No tomar represalias legales contra investigadores de buena fe que
+#   sigan esta política y eviten acceder a datos de usuarios reales.
+#
+# Por favor NO realices pruebas que puedan degradar el servicio
+# (denegación de servicio, spam masivo, ingeniería social contra
+# empleados o usuarios).

@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from '@/shared/ui/select'
 import { Textarea } from '@/shared/ui/textarea'
+import { sanitizeUserText } from '@/shared/lib/sanitize'
 import { fileComplaintSchema, type FileComplaintInput } from '../lib/complaintsSchemas'
 import {
   CLAIM_TYPES,
@@ -91,24 +92,28 @@ export function FileComplaintForm({ onFiled }: Props) {
   const onSubmit = async (values: FileComplaintInput) => {
     setSubmitting(true)
     try {
+      // Sanitize every free-form text field before it hits the wire.
+      // The backend re-validates but we strip BiDi overrides + control
+      // chars client-side so a legitimate paste doesn't surprise us later
+      // when it renders in the admin queue or the confirmation email.
       const receipt = await complaintsRepository.file({
-        consumerFirstName: values.consumerFirstName,
-        consumerLastName: values.consumerLastName,
+        consumerFirstName: sanitizeUserText(values.consumerFirstName),
+        consumerLastName: sanitizeUserText(values.consumerLastName),
         consumerDocumentType: values.consumerDocumentType,
         consumerDocumentNumber: values.consumerDocumentNumber,
         consumerEmail: values.consumerEmail,
         consumerPhone: values.consumerPhone,
-        consumerAddress: values.consumerAddress,
+        consumerAddress: sanitizeUserText(values.consumerAddress),
         consumerIsMinor: values.consumerIsMinor,
-        guardianFullName: values.guardianFullName?.trim() || undefined,
+        guardianFullName: values.guardianFullName ? sanitizeUserText(values.guardianFullName) || undefined : undefined,
         guardianDocumentNumber: values.guardianDocumentNumber?.trim() || undefined,
         productType: values.productType,
-        productDescription: values.productDescription,
+        productDescription: sanitizeUserText(values.productDescription),
         claimedAmount: values.claimedAmount,
         loanId: values.loanId?.trim() || undefined,
         claimType: values.claimType,
-        claimDetail: values.claimDetail,
-        consumerRequest: values.consumerRequest,
+        claimDetail: sanitizeUserText(values.claimDetail),
+        consumerRequest: sanitizeUserText(values.consumerRequest),
       })
       toast.success('Reclamo registrado correctamente. Revisa tu correo.')
       onFiled(receipt, values.consumerDocumentNumber.trim())

@@ -1,3 +1,5 @@
+import { headers } from 'next/headers'
+
 /**
  * Renders a `<script type="application/ld+json">` block with structured data.
  *
@@ -6,9 +8,13 @@
  * convention is to inject in the page or layout `head`/body. We render in
  * the body for simplicity (Next.js handles it the same way).
  *
- * Security: we serialize with JSON.stringify and escape `<` to defang any
- * `</script>` injection from user-controlled fields. All other characters
- * are safe inside a JSON-encoded string.
+ * Security:
+ *   - We serialize with JSON.stringify and escape `<` to defang any
+ *     `</script>` injection from user-controlled fields.
+ *   - We read the per-request `x-nonce` set by `middleware.ts` and attach it
+ *     to the `<script>` tag so it's whitelisted by our CSP. Without this, a
+ *     strict CSP (`script-src 'self' 'nonce-…' 'strict-dynamic'`) would
+ *     block every inline JSON-LD block and Google would see empty markup.
  */
 interface JsonLdProps {
   data: Record<string, unknown> | Record<string, unknown>[]
@@ -17,12 +23,14 @@ interface JsonLdProps {
   id?: string
 }
 
-export function JsonLd({ data, id }: Readonly<JsonLdProps>) {
+export async function JsonLd({ data, id }: Readonly<JsonLdProps>) {
   const safeJson = JSON.stringify(data).replace(/</g, '\\u003c')
+  const nonce = (await headers()).get('x-nonce') ?? undefined
   return (
     <script
       type="application/ld+json"
       id={id}
+      nonce={nonce}
       // dangerouslySetInnerHTML is the standard way to emit raw JSON-LD in
       // React. Escaping above prevents the only XSS vector (closing the
       // script tag from inside a string field).
