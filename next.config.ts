@@ -124,16 +124,28 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withSentryConfig(bundleAnalyzer(nextConfig), {
-  // URL de tu organización/proyecto en Sentry (para source maps)
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  // Auth token para subir source maps (en CI/CD: variable de entorno)
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  // Silenciar logs de Sentry durante el build
-  silent: !process.env.CI,
-  // Subir source maps solo en producción
-  hideSourceMaps: true,
-  // Disable Sentry telemetry
-  telemetry: false,
-})
+// Only run Sentry's build-time plugin (release creation + source-map
+// upload) when an auth token is actually available AND looks real.
+// We ship `.env.example` with a placeholder `sntrys_xxxx` token so the
+// presence of the env var alone isn't enough — it would trip the CLI
+// with "Project not found" on every local build. Vercel production
+// has a real token and skips these guards.
+const sentryToken = process.env.SENTRY_AUTH_TOKEN?.trim() ?? ''
+const isPlaceholderToken =
+  !sentryToken ||
+  sentryToken.includes('xxxx') ||
+  sentryToken.includes('placeholder') ||
+  sentryToken.toUpperCase().includes('YOUR_TOKEN')
+
+const configuredWithAnalyzer = bundleAnalyzer(nextConfig)
+
+export default isPlaceholderToken
+  ? configuredWithAnalyzer
+  : withSentryConfig(configuredWithAnalyzer, {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      authToken: sentryToken,
+      silent: !process.env.CI,
+      hideSourceMaps: true,
+      telemetry: false,
+    })

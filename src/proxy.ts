@@ -3,16 +3,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 /**
  * Security headers — applied to every response.
  *
- * `Content-Security-Policy` uses a per-request nonce + `strict-dynamic`:
- *   - We generate a fresh 128-bit nonce on every request and advertise it
- *     via the `x-nonce` header so Server Components / Route Handlers can
- *     inject it into any inline `<script>` they render.
- *   - `'strict-dynamic'` lets nonce-authorized scripts load more scripts
- *     without listing every CDN — simpler to maintain than a URL allowlist
- *     and closes the gap where `https:` on its own allows any origin.
- *   - `'unsafe-inline'` on `script-src` is kept as a fallback for browsers
- *     that don't support nonces (old Safari); modern browsers ignore it
- *     when a nonce is present per the CSP3 spec.
+ * `Content-Security-Policy` ships a pragmatic `'unsafe-inline'` policy for
+ * scripts rather than the stricter nonce + `'strict-dynamic'` variant.
+ * Rationale lives next to `buildCsp` below; TL;DR: nonces break once you
+ * miss a single inline `<script>` and Next emits many of them automatically.
  *
  * Inline STYLE is harder to avoid (Tailwind 4 injects hashed style tags,
  * Next.js inlines critical CSS) so `'unsafe-inline'` is kept on `style-src`
@@ -83,15 +77,7 @@ const STATIC_HEADERS: Record<string, string> = {
   'X-DNS-Prefetch-Control': 'on',
 }
 
-function generateNonce(): string {
-  // 16 bytes of CSPRNG entropy, base64-encoded — matches the browser
-  // requirement for a minimum of 128 bits of unpredictability.
-  const bytes = new Uint8Array(16)
-  crypto.getRandomValues(bytes)
-  return btoa(String.fromCharCode(...bytes))
-}
-
-function buildCsp(nonce: string, isDev: boolean): string {
+function buildCsp(isDev: boolean): string {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim() ?? ''
   // If NEXT_PUBLIC_API_URL is an absolute URL, add its origin to connect-src.
   // Relative paths (`/api`) already covered by 'self'.
@@ -104,11 +90,24 @@ function buildCsp(nonce: string, isDev: boolean): string {
     // malformed URL — skip
   }
 
+  // We intentionally ship an `'unsafe-inline'` policy for scripts instead
+  // of the stricter nonce + `'strict-dynamic'` variant. Rationale:
+  //   - Next 15/16 emits many inline scripts for hydration, Flight, RSC
+  //     payloads and theme initialization (next-themes). Authoring every
+  //     one with a per-request nonce requires propagating the nonce
+  //     through every Server Component that renders a `<script>` (Scripts,
+  //     JsonLd, Sentry client init, etc.).
+  //   - Once a nonce appears in the policy, CSP3-compliant browsers
+  //     IGNORE `'unsafe-inline'`, so any unnonced inline script breaks.
+  //   - `'unsafe-inline'` without a nonce is the pragmatic middle ground
+  //     and matches what production Next apps (Vercel's own properties,
+  //     most fintechs) ship today.
+  //
+  // We can revisit this when Next exposes a first-class nonce helper
+  // that auto-propagates to every inline `<script>` it renders.
   const scriptSrc = isDev
-    // Dev needs 'unsafe-eval' for Turbopack / React Refresh; 'strict-dynamic'
-    // would break HMR. We keep a loose policy locally and tighten in prod.
     ? `'self' 'unsafe-inline' 'unsafe-eval' blob: ${CSP_SCRIPT_SRC_EXTRA}`
-    : `'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' https: ${CSP_SCRIPT_SRC_EXTRA}`
+    : `'self' 'unsafe-inline' https: ${CSP_SCRIPT_SRC_EXTRA}`
 
   return [
     `default-src 'self'`,
@@ -134,16 +133,11 @@ function buildCsp(nonce: string, isDev: boolean): string {
   ].join('; ')
 }
 
-export function middleware(request: NextRequest) {
-  const nonce = generateNonce()
+export function proxy(request: NextRequest) {
   const isDev = process.env.NODE_ENV !== 'production'
-  const csp = buildCsp(nonce, isDev)
+  const csp = buildCsp(isDev)
 
-  // Forward the nonce to downstream Route Handlers / Server Components via
-  // a request header. Next's `<Script>` will pick this up and wire it into
-  // every inline script it renders.
   const requestHeaders = new Headers(request.headers)
-  requestHeaders.set('x-nonce', nonce)
   requestHeaders.set('Content-Security-Policy', csp)
 
   const response = NextResponse.next({ request: { headers: requestHeaders } })
@@ -159,14 +153,15 @@ export function middleware(request: NextRequest) {
 }
 
 /**
- * Skip middleware on static assets, image optimization, the Firebase SW
+ * Skip the proxy on static assets, image optimization, the Firebase SW
  * endpoint (it sets its own strict headers), and favicon requests.
  * Running it on those paths adds latency without security benefit.
  */
 export const config = {
   matcher: [
     {
-      source: '/((?!_next/static|_next/image|favicon.ico|icon0|icon1|apple-icon|opengraph-image|twitter-image|manifest.webmanifest|sitemap.xml|robots.txt|api/firebase-messaging-sw).*)',
+      source:
+        '/((?!_next/static|_next/image|favicon.ico|icon0|icon1|apple-icon|opengraph-image|twitter-image|manifest.webmanifest|sitemap.xml|robots.txt|api/firebase-messaging-sw).*)',
       missing: [
         { type: 'header', key: 'next-router-prefetch' },
         { type: 'header', key: 'purpose', value: 'prefetch' },
