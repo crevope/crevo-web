@@ -39,13 +39,61 @@ export default function manifest(): MetadataRoute.Manifest {
     name: `${SITE.name} — ${SITE.shortDescription}`,
     short_name: SITE.name,
     description: SITE.description,
+    // `id` uniquely identifies this PWA so the browser doesn't treat the
+    // app as a new install if `start_url` ever changes (e.g. tracking
+    // params get added). Use a stable value forever — changing it would
+    // make existing installs orphaned.
+    id: '/',
     start_url: '/',
+    // `scope` defines which URLs are part of the app. URLs outside this
+    // scope open in the regular browser instead of the PWA window. We use
+    // `/` because Crevo IS the entire site.
+    scope: '/',
     display: 'standalone',
+    // `dir: 'ltr'` matches our Spanish content. Defaults to 'auto' which
+    // works but being explicit avoids any RTL inheritance from parent docs.
+    dir: 'ltr',
     background_color: BRAND_COLORS.surface,
     theme_color: BRAND_COLORS.primary,
     lang: SITE.lang,
     orientation: 'portrait',
     categories: ['finance', 'business'],
+    // When the user taps the home-screen icon while the PWA is already
+    // open, focus that existing window instead of spawning a new one.
+    // 'auto' fallback for browsers that don't recognize the modes yet.
+    launch_handler: {
+      client_mode: ['navigate-existing', 'auto'],
+    },
+    // Long-press the home-screen icon → these shortcuts pop up. Power-user
+    // shortcut to the highest-intent flows in the app. iOS / Android both
+    // honor up to 4 entries, then truncate. We pick the four actions a
+    // returning customer is most likely to want one tap away.
+    shortcuts: [
+      {
+        name: 'Solicitar préstamo',
+        short_name: 'Solicitar',
+        description: 'Crear una nueva solicitud de préstamo',
+        url: '/request-loan',
+      },
+      {
+        name: 'Mis préstamos',
+        short_name: 'Préstamos',
+        description: 'Ver el estado de tus préstamos activos',
+        url: '/loans',
+      },
+      {
+        name: 'Pagar cuota',
+        short_name: 'Pagar',
+        description: 'Registrar un pago de cuota',
+        url: '/payments',
+      },
+      {
+        name: 'Mi perfil',
+        short_name: 'Perfil',
+        description: 'Configuración y datos personales',
+        url: '/profile',
+      },
+    ],
     icons: [
       // Scalable vector — preferred when the browser supports it.
       {
