@@ -24,11 +24,11 @@ export default function TicketDetailPage({ params }: Props) {
     let cancelled = false
     sauRepository
       .getOne(id)
-      .then(t => {
+      .then((t) => {
         if (cancelled) return
         setTicket(t)
       })
-      .catch(err => {
+      .catch((err) => {
         if (cancelled) return
         setNotFound(true)
         // Don't toast a 404 — the page itself communicates the state.
@@ -47,7 +47,7 @@ export default function TicketDetailPage({ params }: Props) {
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
       <Link
-        href="/soporte/mis-tickets"
+        href="/support/my-tickets"
         className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-brand-primary dark:hover:text-brand-secondary transition-colors"
       >
         <ArrowLeft className="h-3 w-3" aria-hidden="true" />
@@ -56,7 +56,10 @@ export default function TicketDetailPage({ params }: Props) {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-brand-primary dark:text-brand-secondary" aria-label="Cargando ticket" />
+          <Loader2
+            className="h-8 w-8 animate-spin text-brand-primary dark:text-brand-secondary"
+            aria-label="Cargando ticket"
+          />
         </div>
       ) : notFound || !ticket ? (
         <div className="p-10 text-center rounded-lg bg-brand-card border border-gray-100 dark:border-white/6">

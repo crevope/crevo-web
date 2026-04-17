@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export const revalidate = 3600
-export const experimental_ppr = true
+// PPR opt-in deferred — see next.config.ts.
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params

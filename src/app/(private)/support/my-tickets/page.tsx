@@ -31,12 +31,12 @@ export default function MyTicketsPage() {
     let cancelled = false
     sauRepository
       .mine({ limit: 50, offset: 0 })
-      .then(list => {
+      .then((list) => {
         if (cancelled) return
         setTickets(list)
         setHasMore(list.length === 50)
       })
-      .catch(err => {
+      .catch((err) => {
         if (cancelled) return
         toast.error(err instanceof Error ? err.message : 'No pudimos cargar tus tickets')
       })
@@ -52,7 +52,7 @@ export default function MyTicketsPage() {
     setLoadingMore(true)
     try {
       const next = await sauRepository.mine({ limit: 50, offset: tickets.length })
-      setTickets(prev => [...prev, ...next])
+      setTickets((prev) => [...prev, ...next])
       setHasMore(next.length === 50)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'No pudimos cargar más tickets')
@@ -65,14 +65,14 @@ export default function MyTicketsPage() {
     <div className="space-y-6 max-w-3xl mx-auto">
       <div className="flex items-center justify-between gap-4">
         <Link
-          href="/soporte"
+          href="/support"
           className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-brand-primary dark:hover:text-brand-secondary transition-colors"
         >
           <ArrowLeft className="h-3 w-3" aria-hidden="true" />
-          Volver a soporte
+          Volver a Soporte
         </Link>
         <Link
-          href="/soporte"
+          href="/support"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-primary hover:bg-brand-primary-hover text-white text-sm font-medium transition-colors"
         >
           <Plus className="h-3 w-3" aria-hidden="true" />
@@ -92,7 +92,7 @@ export default function MyTicketsPage() {
 
       {loading ? (
         <div className="space-y-3">
-          {[1, 2, 3].map(i => (
+          {[1, 2, 3].map((i) => (
             <Card
               key={i}
               className="bg-brand-card rounded-lg border-gray-100 dark:border-white/6 p-5 shadow-none space-y-3"
@@ -111,20 +111,17 @@ export default function MyTicketsPage() {
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Todavía no has abierto ningún ticket de soporte.
           </p>
-          <Button
-            asChild
-            className="bg-brand-primary hover:bg-brand-primary-hover text-white"
-          >
-            <Link href="/soporte">Abrir una solicitud</Link>
+          <Button asChild className="bg-brand-primary hover:bg-brand-primary-hover text-white">
+            <Link href="/support">Abrir una solicitud</Link>
           </Button>
         </Card>
       ) : (
         <>
           <div className="space-y-3">
-            {tickets.map(ticket => (
+            {tickets.map((ticket) => (
               <Link
                 key={ticket.id}
-                href={`/soporte/mis-tickets/${ticket.id}`}
+                href={`/support/my-tickets/${ticket.id}`}
                 className="group block p-5 rounded-lg bg-brand-card border border-gray-100 dark:border-white/6 hover:border-brand-primary/40 dark:hover:border-brand-secondary/40 transition-colors"
               >
                 <div className="flex items-start justify-between gap-4">
@@ -136,7 +133,8 @@ export default function MyTicketsPage() {
                       <SauStatusBadge status={ticket.status} />
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
-                      {SAU_CATEGORY_LABELS[ticket.category]} · Recibido el {formatDate(ticket.filedAt)}
+                      {SAU_CATEGORY_LABELS[ticket.category]} · Recibido el{' '}
+                      {formatDate(ticket.filedAt)}
                     </p>
                     <code className="font-mono text-[10px] text-gray-400 dark:text-gray-500">
                       {ticket.ticketCode}

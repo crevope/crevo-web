@@ -5,8 +5,17 @@ import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import {
-  Home, HandCoins, Wallet, ArrowLeftRight, Bell, BookOpen, User,
-  Sun, Moon, LogOut, Headphones,
+  Home,
+  HandCoins,
+  Wallet,
+  ArrowLeftRight,
+  Bell,
+  BookOpen,
+  User,
+  Sun,
+  Moon,
+  LogOut,
+  Headphones,
 } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { useNotificationStore } from '@/features/notifications'
@@ -21,14 +30,14 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard',      icon: Home,           label: 'Dashboard' },
-  { href: '/request-loan',   icon: HandCoins,      label: 'Solicitar Préstamo' },
-  { href: '/loans',          icon: Wallet,         label: 'Mis Préstamos', matchPrefix: '/loans' },
-  { href: '/payments',       icon: ArrowLeftRight, label: 'Pagos' },
-  { href: '/notifications',  icon: Bell,           label: 'Notificaciones' },
-  { href: '/soporte',        icon: Headphones,     label: 'Soporte', matchPrefix: '/soporte' },
-  { href: '/my-complaints',  icon: BookOpen,       label: 'Mis Reclamos' },
-  { href: '/profile',        icon: User,           label: 'Mi Perfil' },
+  { href: '/dashboard', icon: Home, label: 'Dashboard' },
+  { href: '/request-loan', icon: HandCoins, label: 'Solicitar Préstamo' },
+  { href: '/loans', icon: Wallet, label: 'Mis Préstamos', matchPrefix: '/loans' },
+  { href: '/payments', icon: ArrowLeftRight, label: 'Pagos' },
+  { href: '/notifications', icon: Bell, label: 'Notificaciones' },
+  { href: '/support', icon: Headphones, label: 'Soporte', matchPrefix: '/support' },
+  { href: '/my-complaints', icon: BookOpen, label: 'Mis Reclamos' },
+  { href: '/profile', icon: User, label: 'Mi Perfil' },
 ]
 
 interface Props {
@@ -116,9 +125,10 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
                 onClick={onClose}
                 className={`
                   flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
-                  ${active
-                    ? 'bg-[#00E5FF]/10 text-[#00E5FF] font-medium'
-                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  ${
+                    active
+                      ? 'bg-[#00E5FF]/10 text-[#00E5FF] font-medium'
+                      : 'text-gray-400 hover:bg-white/5 hover:text-white'
                   }
                 `}
               >
@@ -141,7 +151,11 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-gray-400 hover:bg-white/5 hover:text-white transition-colors w-full"
           >
             {mounted ? (
-              isDark ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />
+              isDark ? (
+                <Sun className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Moon className="h-4 w-4" aria-hidden="true" />
+              )
             ) : (
               <span className="w-4" />
             )}

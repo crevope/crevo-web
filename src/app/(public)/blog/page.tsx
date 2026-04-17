@@ -29,7 +29,7 @@ export const metadata = buildMetadata({
 })
 
 export const revalidate = 3600 // 1 hour — enough for editors to see new posts without a redeploy
-export const experimental_ppr = true
+// PPR opt-in deferred — see next.config.ts.
 
 export default async function BlogIndexPage() {
   const posts = await listPosts()

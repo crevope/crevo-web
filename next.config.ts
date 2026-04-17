@@ -41,17 +41,20 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 31,
   },
 
-  // ─── Experimental flags ────────────────────────────────────────────────
+  // ─── Partial Prerendering (PPR) — deferred ─────────────────────────────
   //
-  // Partial Prerendering (PPR): serves static shells instantly while the
-  // dynamic parts (auth-gated chrome, A/B experiments) stream in. With
-  // `ppr: 'incremental'` pages opt in with `export const experimental_ppr
-  // = true`, so we can migrate the landing and legal pages first — where
-  // the TTFB win is largest — without risking behavior changes on the
-  // authenticated area.
-  experimental: {
-    ppr: 'incremental',
-  },
+  // `experimental.ppr` is **canary-only** on Next 16 (throws
+  // CanaryOnlyError on stable). The per-page `experimental_ppr = true`
+  // exports also rely on this flag and would fail at build time; they
+  // stay commented out in the pages so we can flip the switch in one
+  // place the day we're comfortable running Next canary (or PPR
+  // graduates to stable).
+  //
+  // When that day comes, uncomment:
+  //   experimental: { ppr: 'incremental' },
+  // and re-add `export const experimental_ppr = true` to:
+  //   /sobre-nosotros, /preguntas-frecuentes, /blog, /blog/[slug],
+  //   /prestamos-en-[city].
 
   // ─── Response headers ──────────────────────────────────────────────────
   //
