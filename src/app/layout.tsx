@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
-import { Geist } from 'next/font/google'
+import localFont from 'next/font/local'
 import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/shared/ui/sonner'
 import Script from 'next/script'
@@ -26,7 +26,32 @@ import {
   FB_APP_ID,
 } from '@/shared/config/seo'
 
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
+// Plus Jakarta Sans — the brand typeface, served locally for performance
+// (no Google Fonts request, no FOUT) and licensing clarity (OFL.txt shipped
+// alongside the .ttf files in src/app/fonts/).
+//
+// We use the variable-font files (one per axis: regular + italic) so a
+// single fetch covers every weight from 200 to 800. Variable fonts also
+// give us free intermediate weights (e.g. 650) if we ever want to tune
+// hierarchy more precisely than the standard 400/600/700.
+//
+// `display: 'swap'` shows fallback text immediately and swaps in Plus
+// Jakarta Sans once it loads — best CLS / LCP behavior on slow networks.
+const plusJakartaSans = localFont({
+  src: [
+    {
+      path: './fonts/PlusJakartaSans-VariableFont_wght.ttf',
+      style: 'normal',
+    },
+    {
+      path: './fonts/PlusJakartaSans-Italic-VariableFont_wght.ttf',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-sans',
+  display: 'swap',
+  fallback: ['system-ui', 'sans-serif'],
+})
 
 // ─── Default metadata ────────────────────────────────────────────────────────
 // Inherited by every page that doesn't override its own. Per-page metadata in
@@ -159,7 +184,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html
       lang={SITE.lang}
       suppressHydrationWarning
-      className={cn('font-sans', geist.variable)}
+      className={cn('font-sans', plusJakartaSans.variable)}
     >
       <head>
         <link
@@ -167,7 +192,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
       </head>
-      <body className={`${geist.variable} font-(family-name:--font-sans)`}>
+      <body className={`${plusJakartaSans.variable} font-(family-name:--font-sans)`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <CookieConsentProvider>
             {children}
