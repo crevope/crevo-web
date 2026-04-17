@@ -33,6 +33,20 @@ export const SITE = {
   country: 'PE',
 } as const
 
+/** Default Open Graph image. Generated dynamically by
+ *  `src/app/opengraph-image.tsx` and served at `/opengraph-image`.
+ *
+ *  We reference it as an ABSOLUTE URL because some social scrapers
+ *  (LinkedIn especially) refuse to follow relative og:image paths or
+ *  fall back to inferring images from page content when the meta tag
+ *  is missing or malformed. The metadataBase auto-resolution Next.js
+ *  performs only kicks in when the path looks like a file URL — for
+ *  the dynamic-route convention we have to spell it out. */
+export const OG_IMAGE_URL = `${SITE_URL}/opengraph-image` as const
+export const OG_IMAGE_WIDTH = 1200
+export const OG_IMAGE_HEIGHT = 630
+export const OG_IMAGE_ALT = `${SITE.name} — ${SITE.tagline}`
+
 /** Brand color tokens — kept in sync with globals.css. Used by Satori
  *  (ImageResponse) which can't read CSS variables, only literal values. */
 export const BRAND_COLORS = {

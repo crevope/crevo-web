@@ -1,5 +1,12 @@
 import type { Metadata } from 'next'
-import { SITE_URL, SITE } from '@/shared/config/seo'
+import {
+  SITE_URL,
+  SITE,
+  OG_IMAGE_URL,
+  OG_IMAGE_WIDTH,
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_ALT,
+} from '@/shared/config/seo'
 
 interface BuildMetadataInput {
   /** Short page title — gets appended with " | Crevo" via the root template.
@@ -79,11 +86,31 @@ export function buildMetadata({
       title: finalSocialTitle,
       description: finalSocialDescription,
       url: canonicalUrl,
+      // Explicit images — see comment in src/app/layout.tsx for the
+      // rationale (Facebook flags inferred og:image; LinkedIn scrapes
+      // the page for <img> when the meta tag is absent).
+      images: [
+        {
+          url: OG_IMAGE_URL,
+          width: OG_IMAGE_WIDTH,
+          height: OG_IMAGE_HEIGHT,
+          alt: OG_IMAGE_ALT,
+          type: 'image/png',
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: finalSocialTitle,
       description: finalSocialDescription,
+      images: [
+        {
+          url: OG_IMAGE_URL,
+          width: OG_IMAGE_WIDTH,
+          height: OG_IMAGE_HEIGHT,
+          alt: OG_IMAGE_ALT,
+        },
+      ],
     },
   }
 }
