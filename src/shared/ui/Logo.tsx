@@ -107,12 +107,7 @@ export function Logo({
  * outline, which is what makes the mark feel integrated rather than apilado.
  */
 function Mark({ color }: { color: string }) {
-  return (
-    <path
-      d="M 36 16 A 20 20 0 1 0 36 48 L 60 32 L 30 40 A 10 10 0 1 1 30 24 Z"
-      fill={color}
-    />
-  )
+  return <path d="M 36 16 A 20 20 0 1 0 36 48 L 60 32 L 30 40 A 10 10 0 1 1 30 24 Z" fill={color} />
 }
 
 /**

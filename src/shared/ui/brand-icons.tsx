@@ -14,7 +14,11 @@ import type { SVGProps } from 'react'
 
 type IconProps = Omit<SVGProps<SVGSVGElement>, 'children'>
 
-function BaseIcon({ children, viewBox = '0 0 24 24', ...props }: IconProps & { children: React.ReactNode }) {
+function BaseIcon({
+  children,
+  viewBox = '0 0 24 24',
+  ...props
+}: IconProps & { children: React.ReactNode }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

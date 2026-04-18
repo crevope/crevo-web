@@ -1,9 +1,5 @@
 import { z } from 'zod'
-import {
-  CLAIM_TYPES,
-  CONSUMER_DOCUMENT_TYPES,
-  PRODUCT_TYPES,
-} from './complaintsConstants'
+import { CLAIM_TYPES, CONSUMER_DOCUMENT_TYPES, PRODUCT_TYPES } from './complaintsConstants'
 
 /**
  * Validation for the filing form. Rules encode what INDECOPI expects (all
@@ -12,11 +8,7 @@ import {
  */
 
 const trimmed = (min: number, max: number, label: string) =>
-  z
-    .string()
-    .trim()
-    .min(min, `${label} es requerido`)
-    .max(max, `${label} es demasiado largo`)
+  z.string().trim().min(min, `${label} es requerido`).max(max, `${label} es demasiado largo`)
 
 // Document number: loose by design — DNI is 8 digits, CE/Passport vary, RUC
 // is 11. A stricter per-type rule forces us to pick a doc type before typing,

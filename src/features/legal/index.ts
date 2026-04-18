@@ -1,6 +1,10 @@
 export { LegalPageLayout } from './ui/LegalPageLayout'
 export { legalRepository } from './api/legalRepository'
-export type { LegalAcceptance, LegalAcceptanceDTO, CurrentVersionsResponse } from './api/legalRepository'
+export type {
+  LegalAcceptance,
+  LegalAcceptanceDTO,
+  CurrentVersionsResponse,
+} from './api/legalRepository'
 export {
   LEGAL_DOCUMENT_TYPES,
   LEGAL_VERSIONS,

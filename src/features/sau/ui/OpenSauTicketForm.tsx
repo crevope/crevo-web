@@ -8,13 +8,7 @@ import { Button } from '@/shared/ui/button'
 import { Card } from '@/shared/ui/card'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 import { Textarea } from '@/shared/ui/textarea'
 import { sanitizeUserText } from '@/shared/lib/sanitize'
 import { openSauTicketSchema, type OpenSauTicketInput } from '../lib/sauSchemas'
@@ -95,7 +89,9 @@ export function OpenSauTicketForm({ onOpened }: Readonly<Props>) {
         </div>
 
         <div>
-          <Label htmlFor="subject" className={labelCls}>Asunto</Label>
+          <Label htmlFor="subject" className={labelCls}>
+            Asunto
+          </Label>
           <Input
             id="subject"
             type="text"
@@ -107,7 +103,9 @@ export function OpenSauTicketForm({ onOpened }: Readonly<Props>) {
         </div>
 
         <div>
-          <Label htmlFor="body" className={labelCls}>Descripción</Label>
+          <Label htmlFor="body" className={labelCls}>
+            Descripción
+          </Label>
           <Textarea
             id="body"
             rows={6}
@@ -134,9 +132,9 @@ export function OpenSauTicketForm({ onOpened }: Readonly<Props>) {
 
         <div className="pt-2">
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">
-            Responderemos tu caso en un plazo máximo de <strong>{SAU_SLA_DAYS} días calendario</strong>{' '}
-            conforme a la Circular SBS G-184-2015. Te notificaremos por correo y en la app cuando
-            tengamos una respuesta.
+            Responderemos tu caso en un plazo máximo de{' '}
+            <strong>{SAU_SLA_DAYS} días calendario</strong> conforme a la Circular SBS G-184-2015.
+            Te notificaremos por correo y en la app cuando tengamos una respuesta.
           </p>
           <Button
             type="submit"
@@ -145,9 +143,13 @@ export function OpenSauTicketForm({ onOpened }: Readonly<Props>) {
             className="w-full bg-brand-primary hover:bg-brand-primary-hover text-white shadow-lg"
           >
             {submitting ? (
-              <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Enviando...</>
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Enviando...
+              </>
             ) : (
-              <>Enviar solicitud <Send className="h-4 w-4" aria-hidden="true" /></>
+              <>
+                Enviar solicitud <Send className="h-4 w-4" aria-hidden="true" />
+              </>
             )}
           </Button>
         </div>

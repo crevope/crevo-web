@@ -21,16 +21,14 @@ const valueCls = 'text-sm text-brand-text'
 const fmtDate = (iso: string | undefined) =>
   iso
     ? new Date(iso).toLocaleString('es-PE', {
-      dateStyle: 'long',
-      timeStyle: 'short',
-      timeZone: 'America/Lima',
-    })
+        dateStyle: 'long',
+        timeStyle: 'short',
+        timeZone: 'America/Lima',
+      })
     : '—'
 
 const fmtSoles = (amount?: number) =>
-  amount === undefined || amount === null
-    ? '—'
-    : `S/ ${amount.toFixed(2)}`
+  amount === undefined || amount === null ? '—' : `S/ ${amount.toFixed(2)}`
 
 /**
  * Renders the full, public-safe view of a complaint. Reused by the public
@@ -44,12 +42,13 @@ export function ComplaintDetailCard({ complaint }: Props) {
   return (
     <Card className="bg-brand-card rounded-lg border-gray-100 dark:border-white/6 overflow-hidden shadow-none p-0 gap-0">
       <article>
-
         {/* Header: code + status — navy in light / gold in dark keeps the code
              as the strongest visual anchor under the active theme. */}
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-6 sm:p-8 border-b border-gray-100 dark:border-white/5">
           <div>
-            <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Código de reclamo</p>
+            <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+              Código de reclamo
+            </p>
             <code className="font-mono text-lg sm:text-xl font-bold text-brand-primary dark:text-brand-secondary tracking-wider">
               {complaint.claimCode}
             </code>
@@ -68,12 +67,15 @@ export function ComplaintDetailCard({ complaint }: Props) {
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <dt className={labelCls}>Nombre completo</dt>
-              <dd className={valueCls}>{complaint.consumerFirstName} {complaint.consumerLastName}</dd>
+              <dd className={valueCls}>
+                {complaint.consumerFirstName} {complaint.consumerLastName}
+              </dd>
             </div>
             <div>
               <dt className={labelCls}>Documento</dt>
               <dd className={valueCls}>
-                {DOCUMENT_TYPE_LABELS[complaint.consumerDocumentType]} {complaint.consumerDocumentNumber}
+                {DOCUMENT_TYPE_LABELS[complaint.consumerDocumentType]}{' '}
+                {complaint.consumerDocumentNumber}
               </dd>
             </div>
           </dl>
@@ -159,7 +161,9 @@ export function ComplaintDetailCard({ complaint }: Props) {
               <AlertDescription className="text-[#78350F] dark:text-[#FCD34D]">
                 Tu reclamo está en trámite. Te responderemos por correo antes del{' '}
                 <strong>
-                  {new Date(complaint.slaDeadline).toLocaleDateString('es-PE', { timeZone: 'America/Lima' })}
+                  {new Date(complaint.slaDeadline).toLocaleDateString('es-PE', {
+                    timeZone: 'America/Lima',
+                  })}
                 </strong>
                 .
               </AlertDescription>
@@ -177,12 +181,15 @@ function StatusBadge({ status }: { status: PublicComplaintView['status'] }) {
   const isClosed = status === 'CLOSED'
   return (
     <Badge
-      className={`gap-1.5 ${isClosed
+      className={`gap-1.5 ${
+        isClosed
           ? 'bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400'
           : 'bg-amber-100 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400'
-        }`}
+      }`}
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${isClosed ? 'bg-green-500' : 'bg-amber-500 animate-pulse'}`} />
+      <span
+        className={`w-1.5 h-1.5 rounded-full ${isClosed ? 'bg-green-500' : 'bg-amber-500 animate-pulse'}`}
+      />
       {COMPLAINT_STATUS_LABELS[status]}
     </Badge>
   )

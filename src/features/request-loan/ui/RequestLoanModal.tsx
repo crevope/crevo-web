@@ -11,7 +11,13 @@ import { bankAccountRepository, type BankAccount } from '../api/bankAccountRepos
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/shared/ui/form'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/shared/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/shared/ui/dialog'
 import { InfoTooltip } from '@/shared/ui/info-tooltip'
 import { formatCurrency } from '@/shared/lib/utils'
 
@@ -26,9 +32,12 @@ const PRODUCT_OPTIONS = [
 ]
 
 const TOOLTIPS = {
-  techFee: 'Cubre los costos de la plataforma digital, verificación de identidad y procesamiento de tu solicitud.',
-  disbursementFee: 'Cubre la transferencia del dinero a tu cuenta. Se descuenta del monto que recibes.',
-  maintenanceFee: 'Cubre la administración de tu cuenta durante la vigencia del préstamo. Se cobra por cada cuota.',
+  techFee:
+    'Cubre los costos de la plataforma digital, verificación de identidad y procesamiento de tu solicitud.',
+  disbursementFee:
+    'Cubre la transferencia del dinero a tu cuenta. Se descuenta del monto que recibes.',
+  maintenanceFee:
+    'Cubre la administración de tu cuenta durante la vigencia del préstamo. Se cobra por cada cuota.',
   igv: 'Impuesto General a las Ventas (18%) aplicado sobre las comisiones. Los intereses están exonerados de IGV según Ley N° 28194.',
   tcea: 'Tasa de Costo Efectivo Anual. Refleja el costo total del préstamo incluyendo intereses y comisiones.',
 }
@@ -58,7 +67,10 @@ export function RequestLoanModal({ open, onClose }: Props) {
   const productType = form.watch('productType')
 
   const runSimulation = useCallback(async (amt: number, prod: string) => {
-    if (!amt || amt < 200 || amt > 2000) { setSimulation(null); return }
+    if (!amt || amt < 200 || amt > 2000) {
+      setSimulation(null)
+      return
+    }
     setSimLoading(true)
     try {
       const result = await loanRepository.simulate({
@@ -84,10 +96,11 @@ export function RequestLoanModal({ open, onClose }: Props) {
 
   useEffect(() => {
     if (!open) return
-    bankAccountRepository.getMyAccounts()
-      .then(result => {
+    bankAccountRepository
+      .getMyAccounts()
+      .then((result) => {
         setBankAccounts(result.accounts)
-        const defaultAccount = result.accounts.find(a => a.isDefault)
+        const defaultAccount = result.accounts.find((a) => a.isDefault)
         setSelectedAccountId(defaultAccount?.id ?? result.accounts[0]?.id ?? null)
       })
       .catch(() => setBankAccounts([]))
@@ -115,56 +128,62 @@ export function RequestLoanModal({ open, onClose }: Props) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Solicitar préstamo</DialogTitle>
-          <DialogDescription>
-            De S/ 200 a S/ 2,000. Aprobación en minutos.
-          </DialogDescription>
+          <DialogDescription>De S/ 200 a S/ 2,000. Aprobación en minutos.</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-
             {/* Monto */}
-            <FormField control={form.control} name="amount" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Monto (S/)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="500"
-                    {...field}
-                    onChange={e => field.onChange(e.target.valueAsNumber)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Monto (S/)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="500"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Producto */}
-            <FormField control={form.control} name="productType" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Modalidad de pago</FormLabel>
-                <FormControl>
-                  <div className="flex gap-2">
-                    {PRODUCT_OPTIONS.map(opt => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => field.onChange(opt.value)}
-                        className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors text-left
-                          ${field.value === opt.value
-                            ? 'border-primary bg-primary/10 text-primary'
-                            : 'border-input bg-background hover:bg-accent text-foreground'
+            <FormField
+              control={form.control}
+              name="productType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Modalidad de pago</FormLabel>
+                  <FormControl>
+                    <div className="flex gap-2">
+                      {PRODUCT_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => field.onChange(opt.value)}
+                          className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors text-left
+                          ${
+                            field.value === opt.value
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-input bg-background hover:bg-accent text-foreground'
                           }`}
-                      >
-                        <span className="block font-semibold">{opt.label}</span>
-                        <span className="block text-xs opacity-70">{opt.sublabel}</span>
-                      </button>
-                    ))}
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+                        >
+                          <span className="block font-semibold">{opt.label}</span>
+                          <span className="block text-xs opacity-70">{opt.sublabel}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Desglose de costos */}
             <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
@@ -181,7 +200,6 @@ export function RequestLoanModal({ open, onClose }: Props) {
                 </div>
               ) : simulation ? (
                 <div className="px-4 py-3 space-y-2.5 text-sm">
-
                   {/* Monto solicitado */}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Monto solicitado</span>
@@ -206,7 +224,8 @@ export function RequestLoanModal({ open, onClose }: Props) {
                       {formatCurrency(simulation.maintenanceFeeTotal)}
                       {simulation.numInstallments > 1 && (
                         <span className="text-xs text-muted-foreground ml-1">
-                          ({formatCurrency(simulation.maintenanceFee)} × {simulation.numInstallments})
+                          ({formatCurrency(simulation.maintenanceFee)} ×{' '}
+                          {simulation.numInstallments})
                         </span>
                       )}
                     </span>
@@ -220,7 +239,11 @@ export function RequestLoanModal({ open, onClose }: Props) {
 
                   {/* Cuota */}
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{simulation.numInstallments === 1 ? 'Cuota única' : `${simulation.numInstallments} cuotas de`}</span>
+                    <span>
+                      {simulation.numInstallments === 1
+                        ? 'Cuota única'
+                        : `${simulation.numInstallments} cuotas de`}
+                    </span>
                     <span>{formatCurrency(simulation.installmentAmount)}</span>
                   </div>
 
@@ -230,7 +253,9 @@ export function RequestLoanModal({ open, onClose }: Props) {
                       Com. desembolso
                       <InfoTooltip text={TOOLTIPS.disbursementFee} />
                     </span>
-                    <span className="text-amber-500">− {formatCurrency(simulation.disbursementFee)}</span>
+                    <span className="text-amber-500">
+                      − {formatCurrency(simulation.disbursementFee)}
+                    </span>
                   </div>
 
                   {/* Monto que recibes */}
@@ -246,17 +271,25 @@ export function RequestLoanModal({ open, onClose }: Props) {
 
                   {/* Costos del crédito */}
                   <div className="rounded-lg bg-muted/30 px-2.5 py-2 space-y-1 text-xs text-muted-foreground">
-                    <p className="font-semibold text-[10px] uppercase tracking-wide text-foreground/50 mb-1">Comisiones distribuidas en cuotas</p>
+                    <p className="font-semibold text-[10px] uppercase tracking-wide text-foreground/50 mb-1">
+                      Comisiones distribuidas en cuotas
+                    </p>
                     <div className="flex justify-between">
-                      <span className="flex items-center gap-1">Com. tecnología <InfoTooltip text={TOOLTIPS.techFee} /></span>
+                      <span className="flex items-center gap-1">
+                        Com. tecnología <InfoTooltip text={TOOLTIPS.techFee} />
+                      </span>
                       <span>{formatCurrency(simulation.techFee)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="flex items-center gap-1">IGV (18%) <InfoTooltip text={TOOLTIPS.igv} /></span>
+                      <span className="flex items-center gap-1">
+                        IGV (18%) <InfoTooltip text={TOOLTIPS.igv} />
+                      </span>
                       <span>{formatCurrency(simulation.igvAmount)}</span>
                     </div>
                     <div className="flex justify-between border-t border-border/30 pt-1 font-medium text-foreground/70">
-                      <span className="flex items-center gap-1">TCEA <InfoTooltip text={TOOLTIPS.tcea} /></span>
+                      <span className="flex items-center gap-1">
+                        TCEA <InfoTooltip text={TOOLTIPS.tcea} />
+                      </span>
                       <span>{simulation.tceaPercent}% anual</span>
                     </div>
                   </div>
@@ -271,17 +304,20 @@ export function RequestLoanModal({ open, onClose }: Props) {
             {/* Selección de cuenta bancaria */}
             {bankAccounts.length > 0 && (
               <div className="space-y-2">
-                <p className="text-sm font-medium text-foreground">¿A qué cuenta quieres recibir el préstamo?</p>
+                <p className="text-sm font-medium text-foreground">
+                  ¿A qué cuenta quieres recibir el préstamo?
+                </p>
                 <div className="space-y-2">
-                  {bankAccounts.map(account => (
+                  {bankAccounts.map((account) => (
                     <button
                       key={account.id}
                       type="button"
                       onClick={() => setSelectedAccountId(account.id)}
                       className={`w-full flex items-center justify-between rounded-lg border px-3 py-2.5 text-sm text-left transition-colors
-                        ${selectedAccountId === account.id
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-input bg-background hover:bg-accent text-foreground'
+                        ${
+                          selectedAccountId === account.id
+                            ? 'border-primary bg-primary/10 text-primary'
+                            : 'border-input bg-background hover:bg-accent text-foreground'
                         }`}
                     >
                       <div>
@@ -292,7 +328,9 @@ export function RequestLoanModal({ open, onClose }: Props) {
                         </span>
                       </div>
                       {account.isDefault && (
-                        <span className="text-[10px] font-semibold uppercase tracking-wide opacity-60">Predeterminada</span>
+                        <span className="text-[10px] font-semibold uppercase tracking-wide opacity-60">
+                          Predeterminada
+                        </span>
                       )}
                     </button>
                   ))}
@@ -300,10 +338,18 @@ export function RequestLoanModal({ open, onClose }: Props) {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || !simulation}>
-              {form.formState.isSubmitting
-                ? <><Loader2 className="h-4 w-4 animate-spin" /> Enviando solicitud...</>
-                : 'Solicitar préstamo'}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={form.formState.isSubmitting || !simulation}
+            >
+              {form.formState.isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Enviando solicitud...
+                </>
+              ) : (
+                'Solicitar préstamo'
+              )}
             </Button>
           </form>
         </Form>

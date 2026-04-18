@@ -14,10 +14,22 @@ interface LoanState {
   loadMyLoans: () => Promise<void>
   loadLoanDetails: (loanId: string) => Promise<void>
   loadEarlyPayoffQuote: (loanId: string) => Promise<void>
-  requestLoan: (dto: { amount: number; productType: string; paymentFrequency: string; numInstallments: number; bankAccountId?: string }) => Promise<Loan>
+  requestLoan: (dto: {
+    amount: number
+    productType: string
+    paymentFrequency: string
+    numInstallments: number
+    bankAccountId?: string
+  }) => Promise<Loan>
   signLoan: (loanId: string, otp: string) => Promise<void>
-  payLoan: (loanId: string, dto: { amount: number; method: string; reference?: string }) => Promise<void>
-  partialPayLoan: (loanId: string, dto: { amount: number; method: string; reference?: string }) => Promise<void>
+  payLoan: (
+    loanId: string,
+    dto: { amount: number; method: string; reference?: string },
+  ) => Promise<void>
+  partialPayLoan: (
+    loanId: string,
+    dto: { amount: number; method: string; reference?: string },
+  ) => Promise<void>
   earlyPayoff: (loanId: string, dto: { method: string; reference?: string }) => Promise<void>
 }
 
@@ -35,7 +47,8 @@ export const useLoanStore = create<LoanState>((set, get) => ({
     set({ isLoading: true })
     try {
       const loans = await loanRepository.getMyLoans()
-      const activeLoan = loans.find(l => ['APPROVED', 'SIGNED', 'ACTIVE', 'OVERDUE'].includes(l.status)) ?? null
+      const activeLoan =
+        loans.find((l) => ['APPROVED', 'SIGNED', 'ACTIVE', 'OVERDUE'].includes(l.status)) ?? null
       set({ loans, activeLoan })
     } finally {
       set({ isLoading: false })
@@ -69,7 +82,13 @@ export const useLoanStore = create<LoanState>((set, get) => ({
     }
   },
 
-  requestLoan: async (dto: { amount: number; productType: string; paymentFrequency: string; numInstallments: number; bankAccountId?: string }) => {
+  requestLoan: async (dto: {
+    amount: number
+    productType: string
+    paymentFrequency: string
+    numInstallments: number
+    bankAccountId?: string
+  }) => {
     const loan = await loanRepository.requestLoan(dto)
     await get().loadMyLoans()
     return loan

@@ -50,10 +50,9 @@ export function CookiePreferencesDialog() {
             Preferencias de cookies
           </DialogTitle>
           <DialogDescription className="text-gray-600 dark:text-gray-400">
-            Elige qué categorías de cookies quieres permitir. Las cookies
-            necesarias no se pueden desactivar porque son indispensables para
-            que el sitio funcione (sesión, seguridad CSRF, preferencias
-            básicas). Puedes cambiar esta decisión en cualquier momento.
+            Elige qué categorías de cookies quieres permitir. Las cookies necesarias no se pueden
+            desactivar porque son indispensables para que el sitio funcione (sesión, seguridad CSRF,
+            preferencias básicas). Puedes cambiar esta decisión en cualquier momento.
           </DialogDescription>
         </DialogHeader>
 
@@ -61,12 +60,7 @@ export function CookiePreferencesDialog() {
           {/* Necessary — locked on */}
           <div className="rounded-lg border border-gray-200 dark:border-[#334155] bg-gray-50 dark:bg-[#0F172A]/50 p-4">
             <div className="flex items-start gap-3">
-              <Checkbox
-                id="cookie-necessary"
-                checked
-                disabled
-                className="mt-0.5"
-              />
+              <Checkbox id="cookie-necessary" checked disabled className="mt-0.5" />
               <div className="flex-1">
                 <label
                   htmlFor="cookie-necessary"
@@ -78,9 +72,9 @@ export function CookiePreferencesDialog() {
                   </span>
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                  Sesión autenticada, protección CSRF, balanceo de carga y
-                  preferencias mínimas (tema claro/oscuro). Sin estas cookies
-                  el sitio no puede operar, por eso no son opcionales.
+                  Sesión autenticada, protección CSRF, balanceo de carga y preferencias mínimas
+                  (tema claro/oscuro). Sin estas cookies el sitio no puede operar, por eso no son
+                  opcionales.
                 </p>
               </div>
             </div>
@@ -105,10 +99,9 @@ export function CookiePreferencesDialog() {
                   Cookies analíticas
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                  Nos ayudan a entender cómo usas el sitio de forma anónima:
-                  páginas más visitadas, errores que encontrás, tiempos de
-                  carga. Sin esto no podemos mejorar la experiencia. Tus datos
-                  no se usan para publicidad.
+                  Nos ayudan a entender cómo usas el sitio de forma anónima: páginas más visitadas,
+                  errores que encontrás, tiempos de carga. Sin esto no podemos mejorar la
+                  experiencia. Tus datos no se usan para publicidad.
                 </p>
               </div>
             </div>
@@ -133,10 +126,9 @@ export function CookiePreferencesDialog() {
                   Cookies de marketing
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                  Nos permiten mostrarte avisos relevantes en redes sociales y
-                  otros sitios, y medir si nuestras campañas funcionan. Si las
-                  rechazas, igual puedes ver publicidad de Crevo, pero será
-                  genérica en lugar de personalizada.
+                  Nos permiten mostrarte avisos relevantes en redes sociales y otros sitios, y medir
+                  si nuestras campañas funcionan. Si las rechazas, igual puedes ver publicidad de
+                  Crevo, pero será genérica en lugar de personalizada.
                 </p>
               </div>
             </div>
@@ -159,15 +151,12 @@ export function CookiePreferencesDialog() {
             onClick={() => setPreferencesOpen(false)}
           >
             Política de Privacidad
-          </Link>.
+          </Link>
+          .
         </p>
 
         <div className="flex flex-col sm:flex-row gap-2 sm:justify-end mt-4">
-          <Button
-            variant="outline"
-            onClick={rejectAll}
-            className="sm:order-1"
-          >
+          <Button variant="outline" onClick={rejectAll} className="sm:order-1">
             Rechazar opcionales
           </Button>
           <Button

@@ -78,7 +78,9 @@ export function ConsultComplaintForm({ defaultValues, onResult, autoSubmit }: Pr
     <Card className="bg-brand-card rounded-lg border-gray-100 dark:border-white/6 p-6 sm:p-8 shadow-none">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div>
-          <Label htmlFor="claimCode" className={labelCls}>Código de reclamo</Label>
+          <Label htmlFor="claimCode" className={labelCls}>
+            Código de reclamo
+          </Label>
           <Input
             id="claimCode"
             type="text"
@@ -91,7 +93,9 @@ export function ConsultComplaintForm({ defaultValues, onResult, autoSubmit }: Pr
         </div>
 
         <div>
-          <Label htmlFor="documentNumber" className={labelCls}>Número de documento</Label>
+          <Label htmlFor="documentNumber" className={labelCls}>
+            Número de documento
+          </Label>
           <Input
             id="documentNumber"
             type="text"
@@ -114,9 +118,13 @@ export function ConsultComplaintForm({ defaultValues, onResult, autoSubmit }: Pr
           className="w-full bg-brand-primary hover:bg-brand-primary-hover text-white shadow-lg"
         >
           {submitting ? (
-            <><Loader2 className="h-4 w-4 animate-spin" /> Consultando...</>
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Consultando...
+            </>
           ) : (
-            <>Consultar reclamo <Search className="h-4 w-4" aria-hidden="true" /></>
+            <>
+              Consultar reclamo <Search className="h-4 w-4" aria-hidden="true" />
+            </>
           )}
         </Button>
       </form>

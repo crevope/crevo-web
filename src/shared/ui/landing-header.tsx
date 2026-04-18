@@ -27,13 +27,25 @@ export function LandingHeader() {
   const { user, isAuthenticated, loadUser } = useAuthStore()
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  // `mounted` gates the auth-dependent CTA so SSR and the first client render
+  // emit the SAME markup (the guest "Iniciar sesión" button). React would
+  // otherwise mismatch when localStorage already has a logged-in user: the
+  // server has no way to know, so it would render the guest button while the
+  // client immediately renders the dashboard avatar — that's a hard
+  // hydration error in Next 16. Once `mounted` is true we can safely show
+  // the authenticated CTA based on the in-memory store value.
+  const [mounted, setMounted] = useState(false)
+
   useEffect(() => {
+    setMounted(true)
     loadUser()
   }, [loadUser])
 
   // Close the mobile menu on route change. We approximate this by closing
   // whenever the user clicks any link inside the menu (handled per-link).
   const closeMobile = () => setMobileOpen(false)
+
+  const showAuthedCta = mounted && isAuthenticated && user
 
   return (
     <header className="w-full fixed top-0 left-0 z-50 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md border-b border-gray-200/50 dark:border-[#334155]/50">
@@ -69,7 +81,7 @@ export function LandingHeader() {
 
           <div className="w-px h-4 bg-gray-200 dark:bg-[#334155] hidden md:block" />
 
-          {isAuthenticated && user ? (
+          {showAuthedCta ? (
             <Link
               href="/dashboard"
               className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[#0A192F] dark:text-white border border-gray-200 dark:border-white/10 rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition-all"

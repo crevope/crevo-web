@@ -16,7 +16,7 @@ import { CONSENT_STORAGE_KEY } from '@/features/cookie-consent/lib/consentStorag
  */
 const PRESERVED_KEYS: ReadonlySet<string> = new Set([
   CONSENT_STORAGE_KEY, // 'crevo_cookie_consent'
-  'theme',             // next-themes
+  'theme', // next-themes
 ])
 
 /**

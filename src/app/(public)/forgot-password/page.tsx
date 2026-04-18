@@ -38,7 +38,6 @@ export default function ForgotPasswordPage() {
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-10 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-[1000px] flex flex-col lg:flex-row bg-white dark:bg-[#1E293B] rounded-lg shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 min-h-[560px]">
-
           {/* ── Left Hero ─────────────────────────────────────────────── */}
           <div className="hidden lg:flex flex-col justify-center items-center w-1/2 p-10 relative overflow-hidden bg-[#0A192F]">
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-[#00E5FF] rounded-full mix-blend-multiply filter blur-3xl opacity-15 z-0" />
@@ -73,7 +72,10 @@ export default function ForgotPasswordPage() {
                 href="/login"
                 className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-[#00E5FF] dark:hover:text-[#00E5FF] transition-colors mb-7 group"
               >
-                <ArrowLeft className="h-3 w-3 mr-2 group-hover:-translate-x-1 transition-transform" aria-hidden="true" />
+                <ArrowLeft
+                  className="h-3 w-3 mr-2 group-hover:-translate-x-1 transition-transform"
+                  aria-hidden="true"
+                />
                 Volver a Iniciar Sesión
               </Link>
 
@@ -83,10 +85,15 @@ export default function ForgotPasswordPage() {
                     <MailCheck className="h-6 w-6 text-[#00E5FF]" aria-hidden="true" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2">¡Revisa tu correo!</h2>
+                    <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2">
+                      ¡Revisa tu correo!
+                    </h2>
                     <p className="text-gray-400 dark:text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
-                      Si el correo <span className="font-medium text-[#0A192F] dark:text-[#D4AF37]">{getValues('email')}</span> está
-                      registrado, recibirás un enlace en los próximos minutos.
+                      Si el correo{' '}
+                      <span className="font-medium text-[#0A192F] dark:text-[#D4AF37]">
+                        {getValues('email')}
+                      </span>{' '}
+                      está registrado, recibirás un enlace en los próximos minutos.
                     </p>
                   </div>
                   <Link
@@ -124,7 +131,8 @@ export default function ForgotPasswordPage() {
                       />
                       {errors.email && (
                         <p className="text-xs text-red-500 dark:text-red-400 mt-1.5 flex items-center gap-1">
-                          <CircleAlert className="h-3.5 w-3.5" aria-hidden="true" /> {errors.email.message}
+                          <CircleAlert className="h-3.5 w-3.5" aria-hidden="true" />{' '}
+                          {errors.email.message}
                         </p>
                       )}
                     </div>
@@ -135,7 +143,9 @@ export default function ForgotPasswordPage() {
                       className="w-full py-3 rounded-lg bg-[#0A192F] text-[#D4AF37] font-medium text-sm hover:bg-[#112240] disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
                     >
                       {isSubmitting ? (
-                        <><Loader2 className="h-4 w-4 animate-spin" /> Enviando...</>
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" /> Enviando...
+                        </>
                       ) : (
                         'Enviar Enlace'
                       )}

@@ -5,6 +5,7 @@ explica cómo dejar SEO operativo después del deploy y cómo monitorearlo en
 el día a día.
 
 > ⚙️ **Todo el código SEO vive en estos archivos:**
+>
 > - `src/shared/config/seo.ts` — single source of truth (URL, marca, keywords, social, verification)
 > - `src/shared/seo/buildMetadata.ts` — helper de metadata por página
 > - `src/shared/seo/JsonLd.tsx` + `src/shared/seo/schemas/` — structured data
@@ -18,11 +19,11 @@ el día a día.
 
 Copialas desde `.env.example` al panel de Vercel → Settings → Environment Variables.
 
-| Variable | Obligatoria | Para qué |
-|---|---|---|
+| Variable                               | Obligatoria | Para qué                                   |
+| -------------------------------------- | ----------- | ------------------------------------------ |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Recomendada | Verificar dominio en Google Search Console |
-| `NEXT_PUBLIC_BING_SITE_VERIFICATION` | Recomendada | Verificar dominio en Bing Webmaster Tools |
-| `NEXT_PUBLIC_FB_APP_ID` | Opcional | Facebook Insights (analytics de shares) |
+| `NEXT_PUBLIC_BING_SITE_VERIFICATION`   | Recomendada | Verificar dominio en Bing Webmaster Tools  |
+| `NEXT_PUBLIC_FB_APP_ID`                | Opcional    | Facebook Insights (analytics de shares)    |
 
 **Nota:** son `NEXT_PUBLIC_*` porque se renderizan como `<meta>` tags en el HTML — no hay secreto.
 
@@ -88,14 +89,14 @@ Después de cada deploy importante, correr este checklist:
 
 ### Validators online (gratis)
 
-| Tool | Qué valida | URL |
-|---|---|---|
-| **Rich Results Test** | structured data (FAQ, Organization, Breadcrumb) y vista previa Google | https://search.google.com/test/rich-results |
-| **Schema.org Validator** | Sintaxis estricta de schemas (sin filtro Google) | https://validator.schema.org |
-| **Facebook Sharing Debugger** | Open Graph (imagen, título, descripción) | https://developers.facebook.com/tools/debug/ |
-| **LinkedIn Post Inspector** | Preview LinkedIn + warnings | https://www.linkedin.com/post-inspector/ |
-| **PageSpeed Insights** | Core Web Vitals (LCP, INP, CLS) — afectan ranking | https://pagespeed.web.dev/ |
-| **Mobile-Friendly Test** | Que el sitio sea usable en mobile (criterio de ranking) | https://search.google.com/test/mobile-friendly |
+| Tool                          | Qué valida                                                            | URL                                            |
+| ----------------------------- | --------------------------------------------------------------------- | ---------------------------------------------- |
+| **Rich Results Test**         | structured data (FAQ, Organization, Breadcrumb) y vista previa Google | https://search.google.com/test/rich-results    |
+| **Schema.org Validator**      | Sintaxis estricta de schemas (sin filtro Google)                      | https://validator.schema.org                   |
+| **Facebook Sharing Debugger** | Open Graph (imagen, título, descripción)                              | https://developers.facebook.com/tools/debug/   |
+| **LinkedIn Post Inspector**   | Preview LinkedIn + warnings                                           | https://www.linkedin.com/post-inspector/       |
+| **PageSpeed Insights**        | Core Web Vitals (LCP, INP, CLS) — afectan ranking                     | https://pagespeed.web.dev/                     |
+| **Mobile-Friendly Test**      | Que el sitio sea usable en mobile (criterio de ranking)               | https://search.google.com/test/mobile-friendly |
 
 ### URLs que deberían responder OK
 
@@ -113,26 +114,27 @@ GET https://crevo.pe/twitter-image        → 200 image/png  (1200×630)
 
 ```html
 <title>Crevo — Préstamos online rápidos y seguros en Perú</title>
-<meta name="description" content="Mini préstamos online de S/. 200 a S/. 2,000…">
-<link rel="canonical" href="https://crevo.pe/">
-<meta name="robots" content="index, follow">
-<meta property="og:title" content="…">
-<meta property="og:image" content="https://crevo.pe/opengraph-image">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://crevo.pe/opengraph-image">
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A192F">
-<link rel="icon" href="/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-icon" sizes="180x180">
-<link rel="manifest" href="/manifest.webmanifest">
+<meta name="description" content="Mini préstamos online de S/. 200 a S/. 2,000…" />
+<link rel="canonical" href="https://crevo.pe/" />
+<meta name="robots" content="index, follow" />
+<meta property="og:title" content="…" />
+<meta property="og:image" content="https://crevo.pe/opengraph-image" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://crevo.pe/opengraph-image" />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A192F" />
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-icon" sizes="180x180" />
+<link rel="manifest" href="/manifest.webmanifest" />
 
 <!-- Cuando los env vars estén seteados -->
-<meta name="google-site-verification" content="…">
-<meta property="fb:app_id" content="…">
+<meta name="google-site-verification" content="…" />
+<meta property="fb:app_id" content="…" />
 ```
 
 Y en el `<body>`, **3 bloques `<script type="application/ld+json">`**:
+
 - FinancialService (Organization)
 - WebSite
 - FAQPage (solo en home)
@@ -178,6 +180,7 @@ Lo que está apuntado en `src/shared/config/seo.ts` (`SEO_KEYWORDS`) y en cada p
 ### Cómo monitorearlas
 
 GSC → **Performance → Search results** → filtrar por query → ver:
+
 - Impressions (cuántas veces apareciste)
 - CTR (qué % de los que vieron, clickearon)
 - Average position (posición promedio en SERP)
@@ -239,14 +242,14 @@ El setup técnico SEO está **completo**. Lo que sigue es estratégico y depende
 
 ## 7. Troubleshooting
 
-| Síntoma | Causa probable | Fix |
-|---|---|---|
-| Page no aparece en Google después de 2+ semanas | No fue indexada o tiene noindex por error | GSC → URL Inspection → ver "Coverage" — si dice "Excluded" hay un noindex; si "Discovered - currently not indexed", solicitar indexación manual |
-| Preview en Facebook muestra imagen vieja | Cache de FB (hasta 30 días) | Sharing Debugger → "Scrape Again" |
-| LinkedIn muestra "No author found" | LinkedIn parsea la página como Article aunque sea website — no se puede arreglar 100% del lado del frontend | Lo cubre el JSON-LD de Organization que ya emitimos. El warning es cosmético. |
-| Rich Results Test no detecta FAQPage | El JSON-LD no se está renderizando | Ver page source — debería haber `<script type="application/ld+json">` con `"@type":"FAQPage"`. Si no está, problema de hidratación o el componente FaqSection no se montó. |
-| Sitemap muestra fechas viejas (`lastmod`) | El sitemap se genera por request en runtime — pero si Vercel cachea el resultado puede quedar pegado | El sitemap se regenera automáticamente en cada deploy. Si fuerza falta, redeploy manual. |
-| Imágenes locales no se sirven | Path mal escrito o archivo no commiteado a `public/` | `ls public/images/` para confirmar; verificar que el path en `<Image src="/images/...">` no tenga typo |
+| Síntoma                                         | Causa probable                                                                                              | Fix                                                                                                                                                                        |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page no aparece en Google después de 2+ semanas | No fue indexada o tiene noindex por error                                                                   | GSC → URL Inspection → ver "Coverage" — si dice "Excluded" hay un noindex; si "Discovered - currently not indexed", solicitar indexación manual                            |
+| Preview en Facebook muestra imagen vieja        | Cache de FB (hasta 30 días)                                                                                 | Sharing Debugger → "Scrape Again"                                                                                                                                          |
+| LinkedIn muestra "No author found"              | LinkedIn parsea la página como Article aunque sea website — no se puede arreglar 100% del lado del frontend | Lo cubre el JSON-LD de Organization que ya emitimos. El warning es cosmético.                                                                                              |
+| Rich Results Test no detecta FAQPage            | El JSON-LD no se está renderizando                                                                          | Ver page source — debería haber `<script type="application/ld+json">` con `"@type":"FAQPage"`. Si no está, problema de hidratación o el componente FaqSection no se montó. |
+| Sitemap muestra fechas viejas (`lastmod`)       | El sitemap se genera por request en runtime — pero si Vercel cachea el resultado puede quedar pegado        | El sitemap se regenera automáticamente en cada deploy. Si fuerza falta, redeploy manual.                                                                                   |
+| Imágenes locales no se sirven                   | Path mal escrito o archivo no commiteado a `public/`                                                        | `ls public/images/` para confirmar; verificar que el path en `<Image src="/images/...">` no tenga typo                                                                     |
 
 ---
 

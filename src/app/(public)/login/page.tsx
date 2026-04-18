@@ -23,7 +23,6 @@ export default function LoginPage() {
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-10 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-[1100px] flex flex-col lg:flex-row bg-white dark:bg-[#1E293B] rounded-lg shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 min-h-[640px]">
-
           {/* ── Left Hero ─────────────────────────────────────────────── */}
           <div className="hidden lg:flex flex-col justify-center items-center w-1/2 p-10 relative overflow-hidden bg-linear-to-br from-[#0A192F] via-[#0A192F] to-[#0A192F]/80">
             <div className="absolute top-10 left-10 w-32 h-16 bg-[#00E5FF]/15 rounded-full blur-xl" />
@@ -49,13 +48,16 @@ export default function LoginPage() {
 
               <div className="flex flex-wrap gap-2 justify-center mt-3">
                 <div className="px-3 py-1 bg-white/8 border border-white/15 rounded-full text-xs font-medium text-white/80">
-                  <Zap className="inline h-3 w-3 text-[#00E5FF] mr-1" aria-hidden="true" /> Crevo Express
+                  <Zap className="inline h-3 w-3 text-[#00E5FF] mr-1" aria-hidden="true" /> Crevo
+                  Express
                 </div>
                 <div className="px-3 py-1 bg-white/8 border border-white/15 rounded-full text-xs font-medium text-white/80">
-                  <LineChart className="inline h-3 w-3 text-[#D4AF37] mr-1" aria-hidden="true" /> Crevo Flex
+                  <LineChart className="inline h-3 w-3 text-[#D4AF37] mr-1" aria-hidden="true" />{' '}
+                  Crevo Flex
                 </div>
                 <div className="px-3 py-1 bg-white/8 border border-white/15 rounded-full text-xs font-medium text-white/80">
-                  <Crown className="inline h-3 w-3 text-[#D4AF37] mr-1" aria-hidden="true" /> Crevo Plus
+                  <Crown className="inline h-3 w-3 text-[#D4AF37] mr-1" aria-hidden="true" /> Crevo
+                  Plus
                 </div>
               </div>
             </div>
@@ -65,7 +67,9 @@ export default function LoginPage() {
           <div className="w-full lg:w-1/2 p-8 sm:p-10 flex flex-col justify-center bg-white dark:bg-[#1E293B]">
             <div className="max-w-md w-full mx-auto">
               <div className="mb-7 mt-4 lg:mt-0">
-                <h2 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-1">Iniciar Sesión</h2>
+                <h2 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-1">
+                  Iniciar Sesión
+                </h2>
                 <p className="text-sm text-gray-400 dark:text-gray-500">
                   Accede a tu cuenta para gestionar tus préstamos.
                 </p>
@@ -76,19 +80,29 @@ export default function LoginPage() {
               <div className="text-center mt-7 pt-5 border-t border-gray-100 dark:border-white/6">
                 <p className="text-sm text-gray-600 dark:text-gray-300">
                   ¿No tienes cuenta?{' '}
-                  <Link href="/register" className="text-[#00E5FF] font-medium hover:underline ml-1">
+                  <Link
+                    href="/register"
+                    className="text-[#00E5FF] font-medium hover:underline ml-1"
+                  >
                     Regístrate
                   </Link>
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
                   Al continuar, aceptas nuestros{' '}
-                  <Link href="/terminos-y-condiciones" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline">
+                  <Link
+                    href="/terminos-y-condiciones"
+                    className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline"
+                  >
                     Términos de Uso
                   </Link>{' '}
                   y{' '}
-                  <Link href="/politica-de-privacidad" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline">
+                  <Link
+                    href="/politica-de-privacidad"
+                    className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline"
+                  >
                     Política de Privacidad
-                  </Link>.
+                  </Link>
+                  .
                 </p>
               </div>
             </div>
@@ -98,8 +112,8 @@ export default function LoginPage() {
 
       <footer className="w-full py-6 px-4 text-center">
         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-2">
-          <Lock className="h-3 w-3" aria-hidden="true" />
-          © {CURRENT_YEAR} Crevo. Conexión segura 256-bits • Sujeto Obligado UIF-Perú
+          <Lock className="h-3 w-3" aria-hidden="true" />© {CURRENT_YEAR} Crevo. Conexión segura
+          256-bits • Sujeto Obligado UIF-Perú
         </p>
       </footer>
     </div>

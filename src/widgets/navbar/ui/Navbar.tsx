@@ -22,9 +22,11 @@ export function Navbar() {
       {/* ── Desktop top bar ─────────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-
           {/* Logo */}
-          <Link href="/dashboard" className="text-xl font-extrabold tracking-tight text-gradient-brand">
+          <Link
+            href="/dashboard"
+            className="text-xl font-extrabold tracking-tight text-gradient-brand"
+          >
             CREVO
           </Link>
 
@@ -37,9 +39,10 @@ export function Navbar() {
                   key={href}
                   href={href}
                   className={`relative px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200
-                    ${active
-                      ? 'text-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
+                    ${
+                      active
+                        ? 'text-foreground'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
                     }`}
                 >
                   {label}

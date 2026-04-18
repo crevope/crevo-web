@@ -7,7 +7,14 @@ interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
-  register: (dto: { email: string; password: string; firstName: string; lastName: string; dni: string; phone: string }) => Promise<void>
+  register: (dto: {
+    email: string
+    password: string
+    firstName: string
+    lastName: string
+    dni: string
+    phone: string
+  }) => Promise<void>
   logout: () => Promise<void>
   loadUser: () => void
   setUser: (user: AuthUser) => void
@@ -34,7 +41,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ user, isAuthenticated: !!user, isLoading: false })
   },
 
-  setUser: (user) => { authRepository.saveUser(user); set({ user }) },
+  setUser: (user) => {
+    authRepository.saveUser(user)
+    set({ user })
+  },
 
   login: async (email, password) => {
     const { user } = await authRepository.login(email, password)

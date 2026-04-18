@@ -11,13 +11,15 @@ import { toast } from 'sonner'
 import { AuthHeader } from '@/shared/ui/auth-header'
 import { CURRENT_YEAR } from '@/shared/lib/constants'
 
-const schema = z.object({
-  newPassword: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
-  confirmPassword: z.string(),
-}).refine(data => data.newPassword === data.confirmPassword, {
-  message: 'Las contraseñas no coinciden',
-  path: ['confirmPassword'],
-})
+const schema = z
+  .object({
+    newPassword: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Las contraseñas no coinciden',
+    path: ['confirmPassword'],
+  })
 type FormValues = z.infer<typeof schema>
 
 const inputCls =
@@ -30,11 +32,17 @@ function PasswordStrength({ password }: { password: string }) {
   let labelCls = 'text-gray-500 dark:text-gray-400'
 
   if (len > 0 && len < 6) {
-    level = 1; label = 'Débil — Usa más caracteres'; labelCls = 'text-red-500'
+    level = 1
+    label = 'Débil — Usa más caracteres'
+    labelCls = 'text-red-500'
   } else if (len >= 6 && (len < 10 || !/\d/.test(password))) {
-    level = 2; label = 'Media — Agrega números o símbolos'; labelCls = 'text-yellow-500'
+    level = 2
+    label = 'Media — Agrega números o símbolos'
+    labelCls = 'text-yellow-500'
   } else if (len >= 10 && /\d/.test(password)) {
-    level = 3; label = '¡Fuerte — Excelente!'; labelCls = 'text-green-500'
+    level = 3
+    label = '¡Fuerte — Excelente!'
+    labelCls = 'text-green-500'
   }
 
   const barColors = ['bg-gray-200 dark:bg-[#334155]', 'bg-red-500', 'bg-yellow-500', 'bg-green-500']
@@ -42,7 +50,7 @@ function PasswordStrength({ password }: { password: string }) {
   return (
     <div className="pt-2">
       <div className="flex gap-2 mb-1">
-        {[1, 2, 3].map(i => (
+        {[1, 2, 3].map((i) => (
           <div
             key={i}
             className={`h-1 flex-1 rounded-full transition-all ${level >= i ? barColors[level] : 'bg-gray-200 dark:bg-[#334155]'}`}
@@ -72,7 +80,10 @@ function ResetPasswordContent() {
   const newPassword = watch('newPassword', '')
 
   const onSubmit = async (values: FormValues) => {
-    if (!token) { toast.error('Enlace inválido. Solicita uno nuevo.'); return }
+    if (!token) {
+      toast.error('Enlace inválido. Solicita uno nuevo.')
+      return
+    }
     try {
       await authRepository.resetPassword(token, values.newPassword)
       setDone(true)
@@ -105,7 +116,9 @@ function ResetPasswordContent() {
           <Check className="h-7 w-7 text-green-500" aria-hidden="true" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2">¡Contraseña actualizada!</h2>
+          <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2">
+            ¡Contraseña actualizada!
+          </h2>
           <p className="text-gray-400 dark:text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
             Ahora puedes iniciar sesión con tu nueva credencial.
           </p>
@@ -149,12 +162,16 @@ function ResetPasswordContent() {
             />
             <button
               type="button"
-              onClick={() => setShowNew(p => !p)}
+              onClick={() => setShowNew((p) => !p)}
               aria-label={showNew ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'}
               aria-pressed={showNew}
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              {showNew ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+              {showNew ? (
+                <EyeOff className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Eye className="h-4 w-4" aria-hidden="true" />
+              )}
             </button>
           </div>
           {errors.newPassword && (
@@ -177,12 +194,20 @@ function ResetPasswordContent() {
             />
             <button
               type="button"
-              onClick={() => setShowConfirm(p => !p)}
-              aria-label={showConfirm ? 'Ocultar confirmación de contraseña' : 'Mostrar confirmación de contraseña'}
+              onClick={() => setShowConfirm((p) => !p)}
+              aria-label={
+                showConfirm
+                  ? 'Ocultar confirmación de contraseña'
+                  : 'Mostrar confirmación de contraseña'
+              }
               aria-pressed={showConfirm}
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              {showConfirm ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+              {showConfirm ? (
+                <EyeOff className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Eye className="h-4 w-4" aria-hidden="true" />
+              )}
             </button>
           </div>
           {errors.confirmPassword && (
@@ -196,7 +221,9 @@ function ResetPasswordContent() {
           className="w-full py-3 rounded-lg bg-[#0A192F] text-[#D4AF37] font-medium text-sm hover:bg-[#112240] disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 mt-2"
         >
           {isSubmitting ? (
-            <><Loader2 className="h-4 w-4 animate-spin" /> Guardando...</>
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Guardando...
+            </>
           ) : (
             'Guardar y Continuar'
           )}
@@ -213,7 +240,6 @@ export default function ResetPasswordPage() {
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-10 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-250 flex flex-col lg:flex-row bg-white dark:bg-[#1E293B] rounded-lg shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 min-h-[560px]">
-
           {/* ── Left Hero ─────────────────────────────────────────────── */}
           <div className="hidden lg:flex flex-col justify-center items-center w-1/2 p-10 relative overflow-hidden bg-[#0A192F]">
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-[#00E5FF] rounded-full mix-blend-multiply filter blur-3xl opacity-15 z-0" />
@@ -248,15 +274,20 @@ export default function ResetPasswordPage() {
                 href="/login"
                 className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-[#00E5FF] dark:hover:text-[#00E5FF] transition-colors mb-7 group"
               >
-                <ArrowLeft className="h-3 w-3 mr-2 group-hover:-translate-x-1 transition-transform" aria-hidden="true" />
+                <ArrowLeft
+                  className="h-3 w-3 mr-2 group-hover:-translate-x-1 transition-transform"
+                  aria-hidden="true"
+                />
                 Volver a Iniciar Sesión
               </Link>
 
-              <Suspense fallback={
-                <div className="flex justify-center py-12">
-                  <Loader2 className="h-10 w-10 animate-spin text-[#00E5FF]" />
-                </div>
-              }>
+              <Suspense
+                fallback={
+                  <div className="flex justify-center py-12">
+                    <Loader2 className="h-10 w-10 animate-spin text-[#00E5FF]" />
+                  </div>
+                }
+              >
                 <ResetPasswordContent />
               </Suspense>
             </div>

@@ -15,8 +15,7 @@ import {
   COMPLAINT_STATUS_LABELS,
 } from '@/features/complaints'
 
-const cardCls =
-  'bg-brand-card border-gray-100 dark:border-white/6 rounded-lg shadow-none'
+const cardCls = 'bg-brand-card border-gray-100 dark:border-white/6 rounded-lg shadow-none'
 
 /**
  * Authed history view — lists every complaint the current user has filed so
@@ -36,15 +35,15 @@ export default function MyComplaintsPage() {
         if (!cancelled) setComplaints(data)
       } catch (err) {
         if (!cancelled) {
-          toast.error(
-            err instanceof Error ? err.message : 'No pudimos cargar tus reclamos',
-          )
+          toast.error(err instanceof Error ? err.message : 'No pudimos cargar tus reclamos')
         }
       } finally {
         if (!cancelled) setLoading(false)
       }
     })()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const selected = complaints.find((c) => c.id === selectedId) ?? null
@@ -93,8 +92,8 @@ export default function MyComplaintsPage() {
             Aún no has presentado reclamos
           </h3>
           <p className="text-gray-500 dark:text-gray-400 text-sm max-w-md mx-auto mb-5">
-            Si tienes una disconformidad con un producto o la atención recibida, puedes presentar
-            un reclamo formal desde el Libro de Reclamaciones.
+            Si tienes una disconformidad con un producto o la atención recibida, puedes presentar un
+            reclamo formal desde el Libro de Reclamaciones.
           </p>
           <Button asChild className="bg-brand-primary hover:bg-brand-primary-hover text-white">
             <Link href="/libro-de-reclamaciones">
@@ -133,7 +132,11 @@ export default function MyComplaintsPage() {
                         : 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400'
                     }`}
                   >
-                    {isClosed ? <CircleCheck className="h-4 w-4" aria-hidden="true" /> : <Clock className="h-4 w-4" aria-hidden="true" />}
+                    {isClosed ? (
+                      <CircleCheck className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Clock className="h-4 w-4" aria-hidden="true" />
+                    )}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -173,7 +176,10 @@ export default function MyComplaintsPage() {
                     </p>
                   </div>
 
-                  <ChevronRight className="h-3 w-3 text-gray-300 dark:text-gray-600 mt-3" aria-hidden="true" />
+                  <ChevronRight
+                    className="h-3 w-3 text-gray-300 dark:text-gray-600 mt-3"
+                    aria-hidden="true"
+                  />
                 </button>
               )
             })}

@@ -54,9 +54,12 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
 
   const acceptAll = useCallback(() => persist(acceptAllDecision()), [persist])
   const rejectAll = useCallback(() => persist(rejectAllDecision()), [persist])
-  const savePreferences = useCallback((decision: CookieConsentDecision) => {
-    persist(decision)
-  }, [persist])
+  const savePreferences = useCallback(
+    (decision: CookieConsentDecision) => {
+      persist(decision)
+    },
+    [persist],
+  )
 
   const allows = useCallback(
     (category: CookieCategory) => (consent ? consent.categories[category] : false),
@@ -78,7 +81,16 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
       isPreferencesOpen,
       setPreferencesOpen,
     }),
-    [consent, isHydrated, acceptAll, rejectAll, savePreferences, allows, openPreferences, isPreferencesOpen],
+    [
+      consent,
+      isHydrated,
+      acceptAll,
+      rejectAll,
+      savePreferences,
+      allows,
+      openPreferences,
+      isPreferencesOpen,
+    ],
   )
 
   return <CookieConsentContext.Provider value={value}>{children}</CookieConsentContext.Provider>

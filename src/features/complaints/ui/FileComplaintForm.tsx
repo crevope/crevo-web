@@ -9,13 +9,7 @@ import { Card } from '@/shared/ui/card'
 import { Checkbox } from '@/shared/ui/checkbox'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 import { Textarea } from '@/shared/ui/textarea'
 import { sanitizeUserText } from '@/shared/lib/sanitize'
 import { fileComplaintSchema, type FileComplaintInput } from '../lib/complaintsSchemas'
@@ -41,10 +35,8 @@ const errorCls = 'text-xs text-red-500 mt-1'
 
 const sectionCardCls =
   'bg-brand-card rounded-lg border-gray-100 dark:border-white/6 p-6 sm:p-8 shadow-none'
-const sectionTitleCls =
-  'text-lg font-semibold text-brand-text mb-1'
-const sectionDescCls =
-  'text-sm text-gray-500 dark:text-gray-400 mb-6'
+const sectionTitleCls = 'text-lg font-semibold text-brand-text mb-1'
+const sectionDescCls = 'text-sm text-gray-500 dark:text-gray-400 mb-6'
 
 interface Props {
   /** Called with the server receipt after a successful filing so the page can
@@ -105,7 +97,9 @@ export function FileComplaintForm({ onFiled }: Props) {
         consumerPhone: values.consumerPhone,
         consumerAddress: sanitizeUserText(values.consumerAddress),
         consumerIsMinor: values.consumerIsMinor,
-        guardianFullName: values.guardianFullName ? sanitizeUserText(values.guardianFullName) || undefined : undefined,
+        guardianFullName: values.guardianFullName
+          ? sanitizeUserText(values.guardianFullName) || undefined
+          : undefined,
         guardianDocumentNumber: values.guardianDocumentNumber?.trim() || undefined,
         productType: values.productType,
         productDescription: sanitizeUserText(values.productDescription),
@@ -126,25 +120,44 @@ export function FileComplaintForm({ onFiled }: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
       {/* ── Consumer data ──────────────────────────────────────────────── */}
       <Card className={sectionCardCls}>
         <h2 className={sectionTitleCls}>1. Datos del consumidor</h2>
         <p className={sectionDescCls}>
-          Información obligatoria según el formato de la Hoja de Reclamación del INDECOPI
-          (D.S. N° 011-2011-PCM).
+          Información obligatoria según el formato de la Hoja de Reclamación del INDECOPI (D.S. N°
+          011-2011-PCM).
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <Label htmlFor="firstName" className={labelCls}>Nombres</Label>
-            <Input id="firstName" type="text" autoComplete="given-name" className={fieldBrandCls} {...register('consumerFirstName')} />
-            {errors.consumerFirstName && <p className={errorCls}>{errors.consumerFirstName.message}</p>}
+            <Label htmlFor="firstName" className={labelCls}>
+              Nombres
+            </Label>
+            <Input
+              id="firstName"
+              type="text"
+              autoComplete="given-name"
+              className={fieldBrandCls}
+              {...register('consumerFirstName')}
+            />
+            {errors.consumerFirstName && (
+              <p className={errorCls}>{errors.consumerFirstName.message}</p>
+            )}
           </div>
           <div>
-            <Label htmlFor="lastName" className={labelCls}>Apellidos</Label>
-            <Input id="lastName" type="text" autoComplete="family-name" className={fieldBrandCls} {...register('consumerLastName')} />
-            {errors.consumerLastName && <p className={errorCls}>{errors.consumerLastName.message}</p>}
+            <Label htmlFor="lastName" className={labelCls}>
+              Apellidos
+            </Label>
+            <Input
+              id="lastName"
+              type="text"
+              autoComplete="family-name"
+              className={fieldBrandCls}
+              {...register('consumerLastName')}
+            />
+            {errors.consumerLastName && (
+              <p className={errorCls}>{errors.consumerLastName.message}</p>
+            )}
           </div>
         </div>
 
@@ -164,7 +177,9 @@ export function FileComplaintForm({ onFiled }: Props) {
                   </SelectTrigger>
                   <SelectContent>
                     {Object.values(CONSUMER_DOCUMENT_TYPES).map((v) => (
-                      <SelectItem key={v} value={v}>{DOCUMENT_TYPE_LABELS[v]}</SelectItem>
+                      <SelectItem key={v} value={v}>
+                        {DOCUMENT_TYPE_LABELS[v]}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -172,28 +187,61 @@ export function FileComplaintForm({ onFiled }: Props) {
             />
           </div>
           <div className="md:col-span-2">
-            <Label htmlFor="docNumber" className={labelCls}>Número de documento</Label>
-            <Input id="docNumber" type="text" className={fieldBrandCls} {...register('consumerDocumentNumber')} />
-            {errors.consumerDocumentNumber && <p className={errorCls}>{errors.consumerDocumentNumber.message}</p>}
+            <Label htmlFor="docNumber" className={labelCls}>
+              Número de documento
+            </Label>
+            <Input
+              id="docNumber"
+              type="text"
+              className={fieldBrandCls}
+              {...register('consumerDocumentNumber')}
+            />
+            {errors.consumerDocumentNumber && (
+              <p className={errorCls}>{errors.consumerDocumentNumber.message}</p>
+            )}
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
           <div>
-            <Label htmlFor="email" className={labelCls}>Correo electrónico</Label>
-            <Input id="email" type="email" autoComplete="email" className={fieldBrandCls} {...register('consumerEmail')} />
+            <Label htmlFor="email" className={labelCls}>
+              Correo electrónico
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              className={fieldBrandCls}
+              {...register('consumerEmail')}
+            />
             {errors.consumerEmail && <p className={errorCls}>{errors.consumerEmail.message}</p>}
           </div>
           <div>
-            <Label htmlFor="phone" className={labelCls}>Teléfono</Label>
-            <Input id="phone" type="tel" autoComplete="tel" className={fieldBrandCls} {...register('consumerPhone')} />
+            <Label htmlFor="phone" className={labelCls}>
+              Teléfono
+            </Label>
+            <Input
+              id="phone"
+              type="tel"
+              autoComplete="tel"
+              className={fieldBrandCls}
+              {...register('consumerPhone')}
+            />
             {errors.consumerPhone && <p className={errorCls}>{errors.consumerPhone.message}</p>}
           </div>
         </div>
 
         <div className="mt-5">
-          <Label htmlFor="address" className={labelCls}>Domicilio</Label>
-          <Input id="address" type="text" autoComplete="street-address" className={fieldBrandCls} {...register('consumerAddress')} />
+          <Label htmlFor="address" className={labelCls}>
+            Domicilio
+          </Label>
+          <Input
+            id="address"
+            type="text"
+            autoComplete="street-address"
+            className={fieldBrandCls}
+            {...register('consumerAddress')}
+          />
           {errors.consumerAddress && <p className={errorCls}>{errors.consumerAddress.message}</p>}
         </div>
 
@@ -212,22 +260,44 @@ export function FileComplaintForm({ onFiled }: Props) {
                 />
               )}
             />
-            <Label htmlFor="is-minor" className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer font-normal leading-snug">
-              El consumidor es menor de edad y presenta el reclamo a través de su padre, madre o tutor.
+            <Label
+              htmlFor="is-minor"
+              className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer font-normal leading-snug"
+            >
+              El consumidor es menor de edad y presenta el reclamo a través de su padre, madre o
+              tutor.
             </Label>
           </div>
 
           {isMinor && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
               <div>
-                <Label htmlFor="guardianName" className={labelCls}>Nombre completo del representante</Label>
-                <Input id="guardianName" type="text" className={fieldBrandCls} {...register('guardianFullName')} />
-                {errors.guardianFullName && <p className={errorCls}>{errors.guardianFullName.message}</p>}
+                <Label htmlFor="guardianName" className={labelCls}>
+                  Nombre completo del representante
+                </Label>
+                <Input
+                  id="guardianName"
+                  type="text"
+                  className={fieldBrandCls}
+                  {...register('guardianFullName')}
+                />
+                {errors.guardianFullName && (
+                  <p className={errorCls}>{errors.guardianFullName.message}</p>
+                )}
               </div>
               <div>
-                <Label htmlFor="guardianDoc" className={labelCls}>Documento del representante</Label>
-                <Input id="guardianDoc" type="text" className={fieldBrandCls} {...register('guardianDocumentNumber')} />
-                {errors.guardianDocumentNumber && <p className={errorCls}>{errors.guardianDocumentNumber.message}</p>}
+                <Label htmlFor="guardianDoc" className={labelCls}>
+                  Documento del representante
+                </Label>
+                <Input
+                  id="guardianDoc"
+                  type="text"
+                  className={fieldBrandCls}
+                  {...register('guardianDocumentNumber')}
+                />
+                {errors.guardianDocumentNumber && (
+                  <p className={errorCls}>{errors.guardianDocumentNumber.message}</p>
+                )}
               </div>
             </div>
           )}
@@ -237,7 +307,9 @@ export function FileComplaintForm({ onFiled }: Props) {
       {/* ── Product / service ──────────────────────────────────────────── */}
       <Card className={sectionCardCls}>
         <h2 className={sectionTitleCls}>2. Identificación del producto o servicio</h2>
-        <p className={sectionDescCls}>Describe con claridad sobre qué estás presentando el reclamo.</p>
+        <p className={sectionDescCls}>
+          Describe con claridad sobre qué estás presentando el reclamo.
+        </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div>
@@ -247,12 +319,17 @@ export function FileComplaintForm({ onFiled }: Props) {
               control={control}
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className={`w-full ${fieldBrandCls}`} aria-label="Tipo de producto">
+                  <SelectTrigger
+                    className={`w-full ${fieldBrandCls}`}
+                    aria-label="Tipo de producto"
+                  >
                     <SelectValue>{PRODUCT_TYPE_LABELS[field.value]}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {Object.values(PRODUCT_TYPES).map((v) => (
-                      <SelectItem key={v} value={v}>{PRODUCT_TYPE_LABELS[v]}</SelectItem>
+                      <SelectItem key={v} value={v}>
+                        {PRODUCT_TYPE_LABELS[v]}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -260,7 +337,9 @@ export function FileComplaintForm({ onFiled }: Props) {
             />
           </div>
           <div className="md:col-span-2">
-            <Label htmlFor="productDesc" className={labelCls}>Descripción del producto o servicio</Label>
+            <Label htmlFor="productDesc" className={labelCls}>
+              Descripción del producto o servicio
+            </Label>
             <Input
               id="productDesc"
               type="text"
@@ -268,7 +347,9 @@ export function FileComplaintForm({ onFiled }: Props) {
               placeholder="Ej.: Préstamo personal #A1B2C3D4"
               {...register('productDescription')}
             />
-            {errors.productDescription && <p className={errorCls}>{errors.productDescription.message}</p>}
+            {errors.productDescription && (
+              <p className={errorCls}>{errors.productDescription.message}</p>
+            )}
           </div>
         </div>
 
@@ -285,13 +366,21 @@ export function FileComplaintForm({ onFiled }: Props) {
               className={fieldBrandCls}
               {...register('claimedAmount' as const)}
             />
-            {errors.claimedAmount && <p className={errorCls}>{errors.claimedAmount.message as string}</p>}
+            {errors.claimedAmount && (
+              <p className={errorCls}>{errors.claimedAmount.message as string}</p>
+            )}
           </div>
           <div>
             <Label htmlFor="loanId" className={labelCls}>
               ID del préstamo <span className="text-gray-400 font-normal">— opcional</span>
             </Label>
-            <Input id="loanId" type="text" className={fieldBrandCls} placeholder="UUID si aplica" {...register('loanId')} />
+            <Input
+              id="loanId"
+              type="text"
+              className={fieldBrandCls}
+              placeholder="UUID si aplica"
+              {...register('loanId')}
+            />
             {errors.loanId && <p className={errorCls}>{errors.loanId.message}</p>}
           </div>
         </div>
@@ -311,10 +400,11 @@ export function FileComplaintForm({ onFiled }: Props) {
           {Object.values(CLAIM_TYPES).map((v) => (
             <label
               key={v}
-              className={`relative flex flex-col gap-2 p-4 rounded-lg border cursor-pointer transition-all ${claimType === v
+              className={`relative flex flex-col gap-2 p-4 rounded-lg border cursor-pointer transition-all ${
+                claimType === v
                   ? 'border-brand-primary dark:border-brand-secondary bg-brand-surface'
                   : 'border-gray-200 dark:border-[#334155] hover:border-gray-300 dark:hover:border-[#475569]'
-                }`}
+              }`}
             >
               <div className="flex items-center gap-2">
                 <input
@@ -333,7 +423,9 @@ export function FileComplaintForm({ onFiled }: Props) {
         </div>
 
         <div>
-          <Label htmlFor="claimDetail" className={labelCls}>Detalle</Label>
+          <Label htmlFor="claimDetail" className={labelCls}>
+            Detalle
+          </Label>
           <Textarea
             id="claimDetail"
             rows={5}
@@ -345,7 +437,9 @@ export function FileComplaintForm({ onFiled }: Props) {
         </div>
 
         <div className="mt-5">
-          <Label htmlFor="consumerRequest" className={labelCls}>Pedido concreto</Label>
+          <Label htmlFor="consumerRequest" className={labelCls}>
+            Pedido concreto
+          </Label>
           <Textarea
             id="consumerRequest"
             rows={5}
@@ -370,9 +464,13 @@ export function FileComplaintForm({ onFiled }: Props) {
           className="w-full bg-brand-primary hover:bg-brand-primary-hover text-white shadow-lg"
         >
           {submitting ? (
-            <><Loader2 className="h-4 w-4 animate-spin" /> Registrando...</>
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Registrando...
+            </>
           ) : (
-            <>Enviar reclamo <Send className="h-4 w-4" aria-hidden="true" /></>
+            <>
+              Enviar reclamo <Send className="h-4 w-4" aria-hidden="true" />
+            </>
           )}
         </Button>
       </Card>

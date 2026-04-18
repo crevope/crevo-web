@@ -15,25 +15,23 @@ export const contentType = 'image/png'
 export default function Icon512() {
   const MARK_SIZE = 320 // 62.5% of 512
   return new ImageResponse(
-    (
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: BRAND_COLORS.primary,
-        }}
-      >
-        <svg viewBox="0 0 64 64" width={MARK_SIZE} height={MARK_SIZE}>
-          <path
-            d="M 36 16 A 20 20 0 1 0 36 48 L 60 32 L 30 40 A 10 10 0 1 1 30 24 Z"
-            fill={BRAND_COLORS.white}
-          />
-        </svg>
-      </div>
-    ),
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: BRAND_COLORS.primary,
+      }}
+    >
+      <svg viewBox="0 0 64 64" width={MARK_SIZE} height={MARK_SIZE}>
+        <path
+          d="M 36 16 A 20 20 0 1 0 36 48 L 60 32 L 30 40 A 10 10 0 1 1 30 24 Z"
+          fill={BRAND_COLORS.white}
+        />
+      </svg>
+    </div>,
     { ...size },
   )
 }

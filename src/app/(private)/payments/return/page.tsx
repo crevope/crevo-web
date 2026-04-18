@@ -50,14 +50,19 @@ export default function PaymentReturnPage() {
   if (status === 'success') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-        <div className={`${cardCls} w-full max-w-md p-8 flex flex-col items-center gap-6 text-center`}>
+        <div
+          className={`${cardCls} w-full max-w-md p-8 flex flex-col items-center gap-6 text-center`}
+        >
           <div className="w-16 h-16 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
             <CheckCircle2 className="h-9 w-9 text-green-600 dark:text-green-400" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">¡Pago exitoso!</h1>
+            <h1 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">
+              ¡Pago exitoso!
+            </h1>
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-              Tu pago fue procesado correctamente. Puede tomar unos momentos en reflejarse en tu préstamo.
+              Tu pago fue procesado correctamente. Puede tomar unos momentos en reflejarse en tu
+              préstamo.
             </p>
             {orderId && (
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Referencia: {orderId}</p>
@@ -94,12 +99,16 @@ export default function PaymentReturnPage() {
   if (status === 'pending') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-        <div className={`${cardCls} w-full max-w-md p-8 flex flex-col items-center gap-6 text-center`}>
+        <div
+          className={`${cardCls} w-full max-w-md p-8 flex flex-col items-center gap-6 text-center`}
+        >
           <div className="w-16 h-16 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
             <Clock className="h-9 w-9 text-yellow-600 dark:text-yellow-400" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">Pago en proceso</h1>
+            <h1 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">
+              Pago en proceso
+            </h1>
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
               Tu pago está siendo procesado. Te notificaremos cuando se confirme.
             </p>
@@ -118,12 +127,16 @@ export default function PaymentReturnPage() {
   // failed
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-      <div className={`${cardCls} w-full max-w-md p-8 flex flex-col items-center gap-6 text-center`}>
+      <div
+        className={`${cardCls} w-full max-w-md p-8 flex flex-col items-center gap-6 text-center`}
+      >
         <div className="w-16 h-16 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
           <XCircle className="h-9 w-9 text-red-600 dark:text-red-400" />
         </div>
         <div>
-          <h1 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">Pago no completado</h1>
+          <h1 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">
+            Pago no completado
+          </h1>
           <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
             El pago expiró o fue cancelado. Puedes intentarlo nuevamente cuando quieras.
           </p>

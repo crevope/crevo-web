@@ -9,8 +9,7 @@ export const SAU_CATEGORY_LABELS: Record<SauCategory, string> = {
 export const SAU_CATEGORY_DESCRIPTIONS: Record<SauCategory, string> = {
   QUERY:
     'Una duda sobre tu cuenta, una tasa, un pago, un documento, o cualquier aspecto del producto.',
-  SUGGESTION:
-    'Una idea para mejorar la plataforma o un comentario sobre tu experiencia con Crevo.',
+  SUGGESTION: 'Una idea para mejorar la plataforma o un comentario sobre tu experiencia con Crevo.',
   COMPLAINT:
     'Una queja formal sobre la atención recibida o un incumplimiento del servicio. Si tu reclamo es sobre el producto en sí, usa el Libro de Reclamaciones (INDECOPI).',
 }

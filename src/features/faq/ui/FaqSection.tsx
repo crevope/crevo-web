@@ -1,9 +1,4 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/shared/ui/accordion'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/shared/ui/accordion'
 import { FAQS } from '../data/faqs'
 
 /**
@@ -39,12 +34,11 @@ export function FaqSection() {
             id="faq-heading"
             className="text-3xl lg:text-4xl font-bold text-[#0A192F] dark:text-white tracking-tight"
           >
-            Resolvemos tus dudas sobre{' '}
-            <span className="text-[#D4AF37]">préstamos online</span>
+            Resolvemos tus dudas sobre <span className="text-[#D4AF37]">préstamos online</span>
           </h2>
           <p className="mt-4 text-base text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
-            Todo lo que necesitas saber antes de pedir tu primer préstamo con Crevo:
-            montos, requisitos, tiempos y seguridad.
+            Todo lo que necesitas saber antes de pedir tu primer préstamo con Crevo: montos,
+            requisitos, tiempos y seguridad.
           </p>
         </div>
 

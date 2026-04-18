@@ -37,7 +37,9 @@ export function LoginForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {/* Email */}
       <div className="space-y-1.5">
-        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Email</label>
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+          Email
+        </label>
         <input
           type="email"
           placeholder="tu@email.com"
@@ -54,7 +56,9 @@ export function LoginForm() {
 
       {/* Password */}
       <div className="space-y-1.5">
-        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Contraseña</label>
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+          Contraseña
+        </label>
         <div className="relative">
           <input
             type={showPass ? 'text' : 'password'}
@@ -65,12 +69,16 @@ export function LoginForm() {
           />
           <button
             type="button"
-            onClick={() => setShowPass(p => !p)}
+            onClick={() => setShowPass((p) => !p)}
             aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
             aria-pressed={showPass}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
-            {showPass ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+            {showPass ? (
+              <EyeOff className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <Eye className="h-4 w-4" aria-hidden="true" />
+            )}
           </button>
         </div>
         {errors.password && (
@@ -102,9 +110,14 @@ export function LoginForm() {
           className="w-full py-3 cursor-pointer rounded-lg bg-[#0A192F] text-[#D4AF37] font-bold text-base hover:bg-[#112240] hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 transition-all flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
-            <><Loader2 className="h-4 w-4 animate-spin" /> Iniciando sesión...</>
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Iniciando sesión...
+            </>
           ) : (
-            <><span>Iniciar Sesión</span><ArrowRight className="h-4 w-4" aria-hidden="true" /></>
+            <>
+              <span>Iniciar Sesión</span>
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </>
           )}
         </button>
       </div>

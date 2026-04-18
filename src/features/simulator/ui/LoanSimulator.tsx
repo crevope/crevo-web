@@ -5,14 +5,14 @@ import { useTheme } from 'next-themes'
 import { Zap, TrendingUp, Star, Info, Download, Loader2, Lock } from 'lucide-react'
 import { Skeleton } from '@/shared/ui/skeleton'
 import Link from 'next/link'
-import { simulate, downloadSummary, type SimulationResult, type LoanProductType, type PaymentFrequency } from '../api/simulatorRepository'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/ui/select'
+  simulate,
+  downloadSummary,
+  type SimulationResult,
+  type LoanProductType,
+  type PaymentFrequency,
+} from '../api/simulatorRepository'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 
 // ─── Config por producto ──────────────────────────────────────────────────────
 
@@ -66,8 +66,12 @@ function range(min: number, max: number): number[] {
 export function LoanSimulator() {
   const [product, setProduct] = useState<LoanProductType>('EXPRESS')
   const [amount, setAmount] = useState<number>(PRODUCT_CONFIG.EXPRESS.defaultAmount)
-  const [frequency, setFrequency] = useState<PaymentFrequency>(PRODUCT_CONFIG.EXPRESS.defaultFrequency)
-  const [installments, setInstallments] = useState<number>(PRODUCT_CONFIG.EXPRESS.defaultInstallments)
+  const [frequency, setFrequency] = useState<PaymentFrequency>(
+    PRODUCT_CONFIG.EXPRESS.defaultFrequency,
+  )
+  const [installments, setInstallments] = useState<number>(
+    PRODUCT_CONFIG.EXPRESS.defaultInstallments,
+  )
 
   const [result, setResult] = useState<SimulationResult | null>(null)
   const [loading, setLoading] = useState(true)
@@ -140,17 +144,17 @@ export function LoanSimulator() {
   const fillColor = isDark ? '#D4AF37' : '#0A192F'
   const trackColor = isDark ? 'rgba(255,255,255,0.12)' : '#E5E7EB'
   const fillPct = ((amount - cfg.minAmount) / (cfg.maxAmount - cfg.minAmount)) * 100
-  const rangeStyle = { background: `linear-gradient(to right, ${fillColor} ${fillPct}%, ${trackColor} ${fillPct}%)` }
+  const rangeStyle = {
+    background: `linear-gradient(to right, ${fillColor} ${fillPct}%, ${trackColor} ${fillPct}%)`,
+  }
   const totalFees = result ? result.techFee + result.maintenanceFeeTotal + result.igvAmount : null
   const freqLabel = frequency === 'MENSUAL' ? 'mensual' : 'quincenal'
 
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-
         {/* ── Controls ───────────────────────────────────────────────── */}
         <div className="space-y-8">
-
           {/* Producto */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
@@ -160,10 +164,11 @@ export function LoanSimulator() {
               <button
                 type="button"
                 onClick={() => handleProductChange('EXPRESS')}
-                className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-1.5 ${product === 'EXPRESS'
-                  ? 'border-[#00E5FF] bg-[#00E5FF]/10 text-[#0A192F] dark:text-white'
-                  : 'border-gray-200 dark:border-[#334155] text-gray-500 hover:border-[#00E5FF] hover:text-[#00E5FF]'
-                  }`}
+                className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-1.5 ${
+                  product === 'EXPRESS'
+                    ? 'border-[#00E5FF] bg-[#00E5FF]/10 text-[#0A192F] dark:text-white'
+                    : 'border-gray-200 dark:border-[#334155] text-gray-500 hover:border-[#00E5FF] hover:text-[#00E5FF]'
+                }`}
               >
                 <Zap className="h-4 w-4 text-[#00E5FF] shrink-0" />
                 Express
@@ -171,10 +176,11 @@ export function LoanSimulator() {
               <button
                 type="button"
                 onClick={() => handleProductChange('FLEX')}
-                className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-1.5 ${product === 'FLEX'
-                  ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#0A192F] dark:text-white'
-                  : 'border-gray-200 dark:border-[#334155] text-gray-500 hover:border-[#D4AF37] hover:text-[#D4AF37]'
-                  }`}
+                className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-1.5 ${
+                  product === 'FLEX'
+                    ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#0A192F] dark:text-white'
+                    : 'border-gray-200 dark:border-[#334155] text-gray-500 hover:border-[#D4AF37] hover:text-[#D4AF37]'
+                }`}
               >
                 <TrendingUp className="h-4 w-4 shrink-0" />
                 Flex
@@ -182,10 +188,11 @@ export function LoanSimulator() {
               <button
                 type="button"
                 onClick={() => handleProductChange('PLUS')}
-                className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-1.5 ${product === 'PLUS'
-                  ? 'border-purple-400 bg-purple-400/10 text-[#0A192F] dark:text-white'
-                  : 'border-gray-200 dark:border-[#334155] text-gray-500 hover:border-purple-400 hover:text-purple-400'
-                  }`}
+                className={`flex-1 py-3 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-1.5 ${
+                  product === 'PLUS'
+                    ? 'border-purple-400 bg-purple-400/10 text-[#0A192F] dark:text-white'
+                    : 'border-gray-200 dark:border-[#334155] text-gray-500 hover:border-purple-400 hover:text-purple-400'
+                }`}
               >
                 <Star className="h-4 w-4 shrink-0" />
                 Plus
@@ -251,7 +258,10 @@ export function LoanSimulator() {
           {/* Frecuencia + Cuotas */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="frequency" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+              <label
+                htmlFor="frequency"
+                className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5"
+              >
                 Frecuencia
               </label>
               {/* PLUS: solo mensual — mostrar como texto fijo */}
@@ -265,7 +275,9 @@ export function LoanSimulator() {
                   onValueChange={(val) => setFrequency(val as PaymentFrequency)}
                 >
                   <SelectTrigger className="w-full h-10 rounded-md border-gray-200 dark:border-white/10 bg-white dark:bg-[#0F172A] text-gray-700 dark:text-white px-3 text-sm">
-                    <SelectValue>{{ MENSUAL: 'Mensual', QUINCENAL: 'Quincenal' }[frequency]}</SelectValue>
+                    <SelectValue>
+                      {{ MENSUAL: 'Mensual', QUINCENAL: 'Quincenal' }[frequency]}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="QUINCENAL">Quincenal</SelectItem>
@@ -275,7 +287,10 @@ export function LoanSimulator() {
               )}
             </div>
             <div>
-              <label htmlFor="numInstallments" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+              <label
+                htmlFor="numInstallments"
+                className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5"
+              >
                 Cuotas
               </label>
               {/* EXPRESS: solo 1 cuota, sin selector */}
@@ -289,7 +304,9 @@ export function LoanSimulator() {
                   onValueChange={(val) => setInstallments(Number(val))}
                 >
                   <SelectTrigger className="w-full h-10 rounded-md border-gray-200 dark:border-white/10 bg-white dark:bg-[#0F172A] text-gray-700 dark:text-white px-3 text-sm">
-                    <SelectValue>{installments} cuota{installments > 1 ? 's' : ''}</SelectValue>
+                    <SelectValue>
+                      {installments} cuota{installments > 1 ? 's' : ''}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {range(cfg.minInstallments, cfg.maxInstallments).map((n) => (
@@ -306,7 +323,6 @@ export function LoanSimulator() {
 
         {/* ── Summary Card (navy) ────────────────────────────────────── */}
         <div className="bg-linear-to-br from-[#0A192F] to-[#0A192F]/90 dark:bg-[#0F172A] rounded-2xl p-6 sm:p-7 text-white flex flex-col justify-between shadow-lg relative overflow-hidden border border-gray-700/30">
-
           {/* Decorative corner */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-[#00E5FF]/20 to-transparent rounded-bl-full z-0" />
 
@@ -317,7 +333,7 @@ export function LoanSimulator() {
 
             {loading || !result ? (
               <div className="space-y-4">
-                {[1, 2, 3, 4].map(i => (
+                {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="flex justify-between items-center">
                     <Skeleton className="h-4 w-32 bg-white/10" />
                     <Skeleton className="h-4 w-20 bg-white/10" />
@@ -341,7 +357,11 @@ export function LoanSimulator() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400">Plazo</span>
-                    <span className="font-semibold">{result.numInstallments} cuota{result.numInstallments > 1 ? 's' : ''} {freqLabel}{result.numInstallments > 1 ? 's' : ''}</span>
+                    <span className="font-semibold">
+                      {result.numInstallments} cuota{result.numInstallments > 1 ? 's' : ''}{' '}
+                      {freqLabel}
+                      {result.numInstallments > 1 ? 's' : ''}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400">Interés</span>
@@ -359,11 +379,15 @@ export function LoanSimulator() {
                   <div className="w-full h-px bg-gray-700/60 my-2" />
                   <div className="flex justify-between items-center">
                     <span className="text-gray-300 font-medium">TEA</span>
-                    <span className="font-semibold text-[#D4AF37]">{result.teaPercent.toFixed(2)}% anual</span>
+                    <span className="font-semibold text-[#D4AF37]">
+                      {result.teaPercent.toFixed(2)}% anual
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-300 font-medium">TCEA</span>
-                    <span className="font-semibold text-[#D4AF37]">{result.tceaPercent.toFixed(2)}% anual</span>
+                    <span className="font-semibold text-[#D4AF37]">
+                      {result.tceaPercent.toFixed(2)}% anual
+                    </span>
                   </div>
 
                   <div className="w-full h-px bg-gray-700 my-2" />
@@ -427,8 +451,8 @@ export function LoanSimulator() {
       <div className="mt-6 text-xs text-gray-500 text-center flex items-start justify-center gap-2">
         <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
         <p className="max-w-2xl">
-          Simulación referencial. Los valores reales, incluyendo TEA y TCEA, se calcularán en base
-          a tu perfil crediticio y serán detallados en tu propuesta oficial antes de aceptar el
+          Simulación referencial. Los valores reales, incluyendo TEA y TCEA, se calcularán en base a
+          tu perfil crediticio y serán detallados en tu propuesta oficial antes de aceptar el
           préstamo. Crevo Plus requiere mínimo 10 préstamos cancelados.
         </p>
       </div>

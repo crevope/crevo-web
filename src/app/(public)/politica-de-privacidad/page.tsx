@@ -26,14 +26,16 @@ export default function PrivacyPolicyPage() {
       <div className="callout">
         <strong>En una sola línea:</strong> Recopilamos solo los datos necesarios para evaluarte y
         otorgarte un préstamo, los protegemos con cifrado, no los vendemos a terceros y tú puedes
-        ejercer en cualquier momento tus derechos ARCO (acceso, rectificación, cancelación, oposición).
+        ejercer en cualquier momento tus derechos ARCO (acceso, rectificación, cancelación,
+        oposición).
       </div>
 
       <h2>1. Identidad del responsable del tratamiento</h2>
       <p>
-        El responsable del tratamiento de tus datos personales es <strong>{LEGAL_COMPANY.legalName}</strong>{' '}
-        (en adelante, "Crevo"), con RUC <strong>{LEGAL_COMPANY.ruc}</strong> y domicilio en{' '}
-        {LEGAL_COMPANY.address}. Para asuntos de privacidad puedes contactarnos en{' '}
+        El responsable del tratamiento de tus datos personales es{' '}
+        <strong>{LEGAL_COMPANY.legalName}</strong> (en adelante, "Crevo"), con RUC{' '}
+        <strong>{LEGAL_COMPANY.ruc}</strong> y domicilio en {LEGAL_COMPANY.address}. Para asuntos de
+        privacidad puedes contactarnos en{' '}
         <a href={`mailto:${LEGAL_COMPANY.privacyEmail}`}>{LEGAL_COMPANY.privacyEmail}</a>.
       </p>
       <p>
@@ -73,7 +75,10 @@ export default function PrivacyPolicyPage() {
       <ul>
         <li>Dirección IP, tipo de dispositivo, sistema operativo, navegador.</li>
         <li>Datos de geolocalización aproximada (a nivel ciudad/región).</li>
-        <li>Cookies y tecnologías similares (ver <a href={LEGAL_URLS.COOKIES}>Política de Cookies</a>).</li>
+        <li>
+          Cookies y tecnologías similares (ver <a href={LEGAL_URLS.COOKIES}>Política de Cookies</a>
+          ).
+        </li>
         <li>Logs de actividad en la Plataforma (acciones, horarios, resultados).</li>
       </ul>
 
@@ -104,10 +109,21 @@ export default function PrivacyPolicyPage() {
       <h2>4. Base legal del tratamiento</h2>
       <p>El tratamiento de tus datos se sustenta en una o varias de las siguientes bases:</p>
       <ul>
-        <li><strong>Tu consentimiento expreso, libre, previo, inequívoco e informado</strong> al registrarte y aceptar esta Política.</li>
-        <li><strong>Ejecución de un contrato</strong> (el contrato de mutuo dinerario que celebras con Crevo).</li>
-        <li><strong>Cumplimiento de obligaciones legales</strong> (normativa tributaria, antilavado, protección al consumidor).</li>
-        <li><strong>Interés legítimo</strong> de Crevo para prevenir fraudes y mejorar el servicio.</li>
+        <li>
+          <strong>Tu consentimiento expreso, libre, previo, inequívoco e informado</strong> al
+          registrarte y aceptar esta Política.
+        </li>
+        <li>
+          <strong>Ejecución de un contrato</strong> (el contrato de mutuo dinerario que celebras con
+          Crevo).
+        </li>
+        <li>
+          <strong>Cumplimiento de obligaciones legales</strong> (normativa tributaria, antilavado,
+          protección al consumidor).
+        </li>
+        <li>
+          <strong>Interés legítimo</strong> de Crevo para prevenir fraudes y mejorar el servicio.
+        </li>
       </ul>
 
       <h2>5. ¿Con quién compartimos tus datos?</h2>
@@ -116,12 +132,31 @@ export default function PrivacyPolicyPage() {
         siguientes terceros, en la medida estrictamente necesaria para las finalidades descritas:
       </p>
       <ul>
-        <li><strong>Centrales de riesgo</strong> (Equifax Perú, Sentinel) para evaluar tu solvencia y reportar tu comportamiento de pago, conforme a la Ley N° 27489.</li>
-        <li><strong>Proveedores de KYC e identidad</strong> (p. ej. Truora) para verificación biométrica del DNI.</li>
-        <li><strong>Pasarelas de pago y proveedores de desembolsos</strong> (Culqi, Izipay y entidades del sistema financiero) para procesar cobros y abonos.</li>
-        <li><strong>Proveedores de infraestructura</strong> (Supabase / PostgreSQL, almacenamiento de archivos, mensajería transaccional) ubicados en jurisdicciones que ofrecen niveles adecuados de protección.</li>
-        <li><strong>Estudios de cobranza</strong> autorizados, en caso de mora, sujetos a obligaciones contractuales de confidencialidad.</li>
-        <li><strong>Autoridades competentes</strong> (Poder Judicial, Ministerio Público, SUNAT, UIF-Perú, ANPDP) cuando exista requerimiento debidamente fundamentado.</li>
+        <li>
+          <strong>Centrales de riesgo</strong> (Equifax Perú, Sentinel) para evaluar tu solvencia y
+          reportar tu comportamiento de pago, conforme a la Ley N° 27489.
+        </li>
+        <li>
+          <strong>Proveedores de KYC e identidad</strong> (p. ej. Truora) para verificación
+          biométrica del DNI.
+        </li>
+        <li>
+          <strong>Pasarelas de pago y proveedores de desembolsos</strong> (Culqi, Izipay y entidades
+          del sistema financiero) para procesar cobros y abonos.
+        </li>
+        <li>
+          <strong>Proveedores de infraestructura</strong> (Supabase / PostgreSQL, almacenamiento de
+          archivos, mensajería transaccional) ubicados en jurisdicciones que ofrecen niveles
+          adecuados de protección.
+        </li>
+        <li>
+          <strong>Estudios de cobranza</strong> autorizados, en caso de mora, sujetos a obligaciones
+          contractuales de confidencialidad.
+        </li>
+        <li>
+          <strong>Autoridades competentes</strong> (Poder Judicial, Ministerio Público, SUNAT,
+          UIF-Perú, ANPDP) cuando exista requerimiento debidamente fundamentado.
+        </li>
       </ul>
 
       <h2>6. Transferencia internacional de datos</h2>
@@ -129,20 +164,32 @@ export default function PrivacyPolicyPage() {
         Algunos de nuestros proveedores (alojamiento en la nube, mensajería) procesan datos en
         servidores ubicados fuera del Perú, principalmente en Estados Unidos y la Unión Europea.
         Estas transferencias se realizan al amparo de cláusulas contractuales tipo y/o políticas de
-        privacidad que ofrecen niveles de protección equivalentes a los exigidos por la Ley
-        N° 29733. Al aceptar esta Política consientes expresamente dichas transferencias.
+        privacidad que ofrecen niveles de protección equivalentes a los exigidos por la Ley N°
+        29733. Al aceptar esta Política consientes expresamente dichas transferencias.
       </p>
 
       <h2>7. Plazo de conservación</h2>
       <p>
-        Conservamos tus datos personales solo por el tiempo necesario para las finalidades
-        descritas y/o para cumplir nuestras obligaciones legales:
+        Conservamos tus datos personales solo por el tiempo necesario para las finalidades descritas
+        y/o para cumplir nuestras obligaciones legales:
       </p>
       <ul>
-        <li><strong>Datos del contrato de préstamo</strong>: durante la vigencia del préstamo y hasta diez (10) años después de su cancelación o reestructuración, conforme a las normas civiles y tributarias.</li>
-        <li><strong>Datos KYC</strong> (imagen DNI, selfie): durante diez (10) años desde el cierre de tu cuenta o último préstamo, por exigencias de prevención de lavado de activos (Ley N° 27693).</li>
-        <li><strong>Datos comerciales (marketing)</strong>: hasta que retires tu consentimiento.</li>
-        <li><strong>Logs de seguridad</strong>: doce (12) meses, salvo necesidad probatoria mayor.</li>
+        <li>
+          <strong>Datos del contrato de préstamo</strong>: durante la vigencia del préstamo y hasta
+          diez (10) años después de su cancelación o reestructuración, conforme a las normas civiles
+          y tributarias.
+        </li>
+        <li>
+          <strong>Datos KYC</strong> (imagen DNI, selfie): durante diez (10) años desde el cierre de
+          tu cuenta o último préstamo, por exigencias de prevención de lavado de activos (Ley N°
+          27693).
+        </li>
+        <li>
+          <strong>Datos comerciales (marketing)</strong>: hasta que retires tu consentimiento.
+        </li>
+        <li>
+          <strong>Logs de seguridad</strong>: doce (12) meses, salvo necesidad probatoria mayor.
+        </li>
       </ul>
 
       <h2>8. Medidas de seguridad</h2>
@@ -168,19 +215,33 @@ export default function PrivacyPolicyPage() {
         Conforme a la Ley N° 29733, en cualquier momento puedes ejercer los siguientes derechos:
       </p>
       <ul>
-        <li><strong>Acceso:</strong> conocer qué datos tuyos tratamos y para qué.</li>
-        <li><strong>Rectificación:</strong> corregir datos inexactos o desactualizados.</li>
-        <li><strong>Cancelación / supresión:</strong> solicitar la eliminación de tus datos, salvo que exista obligación legal de conservarlos.</li>
-        <li><strong>Oposición:</strong> oponerte a tratamientos específicos (típicamente, marketing).</li>
-        <li><strong>Información:</strong> recibir información clara sobre el tratamiento.</li>
-        <li><strong>Revocación del consentimiento:</strong> retirar tu consentimiento en cualquier momento, sin efecto retroactivo.</li>
+        <li>
+          <strong>Acceso:</strong> conocer qué datos tuyos tratamos y para qué.
+        </li>
+        <li>
+          <strong>Rectificación:</strong> corregir datos inexactos o desactualizados.
+        </li>
+        <li>
+          <strong>Cancelación / supresión:</strong> solicitar la eliminación de tus datos, salvo que
+          exista obligación legal de conservarlos.
+        </li>
+        <li>
+          <strong>Oposición:</strong> oponerte a tratamientos específicos (típicamente, marketing).
+        </li>
+        <li>
+          <strong>Información:</strong> recibir información clara sobre el tratamiento.
+        </li>
+        <li>
+          <strong>Revocación del consentimiento:</strong> retirar tu consentimiento en cualquier
+          momento, sin efecto retroactivo.
+        </li>
       </ul>
       <p>
         Para ejercer cualquiera de estos derechos envía una solicitud a{' '}
-        <a href={`mailto:${LEGAL_COMPANY.privacyEmail}`}>{LEGAL_COMPANY.privacyEmail}</a> adjuntando:
-        (i) tu nombre completo y número de DNI; (ii) descripción clara de tu pedido; (iii) copia de
-        tu DNI vigente para acreditar identidad. Responderemos tu solicitud en un plazo máximo de
-        veinte (20) días hábiles, conforme al Reglamento de la Ley.
+        <a href={`mailto:${LEGAL_COMPANY.privacyEmail}`}>{LEGAL_COMPANY.privacyEmail}</a>{' '}
+        adjuntando: (i) tu nombre completo y número de DNI; (ii) descripción clara de tu pedido;
+        (iii) copia de tu DNI vigente para acreditar identidad. Responderemos tu solicitud en un
+        plazo máximo de veinte (20) días hábiles, conforme al Reglamento de la Ley.
       </p>
       <p>
         Si consideras que tu solicitud no fue atendida adecuadamente, puedes presentar un reclamo
@@ -191,17 +252,17 @@ export default function PrivacyPolicyPage() {
       <h2>10. Datos de menores de edad</h2>
       <p>
         La Plataforma está dirigida exclusivamente a personas mayores de edad. No recopilamos
-        intencionalmente datos de menores de 18 años. Si detectamos que se ha registrado un menor
-        de edad procederemos a cerrar la cuenta y eliminar los datos, sin perjuicio de las acciones
+        intencionalmente datos de menores de 18 años. Si detectamos que se ha registrado un menor de
+        edad procederemos a cerrar la cuenta y eliminar los datos, sin perjuicio de las acciones
         legales que correspondan contra quien haya proporcionado información falsa.
       </p>
 
       <h2>11. Decisiones automatizadas</h2>
       <p>
-        Para aprobar o rechazar préstamos utilizamos modelos automatizados de scoring crediticio
-        que combinan información del Usuario, su comportamiento histórico en Crevo y su historial
-        en centrales de riesgo. En caso de rechazo automatizado tienes derecho a solicitar:
-        (i) explicación general de los criterios usados; (ii) revisión humana de la decisión por un
+        Para aprobar o rechazar préstamos utilizamos modelos automatizados de scoring crediticio que
+        combinan información del Usuario, su comportamiento histórico en Crevo y su historial en
+        centrales de riesgo. En caso de rechazo automatizado tienes derecho a solicitar: (i)
+        explicación general de los criterios usados; (ii) revisión humana de la decisión por un
         analista de Crevo. Las solicitudes deben enviarse a{' '}
         <a href={`mailto:${LEGAL_COMPANY.privacyEmail}`}>{LEGAL_COMPANY.privacyEmail}</a>.
       </p>
@@ -215,23 +276,24 @@ export default function PrivacyPolicyPage() {
 
       <h2>13. Cambios a esta Política</h2>
       <p>
-        Podremos actualizar esta Política para reflejar cambios legales, técnicos u operativos.
-        Los cambios sustanciales serán comunicados al correo electrónico registrado y/o mediante
-        aviso destacado en la Plataforma con la antelación adecuada. La fecha de la última
-        actualización siempre se muestra en el encabezado.
+        Podremos actualizar esta Política para reflejar cambios legales, técnicos u operativos. Los
+        cambios sustanciales serán comunicados al correo electrónico registrado y/o mediante aviso
+        destacado en la Plataforma con la antelación adecuada. La fecha de la última actualización
+        siempre se muestra en el encabezado.
       </p>
 
       <h2>14. Contacto</h2>
-      <p>
-        Para cualquier consulta o ejercicio de derechos sobre tus datos personales:
-      </p>
+      <p>Para cualquier consulta o ejercicio de derechos sobre tus datos personales:</p>
       <ul>
-        <li>Correo: <a href={`mailto:${LEGAL_COMPANY.privacyEmail}`}>{LEGAL_COMPANY.privacyEmail}</a></li>
+        <li>
+          Correo: <a href={`mailto:${LEGAL_COMPANY.privacyEmail}`}>{LEGAL_COMPANY.privacyEmail}</a>
+        </li>
         <li>Domicilio: {LEGAL_COMPANY.address}</li>
       </ul>
 
       <div className="callout" style={{ marginTop: '2rem' }}>
-        <strong>Última actualización:</strong> 15 de abril de 2026 (versión {LEGAL_VERSIONS.PRIVACY}).
+        <strong>Última actualización:</strong> 15 de abril de 2026 (versión {LEGAL_VERSIONS.PRIVACY}
+        ).
       </div>
     </LegalPageLayout>
   )

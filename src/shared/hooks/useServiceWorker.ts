@@ -21,10 +21,8 @@ export function useServiceWorker() {
     // Localhost over plain HTTP is fine; SWs require HTTPS otherwise and
     // the browser will refuse silently. Let the native check handle it.
 
-    navigator.serviceWorker
-      .register('/api/firebase-messaging-sw', { scope: '/' })
-      .catch(() => {
-        // No-op: caching is best-effort.
-      })
+    navigator.serviceWorker.register('/api/firebase-messaging-sw', { scope: '/' }).catch(() => {
+      // No-op: caching is best-effort.
+    })
   }, [])
 }

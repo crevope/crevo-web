@@ -27,14 +27,21 @@ export const authRepository = {
   },
 
   async register(dto: {
-    email: string; password: string; firstName: string
-    lastName: string; dni: string; phone: string
+    email: string
+    password: string
+    firstName: string
+    lastName: string
+    dni: string
+    phone: string
   }): Promise<{ user: AuthUser }> {
     const { data } = await apiClient.post('/auth/register', dto)
     // Backend returns: { id, email, firstName, lastName, emailVerified }
     const { id, email, firstName, lastName, emailVerified } = data.data
     const user: AuthUser = {
-      id, email, firstName, lastName,
+      id,
+      email,
+      firstName,
+      lastName,
       emailVerified: emailVerified ?? false,
       isIdentityVerified: false,
     }
@@ -104,14 +111,22 @@ export const authRepository = {
     clearClientSession()
   },
 
-  saveUser(user: AuthUser) { localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user)) },
+  saveUser(user: AuthUser) {
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user))
+  },
   /** Full client-side cleanup on logout: localStorage (preserves cookie
    *  consent + theme), sessionStorage CSRF, and the readable CSRF cookie. */
-  clearUser() { clearClientSession() },
+  clearUser() {
+    clearClientSession()
+  },
   getStoredUser(): AuthUser | null {
     if (typeof window === 'undefined') return null
     const raw = localStorage.getItem(USER_STORAGE_KEY)
     if (!raw || raw === 'undefined') return null
-    try { return JSON.parse(raw) } catch { return null }
+    try {
+      return JSON.parse(raw)
+    } catch {
+      return null
+    }
   },
 }

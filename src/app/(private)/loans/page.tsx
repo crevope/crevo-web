@@ -2,19 +2,22 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
-  Info, Download, Bell, Plus, Wallet, History, FileText,
-  Search, FolderOpen, Headphones, ArrowRight,
+  Info,
+  Download,
+  Bell,
+  Plus,
+  Wallet,
+  History,
+  FileText,
+  Search,
+  FolderOpen,
+  Headphones,
+  ArrowRight,
 } from 'lucide-react'
 import { useLoanStore, useLoanSummaries, type LoanSummary } from '@/features/request-loan'
 import { formatCurrency, formatDate, loanRef } from '@/shared/lib/utils'
 import type { Loan } from '@/entities/loan'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { Input } from '@/shared/ui/input'
 
@@ -35,12 +38,28 @@ function statusBorderColor(status: string) {
 
 function statusBadge(status: string) {
   if (ACTIVE_STATUSES.includes(status))
-    return <span className="px-2.5 py-0.5 bg-[#D4AF37]/10 text-yellow-700 dark:text-[#D4AF37] text-xs font-medium rounded-full">Activo</span>
+    return (
+      <span className="px-2.5 py-0.5 bg-[#D4AF37]/10 text-yellow-700 dark:text-[#D4AF37] text-xs font-medium rounded-full">
+        Activo
+      </span>
+    )
   if (REVIEW_STATUSES.includes(status))
-    return <span className="px-2.5 py-0.5 bg-[#00E5FF]/10 text-cyan-700 dark:text-[#00E5FF] text-xs font-medium rounded-full">En revisión</span>
+    return (
+      <span className="px-2.5 py-0.5 bg-[#00E5FF]/10 text-cyan-700 dark:text-[#00E5FF] text-xs font-medium rounded-full">
+        En revisión
+      </span>
+    )
   if (status === 'PAID')
-    return <span className="px-2.5 py-0.5 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-medium rounded-full">Pagado</span>
-  return <span className="px-2.5 py-0.5 bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 text-xs font-medium rounded-full">{status}</span>
+    return (
+      <span className="px-2.5 py-0.5 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-medium rounded-full">
+        Pagado
+      </span>
+    )
+  return (
+    <span className="px-2.5 py-0.5 bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 text-xs font-medium rounded-full">
+      {status}
+    </span>
+  )
 }
 
 function LoanCard({ loan, summary }: Readonly<{ loan: Loan; summary?: LoanSummary }>) {
@@ -52,17 +71,15 @@ function LoanCard({ loan, summary }: Readonly<{ loan: Loan; summary?: LoanSummar
   // Fall back to the original amount when the live balance hasn't loaded
   // yet or failed — better than showing 0 while we wait, and closed loans
   // never fetch a summary in the first place.
-  const remaining = summary && !summary.loading && !summary.error
-    ? summary.remaining
-    : isPaid
-      ? 0
-      : loan.amount
+  const remaining =
+    summary && !summary.loading && !summary.error ? summary.remaining : isPaid ? 0 : loan.amount
   const nextInstallment = summary?.nextInstallment
 
   return (
-    <div className={`${cardCls} p-6 border-l-2 ${statusBorderColor(loan.status)} hover:bg-gray-50 dark:hover:bg-[#0F172A]/50 transition-colors`}>
+    <div
+      className={`${cardCls} p-6 border-l-2 ${statusBorderColor(loan.status)} hover:bg-gray-50 dark:hover:bg-[#0F172A]/50 transition-colors`}
+    >
       <div className="flex flex-col lg:flex-row justify-between gap-6">
-
         {/* Left */}
         <div className="flex-1 space-y-4">
           {/* Title row */}
@@ -88,7 +105,10 @@ function LoanCard({ loan, summary }: Readonly<{ loan: Loan; summary?: LoanSummar
           {isReview ? (
             <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-[#0F172A] p-3 rounded-xl border border-gray-100 dark:border-white/6">
               <Info className="h-4 w-4 text-[#00E5FF]" aria-hidden="true" />
-              <span>Tu solicitud está siendo analizada por nuestro equipo. Recibirás una respuesta en las próximas 24-48 horas.</span>
+              <span>
+                Tu solicitud está siendo analizada por nuestro equipo. Recibirás una respuesta en
+                las próximas 24-48 horas.
+              </span>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-gray-100 dark:border-white/6">
@@ -113,11 +133,15 @@ function LoanCard({ loan, summary }: Readonly<{ loan: Loan; summary?: LoanSummar
                 {summary?.loading ? (
                   <Skeleton className="h-4 w-16" />
                 ) : nextInstallment ? (
-                  <p className={`text-sm font-bold ${nextInstallment.status === 'OVERDUE' ? 'text-red-500 dark:text-red-400' : 'text-yellow-600 dark:text-[#D4AF37]'}`}>
+                  <p
+                    className={`text-sm font-bold ${nextInstallment.status === 'OVERDUE' ? 'text-red-500 dark:text-red-400' : 'text-yellow-600 dark:text-[#D4AF37]'}`}
+                  >
                     {formatCurrency(nextInstallment.amount)}
                   </p>
                 ) : (
-                  <p className={`text-sm font-bold ${isActive ? 'text-yellow-600 dark:text-[#D4AF37]' : 'text-gray-500 dark:text-gray-400'}`}>
+                  <p
+                    className={`text-sm font-bold ${isActive ? 'text-yellow-600 dark:text-[#D4AF37]' : 'text-gray-500 dark:text-gray-400'}`}
+                  >
                     —
                   </p>
                 )}
@@ -181,22 +205,26 @@ export default function LoansPage() {
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<Sort>('recent')
 
-  useEffect(() => { loadMyLoans() }, [loadMyLoans])
+  useEffect(() => {
+    loadMyLoans()
+  }, [loadMyLoans])
 
   // Fetch balance + next installment for every active loan in parallel.
   // Closed loans skip the fetch inside the hook so we don't burn requests.
   const summaries = useLoanSummaries(loans)
 
-  const byTab = (tab: Tab) => loans.filter(l => {
-    if (tab === 'activos') return ACTIVE_STATUSES.includes(l.status)
-    if (tab === 'revision') return REVIEW_STATUSES.includes(l.status)
-    return CLOSED_STATUSES.includes(l.status)
-  })
+  const byTab = (tab: Tab) =>
+    loans.filter((l) => {
+      if (tab === 'activos') return ACTIVE_STATUSES.includes(l.status)
+      if (tab === 'revision') return REVIEW_STATUSES.includes(l.status)
+      return CLOSED_STATUSES.includes(l.status)
+    })
 
   const sortedAndFiltered = byTab(activeTab)
-    .filter(l =>
-      l.id.toLowerCase().includes(search.toLowerCase()) ||
-      formatCurrency(l.amount).includes(search)
+    .filter(
+      (l) =>
+        l.id.toLowerCase().includes(search.toLowerCase()) ||
+        formatCurrency(l.amount).includes(search),
     )
     .sort((a, b) => {
       if (sort === 'amount_high') return b.amount - a.amount
@@ -212,7 +240,7 @@ export default function LoansPage() {
   // cached original amount so the stat is never a suspicious 0 while
   // summaries are still loading.
   const totalActive = loans
-    .filter(l => ACTIVE_STATUSES.includes(l.status))
+    .filter((l) => ACTIVE_STATUSES.includes(l.status))
     .reduce((sum, l) => {
       const s = summaries[l.id]
       const value = s && !s.loading && !s.error ? s.remaining : l.amount
@@ -221,16 +249,31 @@ export default function LoansPage() {
   // Sum of the next unpaid installment across every active loan — this is
   // what the consumer has to budget for in the next cycle.
   const nextPaymentTotal = loans
-    .filter(l => ACTIVE_STATUSES.includes(l.status))
+    .filter((l) => ACTIVE_STATUSES.includes(l.status))
     .reduce((sum, l) => sum + (summaries[l.id]?.nextInstallment?.amount ?? 0), 0)
   const nextPaymentLoading = loans
-    .filter(l => ACTIVE_STATUSES.includes(l.status))
-    .some(l => summaries[l.id]?.loading !== false)
+    .filter((l) => ACTIVE_STATUSES.includes(l.status))
+    .some((l) => summaries[l.id]?.loading !== false)
 
   const tabs: { id: Tab; label: string; count: number; countCls: string }[] = [
-    { id: 'activos', label: 'Activos', count: activeCount, countCls: 'bg-[#D4AF37]/20 text-yellow-700 dark:text-[#D4AF37]' },
-    { id: 'revision', label: 'En revisión', count: reviewCount, countCls: 'bg-[#00E5FF]/20 text-cyan-700 dark:text-[#00E5FF]' },
-    { id: 'cerrados', label: 'Cerrados', count: closedCount, countCls: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300' },
+    {
+      id: 'activos',
+      label: 'Activos',
+      count: activeCount,
+      countCls: 'bg-[#D4AF37]/20 text-yellow-700 dark:text-[#D4AF37]',
+    },
+    {
+      id: 'revision',
+      label: 'En revisión',
+      count: reviewCount,
+      countCls: 'bg-[#00E5FF]/20 text-cyan-700 dark:text-[#00E5FF]',
+    },
+    {
+      id: 'cerrados',
+      label: 'Cerrados',
+      count: closedCount,
+      countCls: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',
+    },
   ]
 
   return (
@@ -238,7 +281,9 @@ export default function LoansPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-0.5">Mis Préstamos</h1>
+          <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-0.5">
+            Mis Préstamos
+          </h1>
           <p className="text-sm text-gray-400 dark:text-gray-500">
             Gestiona y consulta el estado de todos tus préstamos en Soles (S/).
           </p>
@@ -254,62 +299,76 @@ export default function LoansPage() {
             href="/request-loan"
             className="bg-[#D4AF37] text-[#0A192F] font-medium px-6 py-2 rounded-lg cursor-pointer flex items-center gap-2 hover:bg-[#B8941F] transition-colors"
           >
-            <Plus className="h-3 w-3" aria-hidden="true" />
-            {' '}
-            Nuevo Préstamo
+            <Plus className="h-3 w-3" aria-hidden="true" /> Nuevo Préstamo
           </Link>
         </div>
       </div>
 
       {/* Summary stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {isLoading ? (
-          [1, 2, 3].map(i => (
-            <div key={i} className={`${cardCls} p-6 flex flex-col justify-between`}>
-              <div className="mb-4">
-                <Skeleton className="w-9 h-9 rounded-lg" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-28" />
-                <Skeleton className="h-8 w-32" />
-              </div>
-            </div>
-          ))
-        ) : (
-          [
-            { icon: Wallet, iconBg: 'bg-[#D4AF37]/20 text-yellow-600 dark:text-[#D4AF37]', label: 'Total Activo', value: formatCurrency(totalActive), loading: false },
-            {
-              icon: History,
-              iconBg: 'bg-[#00E5FF]/20 text-cyan-600 dark:text-[#00E5FF]',
-              label: 'Próximo Pago Total',
-              // Show a dash (not "S/ 0.00") when there's no active loan or
-              // every active loan is already paid through the horizon —
-              // the latter is a legitimate state after a bulk payoff.
-              value: nextPaymentTotal > 0 ? formatCurrency(nextPaymentTotal) : '—',
-              loading: activeCount > 0 && nextPaymentLoading,
-            },
-            { icon: FileText, iconBg: 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400', label: 'Préstamos en Revisión', value: String(reviewCount), loading: false },
-          ].map(s => {
-            const StatIcon = s.icon
-            return (
-              <div key={s.label} className={`${cardCls} p-6 flex flex-col justify-between`}>
+        {isLoading
+          ? [1, 2, 3].map((i) => (
+              <div key={i} className={`${cardCls} p-6 flex flex-col justify-between`}>
                 <div className="mb-4">
-                  <div className={`w-9 h-9 rounded-lg ${s.iconBg} flex items-center justify-center`}>
-                    <StatIcon className="h-4 w-4" aria-hidden="true" />
+                  <Skeleton className="w-9 h-9 rounded-lg" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-3 w-28" />
+                  <Skeleton className="h-8 w-32" />
+                </div>
+              </div>
+            ))
+          : [
+              {
+                icon: Wallet,
+                iconBg: 'bg-[#D4AF37]/20 text-yellow-600 dark:text-[#D4AF37]',
+                label: 'Total Activo',
+                value: formatCurrency(totalActive),
+                loading: false,
+              },
+              {
+                icon: History,
+                iconBg: 'bg-[#00E5FF]/20 text-cyan-600 dark:text-[#00E5FF]',
+                label: 'Próximo Pago Total',
+                // Show a dash (not "S/ 0.00") when there's no active loan or
+                // every active loan is already paid through the horizon —
+                // the latter is a legitimate state after a bulk payoff.
+                value: nextPaymentTotal > 0 ? formatCurrency(nextPaymentTotal) : '—',
+                loading: activeCount > 0 && nextPaymentLoading,
+              },
+              {
+                icon: FileText,
+                iconBg: 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400',
+                label: 'Préstamos en Revisión',
+                value: String(reviewCount),
+                loading: false,
+              },
+            ].map((s) => {
+              const StatIcon = s.icon
+              return (
+                <div key={s.label} className={`${cardCls} p-6 flex flex-col justify-between`}>
+                  <div className="mb-4">
+                    <div
+                      className={`w-9 h-9 rounded-lg ${s.iconBg} flex items-center justify-center`}
+                    >
+                      <StatIcon className="h-4 w-4" aria-hidden="true" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">
+                      {s.label}
+                    </p>
+                    {s.loading ? (
+                      <Skeleton className="h-8 w-32" />
+                    ) : (
+                      <h3 className="text-2xl font-bold text-[#0A192F] dark:text-white">
+                        {s.value}
+                      </h3>
+                    )}
                   </div>
                 </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">{s.label}</p>
-                  {s.loading ? (
-                    <Skeleton className="h-8 w-32" />
-                  ) : (
-                    <h3 className="text-2xl font-bold text-[#0A192F] dark:text-white">{s.value}</h3>
-                  )}
-                </div>
-              </div>
-            )
-          })
-        )}
+              )
+            })}
       </div>
 
       {/* Tabs + filters */}
@@ -317,14 +376,15 @@ export default function LoansPage() {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           {/* Tabs */}
           <div className="flex gap-6 w-full lg:w-auto border-b border-gray-100 dark:border-white/6 lg:border-none">
-            {tabs.map(tab => (
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`pb-3 lg:pb-2 font-medium text-sm transition-all border-b-[1.5px] ${activeTab === tab.id
-                  ? 'text-[#0A192F] dark:text-[#D4AF37] border-[#0A192F] dark:border-[#D4AF37]'
-                  : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
-                  }`}
+                className={`pb-3 lg:pb-2 font-medium text-sm transition-all border-b-[1.5px] ${
+                  activeTab === tab.id
+                    ? 'text-[#0A192F] dark:text-[#D4AF37] border-[#0A192F] dark:border-[#D4AF37]'
+                    : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-500'
+                }`}
               >
                 {tab.label}
                 <span className={`ml-2 ${tab.countCls} text-xs py-0.5 px-2 rounded-full`}>
@@ -337,12 +397,15 @@ export default function LoansPage() {
           {/* Search + Sort */}
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" aria-hidden="true" />
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10"
+                aria-hidden="true"
+              />
               <Input
                 type="text"
                 placeholder="Buscar préstamo..."
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
               />
             </div>
@@ -350,7 +413,14 @@ export default function LoansPage() {
               <Select value={sort} onValueChange={(val) => setSort(val as Sort)}>
                 <SelectTrigger className="w-full py-2.5">
                   <SelectValue>
-                    {{ recent: 'Más recientes', amount_high: 'Monto mayor', amount_low: 'Monto menor', due_soon: 'Próximo a vencer' }[sort]}
+                    {
+                      {
+                        recent: 'Más recientes',
+                        amount_high: 'Monto mayor',
+                        amount_low: 'Monto menor',
+                        due_soon: 'Próximo a vencer',
+                      }[sort]
+                    }
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
@@ -368,8 +438,11 @@ export default function LoansPage() {
       {/* Loan list */}
       {isLoading ? (
         <div className="space-y-4">
-          {[1, 2, 3].map(i => (
-            <div key={i} className={`${cardCls} p-6 border-l-2 border-l-gray-200 dark:border-l-white/10`}>
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className={`${cardCls} p-6 border-l-2 border-l-gray-200 dark:border-l-white/10`}
+            >
               <div className="flex flex-col lg:flex-row justify-between gap-6">
                 <div className="flex-1 space-y-4">
                   <div className="flex justify-between items-start">
@@ -383,7 +456,7 @@ export default function LoansPage() {
                     <Skeleton className="h-6 w-24 hidden lg:block" />
                   </div>
                   <div className="grid grid-cols-4 gap-4 pt-4 border-t border-gray-100 dark:border-white/6">
-                    {[1, 2, 3, 4].map(j => (
+                    {[1, 2, 3, 4].map((j) => (
                       <div key={j} className="space-y-1.5">
                         <Skeleton className="h-3 w-20" />
                         <Skeleton className="h-4 w-16" />
@@ -402,14 +475,17 @@ export default function LoansPage() {
         </div>
       ) : sortedAndFiltered.length === 0 ? (
         <div className={`${cardCls} p-16 text-center`}>
-          <FolderOpen className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" aria-hidden="true" />
+          <FolderOpen
+            className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-4"
+            aria-hidden="true"
+          />
           <p className="text-gray-500 dark:text-gray-400 font-medium">
             {search ? 'No se encontraron resultados.' : 'No tienes préstamos en esta categoría.'}
           </p>
         </div>
       ) : (
         <div className="space-y-6">
-          {sortedAndFiltered.map(loan => (
+          {sortedAndFiltered.map((loan) => (
             <LoanCard key={loan.id} loan={loan} summary={summaries[loan.id]} />
           ))}
         </div>
@@ -424,7 +500,9 @@ export default function LoansPage() {
           </div>
           <div>
             <h3 className="text-white font-medium text-lg">¿Necesitas ayuda con tus préstamos?</h3>
-            <p className="text-sm text-gray-300">Nuestro equipo de soporte está disponible 24/7 en todo el Perú.</p>
+            <p className="text-sm text-gray-300">
+              Nuestro equipo de soporte está disponible 24/7 en todo el Perú.
+            </p>
           </div>
         </div>
         <button className="w-full md:w-auto px-6 py-2.5 rounded-lg cursor-pointer border border-white/20 text-white hover:bg-white/10 transition-colors text-sm font-medium z-10 flex items-center justify-center gap-2">

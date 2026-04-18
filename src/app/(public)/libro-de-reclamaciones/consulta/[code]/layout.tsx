@@ -14,8 +14,6 @@ export const metadata = buildMetadata({
   index: false,
 })
 
-export default function ConsultaCodeLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function ConsultaCodeLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return children
 }

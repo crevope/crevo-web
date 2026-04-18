@@ -36,11 +36,5 @@ export type {
 } from './lib/complaintsConstants'
 
 // Schemas
-export {
-  fileComplaintSchema,
-  consultComplaintSchema,
-} from './lib/complaintsSchemas'
-export type {
-  FileComplaintInput,
-  ConsultComplaintInput,
-} from './lib/complaintsSchemas'
+export { fileComplaintSchema, consultComplaintSchema } from './lib/complaintsSchemas'
+export type { FileComplaintInput, ConsultComplaintInput } from './lib/complaintsSchemas'

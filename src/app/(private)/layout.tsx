@@ -13,16 +13,27 @@ import { usePushNotifications } from '@/shared/hooks/usePushNotifications'
 export default function PrivateLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const router = useRouter()
   const { user, isAuthenticated, isLoading, loadUser } = useAuthStore()
-  const { unreadCount, load: loadNotifications, subscribeRealtime, unsubscribeRealtime } = useNotificationStore()
+  const {
+    unreadCount,
+    load: loadNotifications,
+    subscribeRealtime,
+    unsubscribeRealtime,
+  } = useNotificationStore()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   usePushNotifications()
 
-  useEffect(() => { loadUser() }, [loadUser])
-  useEffect(() => { loadNotifications() }, [loadNotifications])
+  useEffect(() => {
+    loadUser()
+  }, [loadUser])
+  useEffect(() => {
+    loadNotifications()
+  }, [loadNotifications])
   useEffect(() => {
     if (!isAuthenticated || !user?.id) return
     subscribeRealtime(user.id)
-    return () => { unsubscribeRealtime() }
+    return () => {
+      unsubscribeRealtime()
+    }
   }, [isAuthenticated, user?.id, subscribeRealtime, unsubscribeRealtime])
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace('/login')
@@ -50,7 +61,10 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
         <Logo size={28} markColor="#FFFFFF" textColor="#D4AF37" />
 
         <div className="flex items-center gap-1">
-          <Link href="/notifications" className="relative p-1 text-gray-300 hover:text-white transition-colors">
+          <Link
+            href="/notifications"
+            className="relative p-1 text-gray-300 hover:text-white transition-colors"
+          >
             <Bell className="h-5 w-5" aria-hidden="true" />
             {unreadCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full bg-[#00E5FF] text-[#0A192F] text-[9px] font-bold flex items-center justify-center px-1">
@@ -70,9 +84,7 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
 
       {/* Main content */}
       <main className="lg:ml-64 min-h-screen">
-        <div className="max-w-[1366px] mx-auto p-6 lg:p-10">
-          {children}
-        </div>
+        <div className="max-w-[1366px] mx-auto p-6 lg:p-10">{children}</div>
       </main>
     </div>
   )

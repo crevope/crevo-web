@@ -21,7 +21,12 @@ export const bankAccountRepository = {
     const { data } = await apiClient.get('/bank-accounts')
     return data.data
   },
-  async addAccount(dto: { bankName: string; cci: string; alias?: string; isDefault?: boolean }): Promise<BankAccount> {
+  async addAccount(dto: {
+    bankName: string
+    cci: string
+    alias?: string
+    isDefault?: boolean
+  }): Promise<BankAccount> {
     const { data } = await apiClient.post('/bank-accounts', dto)
     return data.data
   },

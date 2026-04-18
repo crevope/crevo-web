@@ -4,8 +4,15 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import {
-  Loader2, Sparkles, TrendingDown, ArrowLeft, TriangleAlert,
-  PiggyBank, Lock, ShieldCheck, CreditCard,
+  Loader2,
+  Sparkles,
+  TrendingDown,
+  ArrowLeft,
+  TriangleAlert,
+  PiggyBank,
+  Lock,
+  ShieldCheck,
+  CreditCard,
 } from 'lucide-react'
 import { loanRepository, useLoanStore } from '@/features/request-loan'
 import { useAuthStore } from '@/features/auth'
@@ -16,13 +23,22 @@ const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-w
 
 export default function PayLoanPage() {
   const { loanId } = useParams<{ loanId: string }>()
-  const { selectedLoan: loan, balance, earlyPayoffQuote, isLoading, loadLoanDetails, loadEarlyPayoffQuote } = useLoanStore()
+  const {
+    selectedLoan: loan,
+    balance,
+    earlyPayoffQuote,
+    isLoading,
+    loadLoanDetails,
+    loadEarlyPayoffQuote,
+  } = useLoanStore()
   const { user } = useAuthStore()
   const [showEarlyPayoff, setShowEarlyPayoff] = useState(false)
   const [isPaying, setIsPaying] = useState(false)
   const [isEarlyPaying, setIsEarlyPaying] = useState(false)
 
-  useEffect(() => { loadLoanDetails(loanId) }, [loanId, loadLoanDetails])
+  useEffect(() => {
+    loadLoanDetails(loanId)
+  }, [loanId, loadLoanDetails])
   useEffect(() => {
     if (loan && ['ACTIVE', 'OVERDUE'].includes(loan.status)) loadEarlyPayoffQuote(loanId)
   }, [loanId, loan, loadEarlyPayoffQuote])
@@ -108,7 +124,9 @@ export default function PayLoanPage() {
             <p className="text-gray-300 text-sm">
               Vence el{' '}
               {new Date(balance.dueDate).toLocaleDateString('es-PE', {
-                day: 'numeric', month: 'long', year: 'numeric',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
               })}
             </p>
           )}
@@ -165,45 +183,63 @@ export default function PayLoanPage() {
 
           {/* Desglose */}
           <div className="bg-gray-50 dark:bg-white/4 border border-gray-200 dark:border-white/8 rounded-lg p-4 space-y-2 mb-4">
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Desglose</p>
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+              Desglose
+            </p>
 
             <div className="flex justify-between text-sm">
               <span className="text-gray-600 dark:text-gray-400">Capital pendiente</span>
-              <span className="font-medium text-gray-800 dark:text-gray-200">{formatCurrency(earlyPayoffQuote.outstandingPrincipal)}</span>
+              <span className="font-medium text-gray-800 dark:text-gray-200">
+                {formatCurrency(earlyPayoffQuote.outstandingPrincipal)}
+              </span>
             </div>
 
             <div className="flex justify-between text-sm">
               <span className="text-gray-600 dark:text-gray-400">
                 Interés devengado
-                <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">({earlyPayoffQuote.daysElapsed} días)</span>
+                <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">
+                  ({earlyPayoffQuote.daysElapsed} días)
+                </span>
               </span>
-              <span className="font-medium text-gray-800 dark:text-gray-200">{formatCurrency(earlyPayoffQuote.accruedInterest)}</span>
+              <span className="font-medium text-gray-800 dark:text-gray-200">
+                {formatCurrency(earlyPayoffQuote.accruedInterest)}
+              </span>
             </div>
 
             {earlyPayoffQuote.accruedMaintenanceFee > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">Com. mantenimiento (proporcional)</span>
-                <span className="font-medium text-gray-800 dark:text-gray-200">{formatCurrency(earlyPayoffQuote.accruedMaintenanceFee)}</span>
+                <span className="text-gray-600 dark:text-gray-400">
+                  Com. mantenimiento (proporcional)
+                </span>
+                <span className="font-medium text-gray-800 dark:text-gray-200">
+                  {formatCurrency(earlyPayoffQuote.accruedMaintenanceFee)}
+                </span>
               </div>
             )}
 
             {earlyPayoffQuote.moraAccrued > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-orange-600 dark:text-orange-400">Intereses moratorios</span>
-                <span className="font-medium text-orange-600 dark:text-orange-400">{formatCurrency(earlyPayoffQuote.moraAccrued)}</span>
+                <span className="font-medium text-orange-600 dark:text-orange-400">
+                  {formatCurrency(earlyPayoffQuote.moraAccrued)}
+                </span>
               </div>
             )}
 
             {earlyPayoffQuote.collectionFeesAccrued > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-orange-600 dark:text-orange-400">Gastos de cobranza</span>
-                <span className="font-medium text-orange-600 dark:text-orange-400">{formatCurrency(earlyPayoffQuote.collectionFeesAccrued)}</span>
+                <span className="font-medium text-orange-600 dark:text-orange-400">
+                  {formatCurrency(earlyPayoffQuote.collectionFeesAccrued)}
+                </span>
               </div>
             )}
 
             <div className="flex justify-between text-sm pt-2 border-t border-gray-200 dark:border-white/10">
               <span className="font-bold text-gray-800 dark:text-gray-100">Total a pagar hoy</span>
-              <span className="font-bold text-emerald-700 dark:text-emerald-300 text-base">{formatCurrency(earlyPayoffQuote.payoffAmount)}</span>
+              <span className="font-bold text-emerald-700 dark:text-emerald-300 text-base">
+                {formatCurrency(earlyPayoffQuote.payoffAmount)}
+              </span>
             </div>
           </div>
 
@@ -232,9 +268,17 @@ export default function PayLoanPage() {
               disabled={isEarlyPaying || !user}
               className="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-60 text-sm flex items-center justify-center gap-2"
             >
-              {isEarlyPaying
-                ? <><Loader2 className="h-4 w-4 animate-spin" />Procesando...</>
-                : <><Lock className="h-4 w-4" aria-hidden="true" />Pagar {formatCurrency(earlyPayoffQuote.payoffAmount)}</>}
+              {isEarlyPaying ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Procesando...
+                </>
+              ) : (
+                <>
+                  <Lock className="h-4 w-4" aria-hidden="true" />
+                  Pagar {formatCurrency(earlyPayoffQuote.payoffAmount)}
+                </>
+              )}
             </button>
           </div>
           <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-3">
@@ -252,7 +296,9 @@ export default function PayLoanPage() {
               <CreditCard className="h-4 w-4" aria-hidden="true" />
             </div>
             <div>
-              <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">Pagar con tarjeta</h3>
+              <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">
+                Pagar con tarjeta
+              </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Visa o Mastercard · confirmación inmediata
               </p>
@@ -271,9 +317,17 @@ export default function PayLoanPage() {
             disabled={isPaying || !user}
             className="w-full bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold py-3 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isPaying
-              ? <><Loader2 className="h-4 w-4 animate-spin" />Procesando...</>
-              : <><Lock className="h-4 w-4" aria-hidden="true" />Pagar {formatCurrency(balance.remaining)}</>}
+            {isPaying ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Procesando...
+              </>
+            ) : (
+              <>
+                <Lock className="h-4 w-4" aria-hidden="true" />
+                Pagar {formatCurrency(balance.remaining)}
+              </>
+            )}
           </button>
 
           <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-3">

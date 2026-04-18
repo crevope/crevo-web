@@ -50,11 +50,11 @@ export const OG_IMAGE_ALT = `${SITE.name} — ${SITE.tagline}`
 /** Brand color tokens — kept in sync with globals.css. Used by Satori
  *  (ImageResponse) which can't read CSS variables, only literal values. */
 export const BRAND_COLORS = {
-  primary: '#0A192F',         // navy
+  primary: '#0A192F', // navy
   primaryHover: '#112240',
-  secondary: '#D4AF37',       // gold
+  secondary: '#D4AF37', // gold
   secondaryHover: '#B8932D',
-  accent: '#00E5FF',          // cyan
+  accent: '#00E5FF', // cyan
   surface: '#F8FAFC',
   text: '#0A192F',
   textMuted: '#64748B',

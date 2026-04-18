@@ -63,8 +63,19 @@ export default function ConsultaIndexPage() {
 
       <footer className="border-t border-gray-100 dark:border-white/5 py-6 text-center text-xs text-gray-500 dark:text-gray-400">
         © {CURRENT_YEAR} Crevo ·{' '}
-        <Link href="/terminos-y-condiciones" className="hover:text-brand-primary dark:hover:text-brand-secondary">Términos</Link>{' · '}
-        <Link href="/politica-de-privacidad" className="hover:text-brand-primary dark:hover:text-brand-secondary">Privacidad</Link>
+        <Link
+          href="/terminos-y-condiciones"
+          className="hover:text-brand-primary dark:hover:text-brand-secondary"
+        >
+          Términos
+        </Link>
+        {' · '}
+        <Link
+          href="/politica-de-privacidad"
+          className="hover:text-brand-primary dark:hover:text-brand-secondary"
+        >
+          Privacidad
+        </Link>
       </footer>
     </div>
   )

@@ -14,11 +14,14 @@ const PAGE_SIZE = 20
 type Filter = 'all' | 'unread'
 
 export default function NotificationsPage() {
-  const { notifications, unreadCount, isLoading, load, markAsRead, markAllAsRead } = useNotificationStore()
+  const { notifications, unreadCount, isLoading, load, markAsRead, markAllAsRead } =
+    useNotificationStore()
   const [filter, setFilter] = useState<Filter>('all')
   const [visible, setVisible] = useState(PAGE_SIZE)
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    load()
+  }, [load])
 
   // Reset pagination when the filter flips so we don't leak rows from the
   // previous slice into the new subset.
@@ -30,7 +33,7 @@ export default function NotificationsPage() {
   // flips `isRead` in place, not the array length. `useMemo` avoids
   // re-computing the filter on every render of unrelated state.
   const filtered = useMemo(
-    () => (filter === 'unread' ? notifications.filter(n => !n.isRead) : notifications),
+    () => (filter === 'unread' ? notifications.filter((n) => !n.isRead) : notifications),
     [notifications, filter],
   )
 
@@ -42,13 +45,18 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-1 tracking-tight">Notificaciones</h1>
+          <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-1 tracking-tight">
+            Notificaciones
+          </h1>
           {unreadCount > 0 ? (
             <p className="text-gray-500 dark:text-gray-400">
-              Tienes <strong className="text-[#0A192F] dark:text-[#D4AF37]">{unreadCount}</strong> sin leer
+              Tienes <strong className="text-[#0A192F] dark:text-[#D4AF37]">{unreadCount}</strong>{' '}
+              sin leer
             </p>
           ) : (
-            <p className="text-gray-500 dark:text-gray-400">Estás al día con todas tus notificaciones</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              Estás al día con todas tus notificaciones
+            </p>
           )}
         </div>
         {unreadCount > 0 && (
@@ -68,11 +76,15 @@ export default function NotificationsPage() {
           tree light even when a long-tenured user has hundreds of
           notifications. */}
       {!isLoading && notifications.length > 0 && (
-        <div className="flex items-center gap-2" role="tablist" aria-label="Filtro de notificaciones">
-          {([
-            { id: 'all' as Filter,    label: 'Todas', count: notifications.length },
+        <div
+          className="flex items-center gap-2"
+          role="tablist"
+          aria-label="Filtro de notificaciones"
+        >
+          {[
+            { id: 'all' as Filter, label: 'Todas', count: notifications.length },
             { id: 'unread' as Filter, label: 'Solo no leídas', count: unreadCount },
-          ]).map(chip => {
+          ].map((chip) => {
             const active = filter === chip.id
             return (
               <button
@@ -81,13 +93,16 @@ export default function NotificationsPage() {
                 role="tab"
                 aria-selected={active}
                 onClick={() => setFilter(chip.id)}
-                className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors border ${active
-                  ? 'bg-[#0A192F] text-white border-[#0A192F] dark:bg-[#D4AF37] dark:text-[#0A192F] dark:border-[#D4AF37]'
-                  : 'bg-white dark:bg-[#1E293B] text-gray-600 dark:text-gray-400 border-gray-200 dark:border-white/6 hover:bg-gray-50 dark:hover:bg-[#0F172A]'
+                className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+                  active
+                    ? 'bg-[#0A192F] text-white border-[#0A192F] dark:bg-[#D4AF37] dark:text-[#0A192F] dark:border-[#D4AF37]'
+                    : 'bg-white dark:bg-[#1E293B] text-gray-600 dark:text-gray-400 border-gray-200 dark:border-white/6 hover:bg-gray-50 dark:hover:bg-[#0F172A]'
                 }`}
               >
                 {chip.label}
-                <span className={`ml-1.5 text-xs ${active ? 'opacity-80' : 'text-gray-400 dark:text-gray-500'}`}>
+                <span
+                  className={`ml-1.5 text-xs ${active ? 'opacity-80' : 'text-gray-400 dark:text-gray-500'}`}
+                >
                   {chip.count}
                 </span>
               </button>
@@ -116,7 +131,7 @@ export default function NotificationsPage() {
       {/* Content */}
       {isLoading ? (
         <div className={`${cardCls} overflow-hidden divide-y divide-gray-100 dark:divide-white/6`}>
-          {[1, 2, 3, 4, 5].map(i => (
+          {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="flex items-start gap-4 p-5">
               <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
               <div className="flex-1 space-y-2 pt-0.5">
@@ -145,21 +160,24 @@ export default function NotificationsPage() {
         <>
           <div className={`${cardCls} overflow-hidden`}>
             <div className="divide-y divide-gray-100 dark:divide-white/6">
-              {slice.map(n => (
+              {slice.map((n) => (
                 <div
                   key={n.id}
                   onClick={() => !n.isRead && markAsRead(n.id)}
                   className={`flex items-start gap-4 p-5 cursor-pointer transition-colors
-                    ${!n.isRead
-                      ? 'bg-[#0A192F]/3 dark:bg-[#D4AF37]/5 hover:bg-[#0A192F]/5 dark:hover:bg-[#D4AF37]/10'
-                      : 'hover:bg-gray-50 dark:hover:bg-[#0F172A]'
+                    ${
+                      !n.isRead
+                        ? 'bg-[#0A192F]/3 dark:bg-[#D4AF37]/5 hover:bg-[#0A192F]/5 dark:hover:bg-[#D4AF37]/10'
+                        : 'hover:bg-gray-50 dark:hover:bg-[#0F172A]'
                     }`}
                 >
                   {/* Icon */}
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0
-                    ${!n.isRead
-                      ? 'bg-[#0A192F]/5 dark:bg-[#D4AF37]/10'
-                      : 'bg-gray-50 dark:bg-white/5'
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0
+                    ${
+                      !n.isRead
+                        ? 'bg-[#0A192F]/5 dark:bg-[#D4AF37]/10'
+                        : 'bg-gray-50 dark:bg-white/5'
                     }`}
                   >
                     {NOTIFICATION_ICONS[n.type]}
@@ -168,14 +186,18 @@ export default function NotificationsPage() {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-3">
-                      <p className={`text-sm leading-snug ${!n.isRead ? 'font-semibold text-[#0A192F] dark:text-white' : 'font-medium text-gray-700 dark:text-gray-300'}`}>
+                      <p
+                        className={`text-sm leading-snug ${!n.isRead ? 'font-semibold text-[#0A192F] dark:text-white' : 'font-medium text-gray-700 dark:text-gray-300'}`}
+                      >
                         {n.title}
                       </p>
                       <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0 mt-0.5">
                         {formatRelativeDate(n.createdAt)}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{n.body}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                      {n.body}
+                    </p>
                   </div>
 
                   {/* Unread dot */}
@@ -191,7 +213,7 @@ export default function NotificationsPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setVisible(v => v + PAGE_SIZE)}
+                onClick={() => setVisible((v) => v + PAGE_SIZE)}
                 className="border-gray-200 dark:border-white/10"
               >
                 Cargar más ({filtered.length - visible} restantes)

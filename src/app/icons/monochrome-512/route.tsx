@@ -33,30 +33,28 @@ const MARK_SIZE = 256 // 50% of canvas — inside the safe zone
 
 export async function GET() {
   return new ImageResponse(
-    (
-      <div
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          // Transparent background is critical — the OS draws its own backing
-          // colored shape behind the silhouette. A solid fill here would
-          // double-paint and look broken.
-          background: 'transparent',
-        }}
-      >
-        <svg viewBox="0 0 64 64" width={MARK_SIZE} height={MARK_SIZE}>
-          <path
-            d="M 36 16 A 20 20 0 1 0 36 48 L 60 32 L 30 40 A 10 10 0 1 1 30 24 Z"
-            // Solid white — the OS will replace this color with the user's
-            // theme tint when monochrome rendering is active.
-            fill="#FFFFFF"
-          />
-        </svg>
-      </div>
-    ),
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        // Transparent background is critical — the OS draws its own backing
+        // colored shape behind the silhouette. A solid fill here would
+        // double-paint and look broken.
+        background: 'transparent',
+      }}
+    >
+      <svg viewBox="0 0 64 64" width={MARK_SIZE} height={MARK_SIZE}>
+        <path
+          d="M 36 16 A 20 20 0 1 0 36 48 L 60 32 L 30 40 A 10 10 0 1 1 30 24 Z"
+          // Solid white — the OS will replace this color with the user's
+          // theme tint when monochrome rendering is active.
+          fill="#FFFFFF"
+        />
+      </svg>
+    </div>,
     {
       width: SIZE,
       height: SIZE,

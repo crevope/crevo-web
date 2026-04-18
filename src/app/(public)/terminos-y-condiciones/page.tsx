@@ -27,38 +27,63 @@ export default function TermsAndConditionsPage() {
         <strong>Resumen rápido:</strong> Crevo es una plataforma digital que te permite solicitar
         préstamos personales en línea. Antes de aceptar un préstamo verás siempre el monto que
         recibirás, el monto que pagarás, las cuotas, la TCEA y todos los costos asociados. Solo nos
-        comprometemos a desembolsarte el préstamo una vez que ambas partes hayan firmado el contrato.
+        comprometemos a desembolsarte el préstamo una vez que ambas partes hayan firmado el
+        contrato.
       </div>
 
       <h2>1. Identificación del titular y marco regulatorio</h2>
       <p>
-        La Plataforma Crevo es operada por <strong>{LEGAL_COMPANY.legalName}</strong>, identificada con
-        RUC <strong>{LEGAL_COMPANY.ruc}</strong>, con domicilio en {LEGAL_COMPANY.address}, República
-        del Perú. Para cualquier comunicación de carácter legal puedes escribirnos a{' '}
+        La Plataforma Crevo es operada por <strong>{LEGAL_COMPANY.legalName}</strong>, identificada
+        con RUC <strong>{LEGAL_COMPANY.ruc}</strong>, con domicilio en {LEGAL_COMPANY.address},
+        República del Perú. Para cualquier comunicación de carácter legal puedes escribirnos a{' '}
         <a href={`mailto:${LEGAL_COMPANY.email}`}>{LEGAL_COMPANY.email}</a>.
       </p>
 
       <h3>1.1. Naturaleza jurídica de Crevo</h3>
       <p>
-        Crevo es una <strong>empresa peruana de préstamos</strong> que otorga créditos personales con{' '}
-        <strong>capital propio</strong>. <strong>No</strong> es un banco, financiera, caja municipal,
-        EDPYME, cooperativa de ahorro y crédito ni cualquier otra entidad del sistema financiero
-        autorizada por la <strong>Superintendencia de Banca, Seguros y AFP (SBS)</strong>. En
-        consecuencia, no captamos depósitos del público ni administramos fondos de terceros, y nuestra
-        actividad <strong>no se encuentra bajo la supervisión prudencial de la SBS</strong>.
+        Crevo es una <strong>empresa peruana de préstamos</strong> que otorga créditos personales
+        con <strong>capital propio</strong>. <strong>No</strong> es un banco, financiera, caja
+        municipal, EDPYME, cooperativa de ahorro y crédito ni cualquier otra entidad del sistema
+        financiero autorizada por la <strong>Superintendencia de Banca, Seguros y AFP (SBS)</strong>
+        . En consecuencia, no captamos depósitos del público ni administramos fondos de terceros, y
+        nuestra actividad <strong>no se encuentra bajo la supervisión prudencial de la SBS</strong>.
       </p>
 
       <h3>1.2. Normas que nos resultan aplicables</h3>
       <p>Nuestra operación se rige por la legislación peruana, en particular:</p>
       <ul>
-        <li><strong>Código Civil</strong> — contrato de mutuo dinerario (artículo 1648° y siguientes).</li>
-        <li><strong>Ley N° 29571</strong> — Código de Protección y Defensa del Consumidor (INDECOPI).</li>
-        <li><strong>Ley N° 29733</strong> y su Reglamento — Protección de Datos Personales (ANPDP).</li>
-        <li><strong>Ley N° 27269</strong> y su Reglamento — Firma Electrónica.</li>
-        <li><strong>Ley N° 27489</strong> — Centrales Privadas de Información de Riesgos.</li>
-        <li><strong>Ley N° 31143</strong> y circulares del <strong>Banco Central de Reserva del Perú (BCRP)</strong> — topes a las tasas de interés convencional compensatoria y moratoria aplicables a operaciones de crédito de consumo y MYPE.</li>
-        <li><strong>Ley N° 27693</strong> y <strong>Resolución SBS N° 789-2018-SBS</strong> — Crevo es <em>sujeto obligado</em> ante la <strong>Unidad de Inteligencia Financiera del Perú (UIF-Perú)</strong>, órgano de la SBS, en materia de prevención del lavado de activos y financiamiento del terrorismo. Esta condición implica obligaciones de reporte y monitoreo, pero <strong>no constituye supervisión prudencial</strong> por parte de la SBS.</li>
-        <li><strong>D.S. N° 011-2011-PCM</strong> — Libro de Reclamaciones.</li>
+        <li>
+          <strong>Código Civil</strong> — contrato de mutuo dinerario (artículo 1648° y siguientes).
+        </li>
+        <li>
+          <strong>Ley N° 29571</strong> — Código de Protección y Defensa del Consumidor (INDECOPI).
+        </li>
+        <li>
+          <strong>Ley N° 29733</strong> y su Reglamento — Protección de Datos Personales (ANPDP).
+        </li>
+        <li>
+          <strong>Ley N° 27269</strong> y su Reglamento — Firma Electrónica.
+        </li>
+        <li>
+          <strong>Ley N° 27489</strong> — Centrales Privadas de Información de Riesgos.
+        </li>
+        <li>
+          <strong>Ley N° 31143</strong> y circulares del{' '}
+          <strong>Banco Central de Reserva del Perú (BCRP)</strong> — topes a las tasas de interés
+          convencional compensatoria y moratoria aplicables a operaciones de crédito de consumo y
+          MYPE.
+        </li>
+        <li>
+          <strong>Ley N° 27693</strong> y <strong>Resolución SBS N° 789-2018-SBS</strong> — Crevo es{' '}
+          <em>sujeto obligado</em> ante la{' '}
+          <strong>Unidad de Inteligencia Financiera del Perú (UIF-Perú)</strong>, órgano de la SBS,
+          en materia de prevención del lavado de activos y financiamiento del terrorismo. Esta
+          condición implica obligaciones de reporte y monitoreo, pero{' '}
+          <strong>no constituye supervisión prudencial</strong> por parte de la SBS.
+        </li>
+        <li>
+          <strong>D.S. N° 011-2011-PCM</strong> — Libro de Reclamaciones.
+        </li>
       </ul>
 
       <h3>1.3. Compromiso voluntario de transparencia</h3>
@@ -68,30 +93,57 @@ export default function TermsAndConditionsPage() {
         financiero, en particular: cálculo y publicación de la <strong>TCEA</strong>, entrega de{' '}
         <strong>Hoja Resumen</strong> y <strong>Cronograma de Pagos</strong> antes de la firma del
         contrato, y respeto a los <strong>topes de tasa de interés</strong> publicados por el BCRP.
-        A mediano plazo, es nuestro plan iniciar el proceso de autorización ante la SBS como
-        Entidad de Desarrollo para la Pequeña y Microempresa (<strong>EDPYME</strong>) cuando
-        alcancemos los requisitos de capital y organización exigidos por la Ley N° 26702.
+        A mediano plazo, es nuestro plan iniciar el proceso de autorización ante la SBS como Entidad
+        de Desarrollo para la Pequeña y Microempresa (<strong>EDPYME</strong>) cuando alcancemos los
+        requisitos de capital y organización exigidos por la Ley N° 26702.
       </p>
 
       <h2>2. Definiciones</h2>
       <ul>
-        <li><strong>Usuario / Tú:</strong> persona natural mayor de edad, con capacidad civil plena, residente en el Perú, que utiliza la Plataforma.</li>
-        <li><strong>Crevo / Nosotros:</strong> {LEGAL_COMPANY.legalName}, en su calidad de titular de la Plataforma y otorgante del préstamo.</li>
-        <li><strong>Préstamo:</strong> contrato de mutuo dinerario celebrado entre Crevo y el Usuario a través de la Plataforma.</li>
-        <li><strong>Cuenta:</strong> registro personal del Usuario en la Plataforma, protegido por correo electrónico y contraseña.</li>
-        <li><strong>Hoja Resumen:</strong> documento que detalla el monto, plazo, número de cuotas, TEA, TCEA, comisiones y todos los costos del préstamo, entregado antes de la firma.</li>
-        <li><strong>TCEA:</strong> Tasa de Costo Efectivo Anual que incluye intereses y demás cargos.</li>
+        <li>
+          <strong>Usuario / Tú:</strong> persona natural mayor de edad, con capacidad civil plena,
+          residente en el Perú, que utiliza la Plataforma.
+        </li>
+        <li>
+          <strong>Crevo / Nosotros:</strong> {LEGAL_COMPANY.legalName}, en su calidad de titular de
+          la Plataforma y otorgante del préstamo.
+        </li>
+        <li>
+          <strong>Préstamo:</strong> contrato de mutuo dinerario celebrado entre Crevo y el Usuario
+          a través de la Plataforma.
+        </li>
+        <li>
+          <strong>Cuenta:</strong> registro personal del Usuario en la Plataforma, protegido por
+          correo electrónico y contraseña.
+        </li>
+        <li>
+          <strong>Hoja Resumen:</strong> documento que detalla el monto, plazo, número de cuotas,
+          TEA, TCEA, comisiones y todos los costos del préstamo, entregado antes de la firma.
+        </li>
+        <li>
+          <strong>TCEA:</strong> Tasa de Costo Efectivo Anual que incluye intereses y demás cargos.
+        </li>
       </ul>
 
       <h2>3. Requisitos para usar la Plataforma</h2>
       <p>Para registrarte y solicitar un préstamo debes cumplir, como mínimo, con lo siguiente:</p>
       <ul>
-        <li>Ser persona natural, mayor de 18 años y menor de 70 años al momento de la solicitud.</li>
+        <li>
+          Ser persona natural, mayor de 18 años y menor de 70 años al momento de la solicitud.
+        </li>
         <li>Contar con DNI vigente emitido por RENIEC.</li>
         <li>Tener domicilio en el territorio nacional peruano.</li>
-        <li>Disponer de un correo electrónico válido y un número de teléfono móvil peruano operativo.</li>
-        <li>Ser titular de una cuenta bancaria a tu nombre en una entidad del sistema financiero peruano.</li>
-        <li>No haber sido reportado por fraude, suplantación de identidad o conducta análoga frente a Crevo o terceros.</li>
+        <li>
+          Disponer de un correo electrónico válido y un número de teléfono móvil peruano operativo.
+        </li>
+        <li>
+          Ser titular de una cuenta bancaria a tu nombre en una entidad del sistema financiero
+          peruano.
+        </li>
+        <li>
+          No haber sido reportado por fraude, suplantación de identidad o conducta análoga frente a
+          Crevo o terceros.
+        </li>
       </ul>
 
       <h2>4. Registro y verificación de identidad (KYC)</h2>
@@ -116,8 +168,14 @@ export default function TermsAndConditionsPage() {
       </p>
       <ul>
         <li>Información proporcionada por el Usuario al momento del registro y la solicitud.</li>
-        <li>Consultas a centrales de riesgo (Equifax, Sentinel u otras), previa autorización expresa del Usuario.</li>
-        <li>Comportamiento histórico del Usuario en la Plataforma (préstamos previos, pagos puntuales, moras).</li>
+        <li>
+          Consultas a centrales de riesgo (Equifax, Sentinel u otras), previa autorización expresa
+          del Usuario.
+        </li>
+        <li>
+          Comportamiento histórico del Usuario en la Plataforma (préstamos previos, pagos puntuales,
+          moras).
+        </li>
         <li>Modelos estadísticos y reglas de negocio definidas por Crevo.</li>
       </ul>
       <p>
@@ -137,13 +195,14 @@ export default function TermsAndConditionsPage() {
       </p>
       <p>
         La TCEA aplicada a tu préstamo no excederá los topes máximos de tasa de interés convencional
-        compensatoria publicados semestralmente por el <strong>Banco Central de Reserva del Perú
-        (BCRP)</strong> para operaciones de crédito de consumo y MYPE, conforme a la Ley N° 31143.
+        compensatoria publicados semestralmente por el{' '}
+        <strong>Banco Central de Reserva del Perú (BCRP)</strong> para operaciones de crédito de
+        consumo y MYPE, conforme a la Ley N° 31143.
       </p>
       <p>
-        La firma del contrato se realiza mediante <strong>Firma Electrónica Simple</strong> (Ley
-        N° 27269 y su Reglamento), implementada a través de un código de un solo uso (OTP) enviado
-        a tu correo electrónico verificado. Al ingresar el OTP en la Plataforma manifiestas tu
+        La firma del contrato se realiza mediante <strong>Firma Electrónica Simple</strong> (Ley N°
+        27269 y su Reglamento), implementada a través de un código de un solo uso (OTP) enviado a tu
+        correo electrónico verificado. Al ingresar el OTP en la Plataforma manifiestas tu
         consentimiento informado y aceptas todas las condiciones del préstamo.
       </p>
 
@@ -173,14 +232,24 @@ export default function TermsAndConditionsPage() {
       <h2>9. Mora y consecuencias del incumplimiento</h2>
       <p>
         El incumplimiento total o parcial de cualquier cuota generará automáticamente la mora desde
-        el día siguiente al vencimiento, devengando los intereses moratorios pactados en el
-        contrato y la Hoja Resumen. Adicionalmente, podrán aplicarse las siguientes consecuencias:
+        el día siguiente al vencimiento, devengando los intereses moratorios pactados en el contrato
+        y la Hoja Resumen. Adicionalmente, podrán aplicarse las siguientes consecuencias:
       </p>
       <ul>
-        <li>Reporte negativo a centrales de riesgo (Equifax, Sentinel) conforme a la Ley N° 27489.</li>
-        <li>Gestiones de cobranza extrajudicial a través de personal propio o terceros autorizados, en estricto respeto de la Ley N° 29571.</li>
-        <li>Exigibilidad anticipada del saldo total del préstamo cuando corresponda según el contrato.</li>
-        <li>Inicio de acciones legales para el cobro de la deuda, con cargo a las costas y costos del proceso.</li>
+        <li>
+          Reporte negativo a centrales de riesgo (Equifax, Sentinel) conforme a la Ley N° 27489.
+        </li>
+        <li>
+          Gestiones de cobranza extrajudicial a través de personal propio o terceros autorizados, en
+          estricto respeto de la Ley N° 29571.
+        </li>
+        <li>
+          Exigibilidad anticipada del saldo total del préstamo cuando corresponda según el contrato.
+        </li>
+        <li>
+          Inicio de acciones legales para el cobro de la deuda, con cargo a las costas y costos del
+          proceso.
+        </li>
       </ul>
       <p>
         Las gestiones de cobranza no se realizarán en horarios nocturnos, días feriados, ni mediante
@@ -198,10 +267,19 @@ export default function TermsAndConditionsPage() {
       <h2>11. Obligaciones del Usuario</h2>
       <ul>
         <li>Proporcionar información veraz, completa y actualizada en todo momento.</li>
-        <li>Mantener la confidencialidad de su contraseña y código OTP. Crevo nunca te pedirá tu contraseña ni OTP por teléfono, WhatsApp o correo.</li>
-        <li>Notificar de inmediato cualquier acceso no autorizado a su Cuenta a {LEGAL_COMPANY.supportEmail}.</li>
+        <li>
+          Mantener la confidencialidad de su contraseña y código OTP. Crevo nunca te pedirá tu
+          contraseña ni OTP por teléfono, WhatsApp o correo.
+        </li>
+        <li>
+          Notificar de inmediato cualquier acceso no autorizado a su Cuenta a{' '}
+          {LEGAL_COMPANY.supportEmail}.
+        </li>
         <li>Utilizar la Plataforma exclusivamente para fines lícitos y personales.</li>
-        <li>No intentar vulnerar la seguridad, hacer ingeniería inversa, ni automatizar el uso de la Plataforma.</li>
+        <li>
+          No intentar vulnerar la seguridad, hacer ingeniería inversa, ni automatizar el uso de la
+          Plataforma.
+        </li>
       </ul>
 
       <h2>12. Propiedad intelectual</h2>
@@ -216,8 +294,8 @@ export default function TermsAndConditionsPage() {
       <p>
         Crevo realiza esfuerzos razonables para mantener la Plataforma operativa 24/7. Sin embargo,
         no garantiza que el servicio sea ininterrumpido o esté libre de errores. Podrán existir
-        ventanas de mantenimiento programadas o interrupciones por causas de fuerza mayor, fallas
-        de proveedores externos (Supabase, pasarelas de pago, servicios de mensajería) o ataques
+        ventanas de mantenimiento programadas o interrupciones por causas de fuerza mayor, fallas de
+        proveedores externos (Supabase, pasarelas de pago, servicios de mensajería) o ataques
         cibernéticos, sin que esto genere responsabilidad alguna por daños indirectos.
       </p>
 
@@ -245,12 +323,16 @@ export default function TermsAndConditionsPage() {
       </p>
 
       <h2>16. Atención al cliente y reclamos</h2>
-      <p>
-        Para consultas, quejas o reclamos puedes contactarnos a través de:
-      </p>
+      <p>Para consultas, quejas o reclamos puedes contactarnos a través de:</p>
       <ul>
-        <li>Correo electrónico: <a href={`mailto:${LEGAL_COMPANY.supportEmail}`}>{LEGAL_COMPANY.supportEmail}</a></li>
-        <li><a href="/libro-de-reclamaciones">Libro de Reclamaciones virtual</a> disponible en la Plataforma (conforme al D.S. N° 011-2011-PCM).</li>
+        <li>
+          Correo electrónico:{' '}
+          <a href={`mailto:${LEGAL_COMPANY.supportEmail}`}>{LEGAL_COMPANY.supportEmail}</a>
+        </li>
+        <li>
+          <a href="/libro-de-reclamaciones">Libro de Reclamaciones virtual</a> disponible en la
+          Plataforma (conforme al D.S. N° 011-2011-PCM).
+        </li>
       </ul>
       <p>
         Atenderemos tu reclamo dentro del plazo legal de quince (15) días hábiles, prorrogable por
@@ -278,14 +360,15 @@ export default function TermsAndConditionsPage() {
       <h2>19. Aceptación</h2>
       <p>
         Al hacer clic en "Acepto los Términos y Condiciones" y/o al registrarte, ingresar a la
-        Plataforma o solicitar un préstamo, confirmas haber leído estos Términos y los aceptas en
-        su totalidad. Esta aceptación queda registrada de forma inmutable en nuestros sistemas
-        junto con la versión exacta del documento, fecha, hora, dirección IP y agente de usuario,
-        como evidencia del consentimiento prestado.
+        Plataforma o solicitar un préstamo, confirmas haber leído estos Términos y los aceptas en su
+        totalidad. Esta aceptación queda registrada de forma inmutable en nuestros sistemas junto
+        con la versión exacta del documento, fecha, hora, dirección IP y agente de usuario, como
+        evidencia del consentimiento prestado.
       </p>
 
       <div className="callout" style={{ marginTop: '2rem' }}>
-        <strong>Última actualización:</strong> 15 de abril de 2026 (versión {LEGAL_VERSIONS.TERMS}).<br />
+        <strong>Última actualización:</strong> 15 de abril de 2026 (versión {LEGAL_VERSIONS.TERMS}).
+        <br />
         <strong>Texto vigente:</strong> Esta página siempre muestra la versión vigente. Las
         versiones anteriores quedan archivadas en nuestros sistemas y pueden solicitarse a{' '}
         <a href={`mailto:${LEGAL_COMPANY.email}`}>{LEGAL_COMPANY.email}</a>.

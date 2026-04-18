@@ -3,11 +3,38 @@ import { useState } from 'react'
 import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
 import {
-  Star, CalendarCheck, History, TrendingUp, Ban, Scale, Percent,
-  Flame, Snowflake, Handshake, PiggyBank, Shield, Bot, PieChart, Tag,
-  Receipt, ListChecks, Target, Calendar, CreditCard, Search,
-  Calculator, FastForward, TriangleAlert, ShieldCheck, UserX, Link as LinkIcon,
-  Lock, Smartphone, ChevronRight, GraduationCap, Zap,
+  Star,
+  CalendarCheck,
+  History,
+  TrendingUp,
+  Ban,
+  Scale,
+  Percent,
+  Flame,
+  Snowflake,
+  Handshake,
+  PiggyBank,
+  Shield,
+  Bot,
+  PieChart,
+  Tag,
+  Receipt,
+  ListChecks,
+  Target,
+  Calendar,
+  CreditCard,
+  Search,
+  Calculator,
+  FastForward,
+  TriangleAlert,
+  ShieldCheck,
+  UserX,
+  Link as LinkIcon,
+  Lock,
+  Smartphone,
+  ChevronRight,
+  GraduationCap,
+  Zap,
 } from 'lucide-react'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -25,8 +52,8 @@ interface Category {
   id: CategoryId
   label: string
   icon: LucideIcon
-  color: string        // Tailwind text color
-  bg: string           // Tailwind bg color (badge/icon bg)
+  color: string // Tailwind text color
+  bg: string // Tailwind bg color (badge/icon bg)
   border: string
   cardBg: string
   tips: Tip[]
@@ -234,20 +261,23 @@ const CATEGORIES: Category[] = [
 export default function LearnPage() {
   const [activeCategory, setActiveCategory] = useState<CategoryId>('historial')
 
-  const category = CATEGORIES.find(c => c.id === activeCategory)!
+  const category = CATEGORIES.find((c) => c.id === activeCategory)!
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-1">
-            <Link href="/dashboard" className="hover:text-[#1A56FF] transition-colors">Dashboard</Link>
+            <Link href="/dashboard" className="hover:text-[#1A56FF] transition-colors">
+              Dashboard
+            </Link>
             <ChevronRight className="h-3 w-3" aria-hidden="true" />
             <span className="text-[#0A192F] dark:text-white">Educación Financiera</span>
           </div>
-          <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white tracking-tight">Educación Financiera</h1>
+          <h1 className="text-2xl font-semibold text-[#0A192F] dark:text-white tracking-tight">
+            Educación Financiera
+          </h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">
             Consejos prácticos para tomar mejores decisiones con tu dinero.
           </p>
@@ -259,7 +289,7 @@ export default function LearnPage() {
 
       {/* Category tabs — horizontal scroll en mobile */}
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        {CATEGORIES.map(cat => {
+        {CATEGORIES.map((cat) => {
           const CatIcon = cat.icon
           return (
             <button
@@ -280,60 +310,80 @@ export default function LearnPage() {
 
       {/* Tips grid */}
       <div>
-        {(() => { const CategoryIcon = category.icon; return (
-        <>
-        {/* Section header */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className={`w-10 h-10 rounded-lg ${category.bg} flex items-center justify-center`}>
-            <CategoryIcon className={`h-4 w-4 ${category.color}`} aria-hidden="true" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-[#0A192F] dark:text-white">{category.label}</h2>
-            <p className="text-xs text-gray-400">{category.tips.length} consejos</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {category.tips.map(tip => {
-            const TipIcon = tip.icon
-            return (
-            <div
-              key={tip.title}
-              className={`p-5 rounded-lg border ${category.border} ${category.cardBg}`}
-            >
-              <div className="flex items-start gap-4">
-                <div className={`w-10 h-10 rounded-lg ${category.bg} flex items-center justify-center shrink-0 mt-0.5`}>
-                  <TipIcon className={`h-4 w-4 ${category.color}`} aria-hidden="true" />
+        {(() => {
+          const CategoryIcon = category.icon
+          return (
+            <>
+              {/* Section header */}
+              <div className="flex items-center gap-3 mb-5">
+                <div
+                  className={`w-10 h-10 rounded-lg ${category.bg} flex items-center justify-center`}
+                >
+                  <CategoryIcon className={`h-4 w-4 ${category.color}`} aria-hidden="true" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                    <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">{tip.title}</h3>
-                    {tip.tag && (
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${category.bg} ${category.color}`}>
-                        {tip.tag}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{tip.body}</p>
+                <div>
+                  <h2 className="text-lg font-semibold text-[#0A192F] dark:text-white">
+                    {category.label}
+                  </h2>
+                  <p className="text-xs text-gray-400">{category.tips.length} consejos</p>
                 </div>
               </div>
-            </div>
-            )
-          })}
-        </div>
-        </>
-        )})()}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {category.tips.map((tip) => {
+                  const TipIcon = tip.icon
+                  return (
+                    <div
+                      key={tip.title}
+                      className={`p-5 rounded-lg border ${category.border} ${category.cardBg}`}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={`w-10 h-10 rounded-lg ${category.bg} flex items-center justify-center shrink-0 mt-0.5`}
+                        >
+                          <TipIcon className={`h-4 w-4 ${category.color}`} aria-hidden="true" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                            <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">
+                              {tip.title}
+                            </h3>
+                            {tip.tag && (
+                              <span
+                                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${category.bg} ${category.color}`}
+                              >
+                                {tip.tag}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                            {tip.body}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )
+        })()}
       </div>
 
       {/* Bottom CTA */}
-      <div className="rounded-lg p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-white/10" style={{ background: 'linear-gradient(135deg, #0A192F 0%, #1A365D 100%)' }}>
+      <div
+        className="rounded-lg p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-white/10"
+        style={{ background: 'linear-gradient(135deg, #0A192F 0%, #1A365D 100%)' }}
+      >
         <div className="flex items-center gap-4">
           <div className="w-11 h-11 rounded-lg bg-[#D4AF37] flex items-center justify-center shrink-0">
             <Zap className="h-6 w-6 text-[#0A192F]" aria-hidden="true" />
           </div>
           <div>
             <p className="font-semibold text-white text-base">¿Listo para mejorar tu score?</p>
-            <p className="text-white/60 text-sm mt-0.5">Aplica lo aprendido. Solicita tu préstamo, págalo a tiempo y construye tu historial.</p>
+            <p className="text-white/60 text-sm mt-0.5">
+              Aplica lo aprendido. Solicita tu préstamo, págalo a tiempo y construye tu historial.
+            </p>
           </div>
         </div>
         <Link
@@ -343,7 +393,6 @@ export default function LearnPage() {
           Solicitar préstamo
         </Link>
       </div>
-
     </div>
   )
 }

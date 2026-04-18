@@ -43,7 +43,7 @@ export function useLoanSummaries(loans: Loan[]): Record<string, LoanSummary> {
   // summary of a given loan doesn't depend on the other loans in the list.
   const activeLoanIds = loans
     .filter(isActiveLoan)
-    .map(l => l.id)
+    .map((l) => l.id)
     .sort()
     .join(',')
 
@@ -57,7 +57,7 @@ export function useLoanSummaries(loans: Loan[]): Record<string, LoanSummary> {
     let cancelled = false
 
     // Seed the state so the UI can show per-loan skeletons immediately.
-    setSummaries(prev => {
+    setSummaries((prev) => {
       const next: Record<string, LoanSummary> = { ...prev }
       for (const id of ids) {
         if (!next[id]) next[id] = { remaining: 0, loading: true, error: false }
@@ -77,7 +77,7 @@ export function useLoanSummaries(loans: Loan[]): Record<string, LoanSummary> {
         ])
         if (cancelled) return
         const next = findNextInstallment(schedule)
-        setSummaries(prev => ({
+        setSummaries((prev) => ({
           ...prev,
           [id]: {
             remaining: balance.remaining,
@@ -88,7 +88,7 @@ export function useLoanSummaries(loans: Loan[]): Record<string, LoanSummary> {
         }))
       } catch {
         if (cancelled) return
-        setSummaries(prev => ({
+        setSummaries((prev) => ({
           ...prev,
           [id]: { remaining: 0, loading: false, error: true },
         }))
@@ -110,7 +110,7 @@ function findNextInstallment(schedule: Installment[]): LoanSummary['nextInstallm
   // more actionable for the borrower than pointing at the next on-schedule
   // payment when there's already one behind.
   const unpaid = schedule
-    .filter(i => i.status === 'PENDING' || i.status === 'OVERDUE')
+    .filter((i) => i.status === 'PENDING' || i.status === 'OVERDUE')
     .sort((a, b) => {
       if (a.status === 'OVERDUE' && b.status !== 'OVERDUE') return -1
       if (b.status === 'OVERDUE' && a.status !== 'OVERDUE') return 1

@@ -12,9 +12,7 @@ const firebaseConfig = {
 }
 
 // Initialize lazily — Firebase is optional for local dev, required for push notifications in prod.
-const app = hasFirebaseConfig
-  ? (getApps().length ? getApp() : initializeApp(firebaseConfig))
-  : null
+const app = hasFirebaseConfig ? (getApps().length ? getApp() : initializeApp(firebaseConfig)) : null
 
 // getMessaging can only be called in the browser
 export const getFirebaseMessaging = () => {

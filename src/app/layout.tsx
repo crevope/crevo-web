@@ -148,9 +148,7 @@ export const metadata: Metadata = {
   // Search Console verification. Filled in once the site is verified.
   verification: {
     google: VERIFICATION.google,
-    other: VERIFICATION.bing
-      ? { 'msvalidate.01': VERIFICATION.bing }
-      : undefined,
+    other: VERIFICATION.bing ? { 'msvalidate.01': VERIFICATION.bing } : undefined,
   },
 
   // Misc <meta> tags that don't have a typed slot in Next.js Metadata.

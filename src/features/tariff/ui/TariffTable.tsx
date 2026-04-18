@@ -18,9 +18,15 @@ export function TariffTable() {
   useEffect(() => {
     let cancelled = false
     getPublicTariff()
-      .then((t) => { if (!cancelled) setTariff(t) })
-      .catch((e: Error) => { if (!cancelled) setError(e.message) })
-    return () => { cancelled = true }
+      .then((t) => {
+        if (!cancelled) setTariff(t)
+      })
+      .catch((e: Error) => {
+        if (!cancelled) setError(e.message)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   if (error) {
@@ -32,8 +38,11 @@ export function TariffTable() {
             No pudimos cargar el tarifario en este momento.
           </p>
           <p className="text-xs text-amber-800 dark:text-amber-300 mt-1">
-            Vuelve a intentarlo en unos minutos. Si el problema persiste,
-            escríbenos a <a href="mailto:soporte@crevo.pe" className="underline">soporte@crevo.pe</a>.
+            Vuelve a intentarlo en unos minutos. Si el problema persiste, escríbenos a{' '}
+            <a href="mailto:soporte@crevo.pe" className="underline">
+              soporte@crevo.pe
+            </a>
+            .
           </p>
         </div>
       </div>
@@ -71,10 +80,9 @@ export function TariffTable() {
           Tasa máxima BCRP vigente
         </h2>
         <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
-          El Banco Central de Reserva del Perú (BCRP) publica cada semestre la tasa
-          de interés compensatoria máxima para créditos de consumo en moneda
-          nacional (Circular 0008-2021). Ninguna TEA aplicada por Crevo supera
-          este techo.
+          El Banco Central de Reserva del Perú (BCRP) publica cada semestre la tasa de interés
+          compensatoria máxima para créditos de consumo en moneda nacional (Circular 0008-2021).
+          Ninguna TEA aplicada por Crevo supera este techo.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white dark:bg-[#0F172A] rounded-md p-4">
@@ -108,10 +116,10 @@ export function TariffTable() {
           Productos y tasas (TEA) por perfil de score
         </h2>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-          Cada cliente recibe una TEA según su score crediticio. La TEA mostrada en
-          el simulador y en el contrato siempre refleja tu tier. La TCEA (costo
-          total anual efectivo) se calcula sumando intereses, comisiones, portes e
-          IGV y se detalla en la Hoja Resumen antes de firmar.
+          Cada cliente recibe una TEA según su score crediticio. La TEA mostrada en el simulador y
+          en el contrato siempre refleja tu tier. La TCEA (costo total anual efectivo) se calcula
+          sumando intereses, comisiones, portes e IGV y se detalla en la Hoja Resumen antes de
+          firmar.
         </p>
 
         <div className="space-y-6">
@@ -176,7 +184,9 @@ export function TariffTable() {
                 <TableHeader>
                   <TableRow className="bg-gray-50 dark:bg-[#0F172A]/50">
                     <TableHead className="text-[#0A192F] dark:text-gray-300">Tier</TableHead>
-                    <TableHead className="text-[#0A192F] dark:text-gray-300">Rango de score</TableHead>
+                    <TableHead className="text-[#0A192F] dark:text-gray-300">
+                      Rango de score
+                    </TableHead>
                     <TableHead className="text-right text-[#0A192F] dark:text-gray-300">
                       TEA aplicable
                     </TableHead>
@@ -209,9 +219,9 @@ export function TariffTable() {
           Comisiones y costos asociados
         </h2>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-          Todas las comisiones están sujetas a IGV ({tariff.igvRatePercent.toFixed(0)}%) y
-          se incluyen en la TCEA. Ver la Hoja Resumen antes de firmar para el detalle en
-          soles aplicado a tu préstamo.
+          Todas las comisiones están sujetas a IGV ({tariff.igvRatePercent.toFixed(0)}%) y se
+          incluyen en la TCEA. Ver la Hoja Resumen antes de firmar para el detalle en soles aplicado
+          a tu préstamo.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -228,7 +238,9 @@ export function TariffTable() {
               <TableHeader>
                 <TableRow className="bg-gray-50 dark:bg-[#0F172A]/50">
                   <TableHead className="text-[#0A192F] dark:text-gray-300">Tramo</TableHead>
-                  <TableHead className="text-right text-[#0A192F] dark:text-gray-300">Comisión</TableHead>
+                  <TableHead className="text-right text-[#0A192F] dark:text-gray-300">
+                    Comisión
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -301,9 +313,9 @@ export function TariffTable() {
           Gastos de cobranza por mora
         </h2>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
-          Estos cargos se aplican únicamente si la cuota no es pagada dentro del
-          plazo. Se rigen por la política de cobranza de Crevo (Ley 27598 — prohíbe
-          el hostigamiento y establece horarios permitidos de contacto).
+          Estos cargos se aplican únicamente si la cuota no es pagada dentro del plazo. Se rigen por
+          la política de cobranza de Crevo (Ley 27598 — prohíbe el hostigamiento y establece
+          horarios permitidos de contacto).
         </p>
 
         <div className="rounded-lg border border-gray-200 dark:border-[#334155] bg-white dark:bg-[#1E293B] overflow-hidden">
@@ -313,7 +325,9 @@ export function TariffTable() {
                 <TableHead className="text-[#0A192F] dark:text-gray-300">Nivel</TableHead>
                 <TableHead className="text-[#0A192F] dark:text-gray-300">Gestión</TableHead>
                 <TableHead className="text-[#0A192F] dark:text-gray-300">Desde</TableHead>
-                <TableHead className="text-right text-[#0A192F] dark:text-gray-300">Cargo</TableHead>
+                <TableHead className="text-right text-[#0A192F] dark:text-gray-300">
+                  Cargo
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -339,16 +353,21 @@ export function TariffTable() {
       </section>
 
       <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed border-t border-gray-100 dark:border-[#334155] pt-6">
-        Tarifario actualizado al {new Date(tariff.publishedAt).toLocaleString('es-PE', {
+        Tarifario actualizado al{' '}
+        {new Date(tariff.publishedAt).toLocaleString('es-PE', {
           day: '2-digit',
           month: 'long',
           year: 'numeric',
           hour: '2-digit',
           minute: '2-digit',
-        })}. Los valores reflejan los parámetros vigentes publicados por Crevo en
-        `financial_parameters`. El techo BCRP se sincroniza de forma automática
-        con la serie PD38590DD. Para casos particulares que no aparezcan aquí,
-        escríbenos a <a href="mailto:soporte@crevo.pe" className="underline">soporte@crevo.pe</a>.
+        })}
+        . Los valores reflejan los parámetros vigentes publicados por Crevo en
+        `financial_parameters`. El techo BCRP se sincroniza de forma automática con la serie
+        PD38590DD. Para casos particulares que no aparezcan aquí, escríbenos a{' '}
+        <a href="mailto:soporte@crevo.pe" className="underline">
+          soporte@crevo.pe
+        </a>
+        .
       </p>
     </div>
   )

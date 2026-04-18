@@ -41,9 +41,15 @@ export function RepresentativeExample() {
   useEffect(() => {
     let cancelled = false
     simulate(EXAMPLE_PARAMS)
-      .then((r) => { if (!cancelled) setResult(r) })
-      .catch(() => { if (!cancelled) setError(true) })
-    return () => { cancelled = true }
+      .then((r) => {
+        if (!cancelled) setResult(r)
+      })
+      .catch(() => {
+        if (!cancelled) setError(true)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   // Si el backend está caído, no rompemos la landing — simplemente ocultamos
@@ -53,7 +59,6 @@ export function RepresentativeExample() {
 
   return (
     <div className="max-w-4xl mx-auto bg-white dark:bg-[#1E293B] rounded-lg shadow-sm border border-gray-200 dark:border-white/6 p-6 md:p-8">
-
       <div className="flex items-start gap-3 mb-6 pb-4 border-b border-gray-100 dark:border-white/10">
         <div className="w-10 h-10 shrink-0 rounded-lg bg-[#0A192F]/8 dark:bg-[#D4AF37]/10 flex items-center justify-center">
           <Info className="h-5 w-5 text-[#0A192F] dark:text-[#D4AF37]" />
@@ -63,8 +68,8 @@ export function RepresentativeExample() {
             Ejemplo representativo
           </h3>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            Cálculo para un cliente con score crediticio promedio (rango 650–799).
-            Tu tasa real depende de tu perfil y se detalla antes de firmar.
+            Cálculo para un cliente con score crediticio promedio (rango 650–799). Tu tasa real
+            depende de tu perfil y se detalla antes de firmar.
           </p>
         </div>
       </div>
@@ -89,35 +94,29 @@ export function RepresentativeExample() {
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Plazo</p>
             <p className="text-lg font-bold text-[#0A192F] dark:text-white">
-              {result.numInstallments} cuota{result.numInstallments > 1 ? 's' : ''} mensual{result.numInstallments > 1 ? 'es' : ''}
+              {result.numInstallments} cuota{result.numInstallments > 1 ? 's' : ''} mensual
+              {result.numInstallments > 1 ? 'es' : ''}
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">TEA</p>
-            <p className="text-lg font-bold text-[#D4AF37]">
-              {result.teaPercent.toFixed(2)}%
-            </p>
+            <p className="text-lg font-bold text-[#D4AF37]">{result.teaPercent.toFixed(2)}%</p>
           </div>
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">TCEA</p>
-            <p className="text-lg font-bold text-[#D4AF37]">
-              {result.tceaPercent.toFixed(2)}%
-            </p>
+            <p className="text-lg font-bold text-[#D4AF37]">{result.tceaPercent.toFixed(2)}%</p>
           </div>
           <div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Total a pagar</p>
-            <p className="text-lg font-bold text-[#00E5FF]">
-              S/ {fmt(result.totalAmount)}
-            </p>
+            <p className="text-lg font-bold text-[#00E5FF]">S/ {fmt(result.totalAmount)}</p>
           </div>
         </div>
       )}
 
       <p className="mt-5 text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed">
-        La TCEA incluye intereses, comisiones, portes e IGV y es el indicador que
-        permite comparar el costo total entre diferentes ofertas de crédito. La TEA
-        compensatoria respeta en todo momento el techo vigente publicado por el BCRP
-        (Circular 0008-2021).
+        La TCEA incluye intereses, comisiones, portes e IGV y es el indicador que permite comparar
+        el costo total entre diferentes ofertas de crédito. La TEA compensatoria respeta en todo
+        momento el techo vigente publicado por el BCRP (Circular 0008-2021).
       </p>
     </div>
   )

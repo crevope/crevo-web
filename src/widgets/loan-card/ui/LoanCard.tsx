@@ -14,15 +14,21 @@ export function LoanCard({ loan }: Readonly<Props>) {
 
   return (
     <Link href={`/loans/${loan.id}`}>
-      <div className={`group relative rounded-xl border bg-card p-5 transition-all duration-200
+      <div
+        className={`group relative rounded-xl border bg-card p-5 transition-all duration-200
         hover:border-primary/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20
         ${isOverdue ? 'border-destructive/30' : 'border-border/60'}
-      `}>
+      `}
+      >
         {/* Top row */}
         <div className="flex items-start justify-between mb-4">
           <div>
-            <p className="text-xs text-muted-foreground mb-0.5 font-medium uppercase tracking-wide">Préstamo</p>
-            <p className={`text-2xl font-bold ${isOverdue ? 'text-destructive' : 'text-foreground'}`}>
+            <p className="text-xs text-muted-foreground mb-0.5 font-medium uppercase tracking-wide">
+              Préstamo
+            </p>
+            <p
+              className={`text-2xl font-bold ${isOverdue ? 'text-destructive' : 'text-foreground'}`}
+            >
               {formatCurrency(loan.amount)}
             </p>
           </div>
@@ -36,7 +42,9 @@ export function LoanCard({ loan }: Readonly<Props>) {
             {formatDate(loan.createdAt)}
           </span>
           {loan.dueDate && isActive && (
-            <span className={`flex items-center gap-1.5 ${isOverdue ? 'text-destructive font-medium' : ''}`}>
+            <span
+              className={`flex items-center gap-1.5 ${isOverdue ? 'text-destructive font-medium' : ''}`}
+            >
               <Clock className="h-3.5 w-3.5" />
               Vence {formatDate(loan.dueDate)}
             </span>

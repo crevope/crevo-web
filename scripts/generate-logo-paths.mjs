@@ -84,7 +84,9 @@ console.log(`Font          : ${FONT_PATH.split(/[/\\]/).slice(-1)[0]}`)
 console.log(`Font size     : ${FONT_SIZE}`)
 console.log(`Position (x,y): (${X}, ${Y})`)
 console.log(`Letter-spacing: ${LETTER_SPACING}em`)
-console.log(`Bounding box  : x ${bbox.x1.toFixed(2)}–${bbox.x2.toFixed(2)}, y ${bbox.y1.toFixed(2)}–${bbox.y2.toFixed(2)}`)
+console.log(
+  `Bounding box  : x ${bbox.x1.toFixed(2)}–${bbox.x2.toFixed(2)}, y ${bbox.y1.toFixed(2)}–${bbox.y2.toFixed(2)}`,
+)
 console.log(`Path length   : ${d.length} characters`)
 console.log('─────────────────────────────────────────────────────────────')
 console.log()

@@ -4,10 +4,29 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { toast } from 'sonner'
 import {
-  Loader2, Mail, IdCard, HandCoins, Bell, Plus, ShieldCheck, Rocket,
-  Check, CircleCheck, Send, Wallet, ArrowRight, Calendar, FileSignature,
-  GraduationCap, Lightbulb, LineChart, PiggyBank, FolderOpen, Headphones,
-  ArrowLeftRight, Clock,
+  Loader2,
+  Mail,
+  IdCard,
+  HandCoins,
+  Bell,
+  Plus,
+  ShieldCheck,
+  Rocket,
+  Check,
+  CircleCheck,
+  Send,
+  Wallet,
+  ArrowRight,
+  Calendar,
+  FileSignature,
+  GraduationCap,
+  Lightbulb,
+  LineChart,
+  PiggyBank,
+  FolderOpen,
+  Headphones,
+  ArrowLeftRight,
+  Clock,
 } from 'lucide-react'
 import { useAuthStore } from '@/features/auth'
 import { authRepository } from '@/features/auth'
@@ -18,7 +37,7 @@ import { useLoanStore } from '@/features/request-loan'
 // "Solicitar préstamo", which typically happens at most once per session. Defer
 // the chunk until then to keep the dashboard TTI low.
 const RequestLoanModal = dynamic(
-  () => import('@/features/request-loan').then(m => ({ default: m.RequestLoanModal })),
+  () => import('@/features/request-loan').then((m) => ({ default: m.RequestLoanModal })),
   { ssr: false },
 )
 import { useNotificationStore } from '@/features/notifications'
@@ -62,14 +81,17 @@ export default function DashboardPage() {
   useEffect(() => {
     loadMyLoans()
     loadNotifications()
-    kycRepository.getStatus()
-      .then(s => setKycApproved(s.isIdentityVerified))
-      .catch(() => { })
+    kycRepository
+      .getStatus()
+      .then((s) => setKycApproved(s.isIdentityVerified))
+      .catch(() => {})
       .finally(() => setKycLoading(false))
   }, [loadMyLoans, loadNotifications])
 
-  const activeLoans = loans.filter(l => ['APPROVED', 'SIGNED', 'ACTIVE', 'OVERDUE'].includes(l.status))
-  const pendingLoans = loans.filter(l => l.status === 'PENDING')
+  const activeLoans = loans.filter((l) =>
+    ['APPROVED', 'SIGNED', 'ACTIVE', 'OVERDUE'].includes(l.status),
+  )
+  const pendingLoans = loans.filter((l) => l.status === 'PENDING')
   const recentActivity = loans.slice(0, 3)
 
   const emailVerified = user?.emailVerified ?? false
@@ -119,9 +141,7 @@ export default function DashboardPage() {
               onClick={() => setShowModal(true)}
               className="bg-[#D4AF37] text-[#0A192F] font-medium px-6 py-2 rounded-lg cursor-pointer flex items-center gap-2 hover:bg-[#B8941F] transition-colors"
             >
-              <Plus className="h-3 w-3" aria-hidden="true" />
-              {' '}
-              Nuevo Préstamo
+              <Plus className="h-3 w-3" aria-hidden="true" /> Nuevo Préstamo
             </button>
           )}
         </div>
@@ -130,7 +150,9 @@ export default function DashboardPage() {
       {/* Banners + Onboarding */}
       {kycLoading || isLoading ? (
         <div className="space-y-4">
-          <div className={`${cardCls} p-4 flex items-center justify-between border-l-2 border-l-gray-200 dark:border-l-white/10`}>
+          <div
+            className={`${cardCls} p-4 flex items-center justify-between border-l-2 border-l-gray-200 dark:border-l-white/10`}
+          >
             <div className="flex items-center gap-4">
               <Skeleton className="w-10 h-10 rounded-full shrink-0" />
               <div className="space-y-2">
@@ -149,7 +171,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {[1, 2, 3].map(i => (
+              {[1, 2, 3].map((i) => (
                 <div key={i} className="flex flex-col items-center gap-3 p-4">
                   <Skeleton className="w-10 h-10 rounded-full" />
                   <Skeleton className="h-4 w-28" />
@@ -163,7 +185,9 @@ export default function DashboardPage() {
       ) : (
         <div className="space-y-4">
           {/* Security Banner */}
-          <div className={`${cardCls} p-4 flex items-center justify-between border-l-2 border-l-[#00E5FF]`}>
+          <div
+            className={`${cardCls} p-4 flex items-center justify-between border-l-2 border-l-[#00E5FF]`}
+          >
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-[#00E5FF]/10 flex items-center justify-center text-[#00E5FF]">
                 <ShieldCheck className="h-6 w-6" aria-hidden="true" />
@@ -177,7 +201,10 @@ export default function DashboardPage() {
                 </p>
               </div>
             </div>
-            <Link href="/security-info" className="text-sm text-[#00E5FF] font-medium hover:text-[#0A192F] dark:hover:text-[#D4AF37] transition-colors shrink-0 whitespace-nowrap">
+            <Link
+              href="/security-info"
+              className="text-sm text-[#00E5FF] font-medium hover:text-[#0A192F] dark:hover:text-[#D4AF37] transition-colors shrink-0 whitespace-nowrap"
+            >
               Ver detalles
             </Link>
           </div>
@@ -192,8 +219,12 @@ export default function DashboardPage() {
                     <Rocket className="h-4 w-4 text-[#00E5FF]" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-base font-semibold text-[#0A192F] dark:text-white">Primeros pasos</h3>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">{completedSteps} de 3 completados</p>
+                    <h3 className="text-base font-semibold text-[#0A192F] dark:text-white">
+                      Primeros pasos
+                    </h3>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                      {completedSteps} de 3 completados
+                    </p>
                   </div>
                 </div>
                 <div className="hidden sm:flex items-center gap-2">
@@ -216,9 +247,7 @@ export default function DashboardPage() {
 
                 {ONBOARDING_STEPS.map((step) => {
                   const isComplete =
-                    step.id === 'email' ? emailVerified :
-                    step.id === 'kyc' ? kycApproved :
-                    hasLoan
+                    step.id === 'email' ? emailVerified : step.id === 'kyc' ? kycApproved : hasLoan
                   const isActive = step.id === activeStepId
 
                   return (
@@ -231,35 +260,45 @@ export default function DashboardPage() {
                       }`}
                     >
                       {/* Circle */}
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ring-4 transition-all ${
-                        isComplete
-                          ? 'bg-green-500 text-white ring-green-100 dark:ring-green-900/30'
-                          : isActive
-                            ? 'bg-[#00E5FF] text-[#0A192F] ring-[#00E5FF]/20'
-                            : 'bg-gray-100 dark:bg-[#0F172A] text-gray-400 dark:text-gray-500 ring-transparent'
-                      }`}>
-                        {isComplete
-                          ? <Check className="h-4 w-4" aria-hidden="true" />
-                          : (() => { const StepIcon = step.icon; return <StepIcon className="h-4 w-4" aria-hidden="true" /> })()
-                        }
+                      <div
+                        className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ring-4 transition-all ${
+                          isComplete
+                            ? 'bg-green-500 text-white ring-green-100 dark:ring-green-900/30'
+                            : isActive
+                              ? 'bg-[#00E5FF] text-[#0A192F] ring-[#00E5FF]/20'
+                              : 'bg-gray-100 dark:bg-[#0F172A] text-gray-400 dark:text-gray-500 ring-transparent'
+                        }`}
+                      >
+                        {isComplete ? (
+                          <Check className="h-4 w-4" aria-hidden="true" />
+                        ) : (
+                          (() => {
+                            const StepIcon = step.icon
+                            return <StepIcon className="h-4 w-4" aria-hidden="true" />
+                          })()
+                        )}
                       </div>
 
                       {/* Label */}
                       <div>
-                        <p className={`text-sm font-semibold leading-tight ${
-                          isComplete
-                            ? 'text-green-600 dark:text-green-400'
-                            : isActive
-                              ? 'text-[#0A192F] dark:text-white'
-                              : 'text-gray-400 dark:text-gray-500'
-                        }`}>
+                        <p
+                          className={`text-sm font-semibold leading-tight ${
+                            isComplete
+                              ? 'text-green-600 dark:text-green-400'
+                              : isActive
+                                ? 'text-[#0A192F] dark:text-white'
+                                : 'text-gray-400 dark:text-gray-500'
+                          }`}
+                        >
                           {step.title}
                         </p>
-                        <p className={`text-xs mt-0.5 leading-relaxed ${
-                          isActive
-                            ? 'text-gray-500 dark:text-gray-400'
-                            : 'text-gray-400 dark:text-gray-600'
-                        }`}>
+                        <p
+                          className={`text-xs mt-0.5 leading-relaxed ${
+                            isActive
+                              ? 'text-gray-500 dark:text-gray-400'
+                              : 'text-gray-400 dark:text-gray-600'
+                          }`}
+                        >
                           {step.desc}
                         </p>
                       </div>
@@ -272,8 +311,9 @@ export default function DashboardPage() {
                         </span>
                       )}
 
-                      {isActive && step.id === 'email' && (
-                        resendSent ? (
+                      {isActive &&
+                        step.id === 'email' &&
+                        (resendSent ? (
                           <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
                             <CircleCheck className="h-2.5 w-2.5" aria-hidden="true" />
                             Correo enviado — revisa tu bandeja
@@ -285,14 +325,14 @@ export default function DashboardPage() {
                             onClick={handleResendEmail}
                             className="text-xs font-semibold bg-[#0A192F] dark:bg-[#00E5FF] text-white dark:text-[#0A192F] px-4 py-1.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-1.5"
                           >
-                            {resendLoading
-                              ? <Loader2 className="h-3 w-3 animate-spin" />
-                              : <Send className="h-2.5 w-2.5" aria-hidden="true" />
-                            }
+                            {resendLoading ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Send className="h-2.5 w-2.5" aria-hidden="true" />
+                            )}
                             Reenviar correo
                           </button>
-                        )
-                      )}
+                        ))}
 
                       {isActive && step.id === 'kyc' && (
                         <Link
@@ -323,7 +363,8 @@ export default function DashboardPage() {
       {/* Main stat cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Hero card — total pending balance */}
-        <div className="col-span-1 md:col-span-2 lg:col-span-1 rounded-lg p-8 relative overflow-hidden shadow-xl"
+        <div
+          className="col-span-1 md:col-span-2 lg:col-span-1 rounded-lg p-8 relative overflow-hidden shadow-xl"
           style={{ background: 'linear-gradient(135deg, #0A192F 0%, #1A365D 100%)' }}
         >
           <div className="absolute -right-10 -top-10 w-40 h-40 bg-[#00E5FF]/20 rounded-full blur-2xl" />
@@ -350,9 +391,7 @@ export default function DashboardPage() {
                   {activeLoan ? 'Préstamo activo' : 'Sin préstamos activos'}
                 </span>
                 {activeLoan && (
-                  <span className="text-[#D4AF37] font-bold text-sm">
-                    {activeLoan.status}
-                  </span>
+                  <span className="text-[#D4AF37] font-bold text-sm">{activeLoan.status}</span>
                 )}
               </div>
               {/* ── Tasas del préstamo activo (transparencia SBS Res. 3274-2017)
@@ -414,7 +453,9 @@ export default function DashboardPage() {
             </span>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">Préstamos Activos</p>
+            <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">
+              Préstamos Activos
+            </p>
             {isLoading ? (
               <Skeleton className="h-8 w-12 mb-2" />
             ) : (
@@ -428,7 +469,9 @@ export default function DashboardPage() {
               </p>
             ) : (
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {activeLoans.length === 0 ? 'No tienes préstamos activos.' : 'Revisa tus préstamos.'}
+                {activeLoans.length === 0
+                  ? 'No tienes préstamos activos.'
+                  : 'Revisa tus préstamos.'}
               </p>
             )}
           </div>
@@ -437,12 +480,16 @@ export default function DashboardPage() {
               <div className="w-full bg-gray-100 dark:bg-[#0F172A] rounded-full h-2 mb-2">
                 <div
                   className="bg-[#D4AF37] h-2 rounded-full"
-                  style={{ width: `${Math.min(100, (activeLoans.length / Math.max(loans.length, 1)) * 100)}%` }}
+                  style={{
+                    width: `${Math.min(100, (activeLoans.length / Math.max(loans.length, 1)) * 100)}%`,
+                  }}
                 />
               </div>
               <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 font-medium">
                 <span>Préstamos activos</span>
-                <span>{activeLoans.length}/{loans.length}</span>
+                <span>
+                  {activeLoans.length}/{loans.length}
+                </span>
               </div>
             </div>
           )}
@@ -459,7 +506,9 @@ export default function DashboardPage() {
             </span>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">Solicitudes Pendientes</p>
+            <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">
+              Solicitudes Pendientes
+            </p>
             {isLoading ? (
               <Skeleton className="h-7 w-10 mb-2" />
             ) : (
@@ -488,14 +537,44 @@ export default function DashboardPage() {
 
       {/* Quick access */}
       <div>
-        <h3 className="text-lg font-semibold text-[#0A192F] dark:text-white mb-4">Accesos Rápidos</h3>
+        <h3 className="text-lg font-semibold text-[#0A192F] dark:text-white mb-4">
+          Accesos Rápidos
+        </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { icon: HandCoins, label: 'Solicitar Préstamo', color: 'text-[#00E5FF]', bg: 'bg-[#00E5FF]/10', href: '/request-loan', hoverBorder: 'hover:border-[#00E5FF]' },
-            { icon: Wallet, label: 'Mis Préstamos', color: 'text-[#0A192F] dark:text-[#D4AF37]', bg: 'bg-[#0A192F]/5 dark:bg-[#D4AF37]/10', href: '/loans', hoverBorder: 'hover:border-[#0A192F] dark:hover:border-[#D4AF37]' },
-            { icon: ArrowLeftRight, label: 'Hacer Pago', color: 'text-[#0A192F] dark:text-[#D4AF37]', bg: 'bg-[#0A192F]/5 dark:bg-[#D4AF37]/10', href: activeLoan ? `/loans/${activeLoan.id}/pay` : '/loans', hoverBorder: 'hover:border-[#0A192F] dark:hover:border-[#D4AF37]' },
-            { icon: Headphones, label: 'Ayuda', color: 'text-[#0A192F] dark:text-[#D4AF37]', bg: 'bg-[#0A192F]/5 dark:bg-[#D4AF37]/10', href: '#', hoverBorder: 'hover:border-[#0A192F] dark:hover:border-[#D4AF37]' },
-          ].map(item => {
+            {
+              icon: HandCoins,
+              label: 'Solicitar Préstamo',
+              color: 'text-[#00E5FF]',
+              bg: 'bg-[#00E5FF]/10',
+              href: '/request-loan',
+              hoverBorder: 'hover:border-[#00E5FF]',
+            },
+            {
+              icon: Wallet,
+              label: 'Mis Préstamos',
+              color: 'text-[#0A192F] dark:text-[#D4AF37]',
+              bg: 'bg-[#0A192F]/5 dark:bg-[#D4AF37]/10',
+              href: '/loans',
+              hoverBorder: 'hover:border-[#0A192F] dark:hover:border-[#D4AF37]',
+            },
+            {
+              icon: ArrowLeftRight,
+              label: 'Hacer Pago',
+              color: 'text-[#0A192F] dark:text-[#D4AF37]',
+              bg: 'bg-[#0A192F]/5 dark:bg-[#D4AF37]/10',
+              href: activeLoan ? `/loans/${activeLoan.id}/pay` : '/loans',
+              hoverBorder: 'hover:border-[#0A192F] dark:hover:border-[#D4AF37]',
+            },
+            {
+              icon: Headphones,
+              label: 'Ayuda',
+              color: 'text-[#0A192F] dark:text-[#D4AF37]',
+              bg: 'bg-[#0A192F]/5 dark:bg-[#D4AF37]/10',
+              href: '#',
+              hoverBorder: 'hover:border-[#0A192F] dark:hover:border-[#D4AF37]',
+            },
+          ].map((item) => {
             const ItemIcon = item.icon
             return (
               <Link
@@ -503,7 +582,9 @@ export default function DashboardPage() {
                 href={item.href}
                 className={`${cardCls} p-4 flex flex-col items-center justify-center gap-3 ${item.hoverBorder} transition-colors group`}
               >
-                <div className={`w-10 h-10 rounded-xl ${item.bg} ${item.color} flex items-center justify-center group-hover:scale-105 transition-transform`}>
+                <div
+                  className={`w-10 h-10 rounded-xl ${item.bg} ${item.color} flex items-center justify-center group-hover:scale-105 transition-transform`}
+                >
                   <ItemIcon className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-[#0A192F] dark:group-hover:text-white text-center">
@@ -522,44 +603,63 @@ export default function DashboardPage() {
             <div className="w-10 h-10 rounded-xl bg-[#00E5FF]/10 flex items-center justify-center text-[#00E5FF]">
               <GraduationCap className="h-6 w-6" aria-hidden="true" />
             </div>
-            <h3 className="text-lg font-semibold text-[#0A192F] dark:text-white">Educación Financiera</h3>
+            <h3 className="text-lg font-semibold text-[#0A192F] dark:text-white">
+              Educación Financiera
+            </h3>
           </div>
-          <Link href="/learn" className="text-sm text-[#00E5FF] font-medium hover:underline">Ver más consejos</Link>
+          <Link href="/learn" className="text-sm text-[#00E5FF] font-medium hover:underline">
+            Ver más consejos
+          </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
             {
-              icon: Lightbulb, iconBg: 'bg-blue-500',
-              cardBg: 'bg-linear-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/40 dark:to-blue-800/20',
+              icon: Lightbulb,
+              iconBg: 'bg-blue-500',
+              cardBg:
+                'bg-linear-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/40 dark:to-blue-800/20',
               border: 'border-blue-200 dark:border-blue-700/50',
               title: 'Cómo mejorar tu historial crediticio',
               text: 'Paga tus cuotas a tiempo y mantén un buen comportamiento de pago para acceder a mejores tasas.',
             },
             {
-              icon: LineChart, iconBg: 'bg-green-500',
-              cardBg: 'bg-linear-to-br from-green-50 to-green-100/50 dark:from-green-900/40 dark:to-green-800/20',
+              icon: LineChart,
+              iconBg: 'bg-green-500',
+              cardBg:
+                'bg-linear-to-br from-green-50 to-green-100/50 dark:from-green-900/40 dark:to-green-800/20',
               border: 'border-green-200 dark:border-green-700/50',
               title: 'Gestiona tu endeudamiento',
               text: 'No comprometas más del 30% de tus ingresos en el pago de deudas mensuales.',
             },
             {
-              icon: PiggyBank, iconBg: 'bg-yellow-500',
-              cardBg: 'bg-linear-to-br from-yellow-50 to-yellow-100/50 dark:from-yellow-900/40 dark:to-yellow-800/20',
+              icon: PiggyBank,
+              iconBg: 'bg-yellow-500',
+              cardBg:
+                'bg-linear-to-br from-yellow-50 to-yellow-100/50 dark:from-yellow-900/40 dark:to-yellow-800/20',
               border: 'border-yellow-200 dark:border-yellow-700/50',
               title: 'Ahorra para emergencias',
               text: 'Mantén un fondo de emergencia equivalente a 3-6 meses de tus gastos fijos.',
             },
-          ].map(card => {
+          ].map((card) => {
             const CardIcon = card.icon
             return (
-              <div key={card.title} className={`p-4 rounded-xl ${card.cardBg} border ${card.border}`}>
+              <div
+                key={card.title}
+                className={`p-4 rounded-xl ${card.cardBg} border ${card.border}`}
+              >
                 <div className="flex items-start gap-3">
-                  <div className={`w-8 h-8 rounded-lg ${card.iconBg} flex items-center justify-center text-white shrink-0 mt-0.5`}>
+                  <div
+                    className={`w-8 h-8 rounded-lg ${card.iconBg} flex items-center justify-center text-white shrink-0 mt-0.5`}
+                  >
                     <CardIcon className="h-4 w-4" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-[#0A192F] dark:text-white text-sm mb-1.5">{card.title}</h3>
-                    <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{card.text}</p>
+                    <h3 className="font-medium text-[#0A192F] dark:text-white text-sm mb-1.5">
+                      {card.title}
+                    </h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                      {card.text}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -573,12 +673,16 @@ export default function DashboardPage() {
         {/* Recent activity */}
         <div className={`lg:col-span-2 ${cardCls} p-6`}>
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-[#0A192F] dark:text-white">Actividad Reciente</h3>
-            <Link href="/loans" className="text-sm text-[#00E5FF] font-medium hover:underline">Ver todo</Link>
+            <h3 className="text-lg font-semibold text-[#0A192F] dark:text-white">
+              Actividad Reciente
+            </h3>
+            <Link href="/loans" className="text-sm text-[#00E5FF] font-medium hover:underline">
+              Ver todo
+            </Link>
           </div>
           {isLoading ? (
             <div className="space-y-3">
-              {[1, 2, 3].map(i => (
+              {[1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center gap-4 p-4 rounded-xl">
                   <Skeleton className="w-9 h-9 rounded-lg shrink-0" />
                   <div className="flex-1 space-y-2">
@@ -594,38 +698,46 @@ export default function DashboardPage() {
             </div>
           ) : recentActivity.length === 0 ? (
             <div className="py-12 text-center">
-              <FolderOpen className="h-10 w-10 text-gray-300 dark:text-gray-600 mb-3" aria-hidden="true" />
+              <FolderOpen
+                className="h-10 w-10 text-gray-300 dark:text-gray-600 mb-3"
+                aria-hidden="true"
+              />
               <p className="text-gray-500 dark:text-gray-400 text-sm">No hay actividad reciente.</p>
             </div>
           ) : (
             <div className="space-y-2">
-              {recentActivity.map(loan => (
+              {recentActivity.map((loan) => (
                 <Link
                   key={loan.id}
                   href={`/loans/${loan.id}`}
                   className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors border border-transparent hover:border-[#E2E8F0] dark:hover:border-[#334155]"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0
-                      ${loan.status === 'PAID'
-                        ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'
-                        : loan.status === 'PENDING'
-                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400'
-                          : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400'
+                    <div
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0
+                      ${
+                        loan.status === 'PAID'
+                          ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'
+                          : loan.status === 'PENDING'
+                            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-500 dark:text-blue-400'
+                            : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400'
                       }`}
                     >
-                      {loan.status === 'PAID'
-                        ? <Check className="h-5 w-5" aria-hidden="true" />
-                        : loan.status === 'PENDING'
-                          ? <Clock className="h-5 w-5" aria-hidden="true" />
-                          : <Wallet className="h-5 w-5" aria-hidden="true" />
-                      }
+                      {loan.status === 'PAID' ? (
+                        <Check className="h-5 w-5" aria-hidden="true" />
+                      ) : loan.status === 'PENDING' ? (
+                        <Clock className="h-5 w-5" aria-hidden="true" />
+                      ) : (
+                        <Wallet className="h-5 w-5" aria-hidden="true" />
+                      )}
                     </div>
                     <div>
                       <h3 className="text-[#0A192F] dark:text-white font-medium text-sm">
                         Préstamo #{loanRef(loan.id)}
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(loan.createdAt)}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {formatDate(loan.createdAt)}
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -644,7 +756,9 @@ export default function DashboardPage() {
         <div className="space-y-6">
           {/* Pre-approval promo */}
           {kycApproved && !activeLoan && (
-            <div className={`${cardCls} p-6 border border-[#D4AF37]/50 relative overflow-hidden bg-linear-to-br from-white dark:from-[#1E293B] to-yellow-50 dark:to-yellow-900/10`}>
+            <div
+              className={`${cardCls} p-6 border border-[#D4AF37]/50 relative overflow-hidden bg-linear-to-br from-white dark:from-[#1E293B] to-yellow-50 dark:to-yellow-900/10`}
+            >
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#D4AF37]/20 rounded-full blur-xl" />
               <div className="relative z-10">
                 <span className="inline-block px-2 py-0.5 bg-[#D4AF37]/10 text-yellow-800 dark:text-[#D4AF37] text-xs font-medium rounded mb-3 uppercase tracking-wider">
@@ -654,7 +768,9 @@ export default function DashboardPage() {
                   Solicita tu préstamo
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                  Estás verificado. Obtén hasta <strong className="text-[#0A192F] dark:text-[#D4AF37]">S/ 2,000</strong> con aprobación en minutos.
+                  Estás verificado. Obtén hasta{' '}
+                  <strong className="text-[#0A192F] dark:text-[#D4AF37]">S/ 2,000</strong> con
+                  aprobación en minutos.
                 </p>
                 <button
                   type="button"
@@ -669,11 +785,16 @@ export default function DashboardPage() {
 
           {/* Account summary */}
           <div className={`${cardCls} p-6`}>
-            <h3 className="text-base font-semibold text-[#0A192F] dark:text-white mb-4">Datos de Cuenta</h3>
+            <h3 className="text-base font-semibold text-[#0A192F] dark:text-white mb-4">
+              Datos de Cuenta
+            </h3>
             {isLoading ? (
               <div className="space-y-3">
                 {[1, 2, 3, 4].map((i, idx, arr) => (
-                  <div key={i} className={`flex justify-between items-center ${idx < arr.length - 1 ? 'pb-3 border-b border-gray-100 dark:border-white/6' : ''}`}>
+                  <div
+                    key={i}
+                    className={`flex justify-between items-center ${idx < arr.length - 1 ? 'pb-3 border-b border-gray-100 dark:border-white/6' : ''}`}
+                  >
                     <Skeleton className="h-4 w-20" />
                     <Skeleton className="h-4 w-32" />
                   </div>
@@ -684,18 +805,33 @@ export default function DashboardPage() {
                 {[
                   { label: 'Titular', value: user ? `${user.firstName} ${user.lastName}` : '–' },
                   { label: 'Email', value: user?.email ?? '–' },
-                  { label: 'Email', value: user?.emailVerified ? '✓ Email verificado' : '⚠ Pendiente de verificación' },
-                  { label: 'Estado KYC', value: kycApproved ? '✓ Identidad verificada' : 'Pendiente de verificación' },
+                  {
+                    label: 'Email',
+                    value: user?.emailVerified
+                      ? '✓ Email verificado'
+                      : '⚠ Pendiente de verificación',
+                  },
+                  {
+                    label: 'Estado KYC',
+                    value: kycApproved ? '✓ Identidad verificada' : 'Pendiente de verificación',
+                  },
                 ].map((item, i, arr) => (
-                  <div key={`${item.label}-${i}`} className={`flex justify-between items-center ${i < arr.length - 1 ? 'pb-3 border-b border-gray-100 dark:border-white/6' : ''}`}>
+                  <div
+                    key={`${item.label}-${i}`}
+                    className={`flex justify-between items-center ${i < arr.length - 1 ? 'pb-3 border-b border-gray-100 dark:border-white/6' : ''}`}
+                  >
                     <span className="text-sm text-gray-500 dark:text-gray-400">{item.label}</span>
-                    <span className={`text-sm font-medium text-right max-w-[55%] truncate ${
-                      item.value.startsWith('✓')
-                        ? 'text-green-600 dark:text-green-400'
-                        : item.value.startsWith('⚠')
-                          ? 'text-amber-500'
-                          : 'text-gray-800 dark:text-gray-200'
-                    }`}>{item.value}</span>
+                    <span
+                      className={`text-sm font-medium text-right max-w-[55%] truncate ${
+                        item.value.startsWith('✓')
+                          ? 'text-green-600 dark:text-green-400'
+                          : item.value.startsWith('⚠')
+                            ? 'text-amber-500'
+                            : 'text-gray-800 dark:text-gray-200'
+                      }`}
+                    >
+                      {item.value}
+                    </span>
                   </div>
                 ))}
               </div>

@@ -48,8 +48,8 @@ export default function LibroDeReclamacionesPage() {
             Presenta un reclamo o queja
           </h1>
           <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Conforme al <strong>D.S. N° 011-2011-PCM</strong> y al Código de Protección y Defensa del
-            Consumidor (<strong>Ley N° 29571</strong>). Te responderemos por correo en un plazo
+            Conforme al <strong>D.S. N° 011-2011-PCM</strong> y al Código de Protección y Defensa
+            del Consumidor (<strong>Ley N° 29571</strong>). Te responderemos por correo en un plazo
             máximo de <strong>15 días hábiles</strong>.
           </p>
         </div>
@@ -63,12 +63,13 @@ export default function LibroDeReclamacionesPage() {
             <Card className="mb-6 p-4 rounded-lg bg-brand-card border-gray-100 dark:border-white/6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-none">
               <div className="flex items-start gap-3">
                 <div className="w-9 h-9 rounded-full bg-brand-primary/5 dark:bg-brand-secondary/10 flex items-center justify-center shrink-0">
-                  <Search className="h-4 w-4 text-brand-primary dark:text-brand-secondary" aria-hidden="true" />
+                  <Search
+                    className="h-4 w-4 text-brand-primary dark:text-brand-secondary"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-brand-text">
-                    ¿Ya presentaste un reclamo?
-                  </p>
+                  <p className="text-sm font-medium text-brand-text">¿Ya presentaste un reclamo?</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     Consulta su estado con tu código y número de documento.
                   </p>
@@ -90,8 +91,19 @@ export default function LibroDeReclamacionesPage() {
 
       <footer className="border-t border-gray-100 dark:border-white/5 py-6 text-center text-xs text-gray-500 dark:text-gray-400">
         © {CURRENT_YEAR} Crevo ·{' '}
-        <Link href="/terminos-y-condiciones" className="hover:text-brand-primary dark:hover:text-brand-secondary">Términos</Link>{' · '}
-        <Link href="/politica-de-privacidad" className="hover:text-brand-primary dark:hover:text-brand-secondary">Privacidad</Link>
+        <Link
+          href="/terminos-y-condiciones"
+          className="hover:text-brand-primary dark:hover:text-brand-secondary"
+        >
+          Términos
+        </Link>
+        {' · '}
+        <Link
+          href="/politica-de-privacidad"
+          className="hover:text-brand-primary dark:hover:text-brand-secondary"
+        >
+          Privacidad
+        </Link>
       </footer>
     </div>
   )

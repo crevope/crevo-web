@@ -71,16 +71,22 @@ export function SauTicketDetailCard({ ticket }: Readonly<{ ticket: SauTicketView
       {/* Meta */}
       <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-5 border-t border-gray-100 dark:border-white/6 text-sm">
         <div>
-          <dt className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Recibido</dt>
+          <dt className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+            Recibido
+          </dt>
           <dd className="text-brand-text font-medium">{formatDateTime(ticket.filedAt)}</dd>
         </div>
         <div>
-          <dt className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Plazo máximo de respuesta</dt>
+          <dt className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+            Plazo máximo de respuesta
+          </dt>
           <dd className="text-brand-text font-medium">{formatDateTime(ticket.slaDeadline)}</dd>
         </div>
         {ticket.loanId && (
           <div className="sm:col-span-2">
-            <dt className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Préstamo relacionado</dt>
+            <dt className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+              Préstamo relacionado
+            </dt>
             <dd className="text-brand-text font-mono text-xs break-all">{ticket.loanId}</dd>
           </div>
         )}

@@ -95,10 +95,9 @@ export const complaintsRepository = {
   /** Public lookup — requires the claim code AND the consumer document number,
    *  passed as a query param so the code alone is useless for enumeration. */
   async consult(claimCode: string, documentNumber: string): Promise<PublicComplaintView> {
-    const { data } = await apiClient.get(
-      `/complaints/consulta/${encodeURIComponent(claimCode)}`,
-      { params: { documentNumber } },
-    )
+    const { data } = await apiClient.get(`/complaints/consulta/${encodeURIComponent(claimCode)}`, {
+      params: { documentNumber },
+    })
     return data.data
   },
 

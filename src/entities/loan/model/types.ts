@@ -3,12 +3,12 @@ export interface Loan {
   userId: string
   amount: number
   // ── Comisiones ─────────────────────────────────────────────────────────────
-  disbursementFee: number      // comisión de desembolso — se descuenta del monto recibido
-  techFee: number              // comisión de tecnología — ítem separado
-  maintenanceFee: number       // comisión de mantenimiento por cuota
-  maintenanceFeeTotal: number  // maintenanceFee × numInstallments
-  igvAmount: number            // IGV 18% sobre comisiones
-  netDisbursed: number         // monto que recibe el cliente (amount - disbursementFee)
+  disbursementFee: number // comisión de desembolso — se descuenta del monto recibido
+  techFee: number // comisión de tecnología — ítem separado
+  maintenanceFee: number // comisión de mantenimiento por cuota
+  maintenanceFeeTotal: number // maintenanceFee × numInstallments
+  igvAmount: number // IGV 18% sobre comisiones
+  netDisbursed: number // monto que recibe el cliente (amount - disbursementFee)
   // ── Totales ────────────────────────────────────────────────────────────────
   totalInterest: number
   totalAmount: number
@@ -33,8 +33,15 @@ export interface Loan {
 }
 
 export type LoanStatus =
-  | 'PENDING' | 'APPROVED' | 'REJECTED' | 'SIGNED'
-  | 'DISBURSED' | 'ACTIVE' | 'OVERDUE' | 'PAID' | 'CANCELLED'
+  | 'PENDING'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'SIGNED'
+  | 'DISBURSED'
+  | 'ACTIVE'
+  | 'OVERDUE'
+  | 'PAID'
+  | 'CANCELLED'
 
 export interface LoanBalance {
   loanId: string
@@ -76,7 +83,7 @@ export interface Installment {
   amount: number
   paidAmount: number
   status: InstallmentStatus
-  paymentId?: string  // ID del pago que cubrió esta cuota (disponible si status === 'PAID')
+  paymentId?: string // ID del pago que cubrió esta cuota (disponible si status === 'PAID')
 }
 
 export interface ProductLimitInfo {

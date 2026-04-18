@@ -54,8 +54,7 @@ export function buildMetadata({
   keywords,
 }: BuildMetadataInput): Metadata {
   const canonicalUrl = `${SITE_URL}${path}`
-  const finalSocialTitle =
-    socialTitle ?? (titleAbsolute ? title : `${title} | ${SITE.name}`)
+  const finalSocialTitle = socialTitle ?? (titleAbsolute ? title : `${title} | ${SITE.name}`)
   const finalSocialDescription = socialDescription ?? description
 
   return {

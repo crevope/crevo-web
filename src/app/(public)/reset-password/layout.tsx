@@ -8,8 +8,6 @@ export const metadata = buildMetadata({
   index: false,
 })
 
-export default function ResetPasswordLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function ResetPasswordLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return children
 }

@@ -8,12 +8,22 @@ export interface Notification {
 }
 
 export type NotificationType =
-  | 'LOAN_APPROVED' | 'LOAN_REJECTED' | 'LOAN_DISBURSED'
-  | 'PAYMENT_CONFIRMED' | 'PAYMENT_REMINDER' | 'LOAN_OVERDUE'
-  | 'LOAN_PAID' | 'KYC_VERIFIED'
+  | 'LOAN_APPROVED'
+  | 'LOAN_REJECTED'
+  | 'LOAN_DISBURSED'
+  | 'PAYMENT_CONFIRMED'
+  | 'PAYMENT_REMINDER'
+  | 'LOAN_OVERDUE'
+  | 'LOAN_PAID'
+  | 'KYC_VERIFIED'
 
 export const NOTIFICATION_ICONS: Record<NotificationType, string> = {
-  LOAN_APPROVED: '✅', LOAN_REJECTED: '❌', LOAN_DISBURSED: '💸',
-  PAYMENT_CONFIRMED: '💚', PAYMENT_REMINDER: '⏰', LOAN_OVERDUE: '🔴',
-  LOAN_PAID: '🎉', KYC_VERIFIED: '🪪',
+  LOAN_APPROVED: '✅',
+  LOAN_REJECTED: '❌',
+  LOAN_DISBURSED: '💸',
+  PAYMENT_CONFIRMED: '💚',
+  PAYMENT_REMINDER: '⏰',
+  LOAN_OVERDUE: '🔴',
+  LOAN_PAID: '🎉',
+  KYC_VERIFIED: '🪪',
 }

@@ -5,7 +5,8 @@ import { buildMetadata } from '@/shared/seo/buildMetadata'
 // us still set the noindex headers + a sensible browser-tab title.
 export const metadata = buildMetadata({
   title: 'Recuperar contraseña',
-  description: 'Recupera el acceso a tu cuenta de Crevo. Te enviaremos un enlace seguro a tu correo.',
+  description:
+    'Recupera el acceso a tu cuenta de Crevo. Te enviaremos un enlace seguro a tu correo.',
   path: '/forgot-password',
   index: false,
 })

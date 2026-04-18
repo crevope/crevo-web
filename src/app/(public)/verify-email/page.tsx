@@ -2,7 +2,17 @@
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Loader2, Check, TriangleAlert, CircleAlert, RotateCw, ArrowLeft, MailCheck, ShieldCheck, Zap } from 'lucide-react'
+import {
+  Loader2,
+  Check,
+  TriangleAlert,
+  CircleAlert,
+  RotateCw,
+  ArrowLeft,
+  MailCheck,
+  ShieldCheck,
+  Zap,
+} from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -35,12 +45,13 @@ function VerifyEmailContent() {
       setMessage('Token de verificación no encontrado.')
       return
     }
-    authRepository.verifyEmail(token)
-      .then(res => {
+    authRepository
+      .verifyEmail(token)
+      .then((res) => {
         setStatus('success')
         setMessage(res.message || '¡Email verificado con éxito!')
       })
-      .catch(err => {
+      .catch((err) => {
         setStatus('error')
         setMessage(err instanceof Error ? err.message : 'El enlace expiró o es inválido.')
       })
@@ -62,7 +73,9 @@ function VerifyEmailContent() {
           <Loader2 className="h-6 w-6 animate-spin text-[#00E5FF]" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-1">Verificando tu email</h2>
+          <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-1">
+            Verificando tu email
+          </h2>
           <p className="text-gray-400 dark:text-gray-500 text-sm">Por favor espera un momento...</p>
         </div>
       </div>
@@ -79,7 +92,9 @@ function VerifyEmailContent() {
           <span className="text-[#00E5FF] text-xs tracking-wider uppercase mb-2 block">
             Verificación exitosa
           </span>
-          <h2 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-2">¡Email verificado!</h2>
+          <h2 className="text-2xl font-semibold text-[#0A192F] dark:text-white mb-2">
+            ¡Email verificado!
+          </h2>
           <p className="text-gray-400 dark:text-gray-500 text-sm leading-relaxed max-w-xs mx-auto">
             {message}
           </p>
@@ -104,7 +119,9 @@ function VerifyEmailContent() {
           <span className="text-red-500 text-xs tracking-wider uppercase mb-2 block">
             Error de verificación
           </span>
-          <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-1">Enlace inválido</h2>
+          <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-1">
+            Enlace inválido
+          </h2>
           <p className="text-gray-400 dark:text-gray-500 text-sm">{message}</p>
         </div>
       </div>
@@ -136,9 +153,13 @@ function VerifyEmailContent() {
           className="w-full py-3 rounded-lg bg-[#0A192F] text-[#D4AF37] font-medium text-sm hover:bg-[#112240] disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
-            <><Loader2 className="h-4 w-4 animate-spin" /> Enviando...</>
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Enviando...
+            </>
           ) : (
-            <><RotateCw className="h-3 w-3" aria-hidden="true" /> Reenviar email de verificación</>
+            <>
+              <RotateCw className="h-3 w-3" aria-hidden="true" /> Reenviar email de verificación
+            </>
           )}
         </button>
       </form>
@@ -148,7 +169,10 @@ function VerifyEmailContent() {
           href="/login"
           className="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-[#00E5FF] dark:hover:text-[#00E5FF] transition-colors group"
         >
-          <ArrowLeft className="h-3 w-3 mr-2 group-hover:-translate-x-1 transition-transform" aria-hidden="true" />
+          <ArrowLeft
+            className="h-3 w-3 mr-2 group-hover:-translate-x-1 transition-transform"
+            aria-hidden="true"
+          />
           Volver al inicio
         </Link>
       </div>
@@ -163,7 +187,6 @@ export default function VerifyEmailPage() {
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-10 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-[1000px] flex flex-col lg:flex-row bg-white dark:bg-[#1E293B] rounded-lg shadow-sm overflow-hidden border border-gray-100 dark:border-white/6 min-h-[560px]">
-
           {/* ── Left Hero ─────────────────────────────────────────────── */}
           <div className="hidden lg:flex flex-col justify-center items-center w-1/2 p-10 relative overflow-hidden bg-[#0A192F]">
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-[#00E5FF] rounded-full mix-blend-multiply filter blur-3xl opacity-15 z-0" />
@@ -194,11 +217,13 @@ export default function VerifyEmailPage() {
           {/* ── Right Content ──────────────────────────────────────────── */}
           <div className="w-full lg:w-1/2 p-8 sm:p-10 flex flex-col justify-center bg-white dark:bg-[#1E293B]">
             <div className="max-w-md w-full mx-auto">
-              <Suspense fallback={
-                <div className="flex justify-center py-12">
-                  <Loader2 className="h-10 w-10 animate-spin text-[#00E5FF]" />
-                </div>
-              }>
+              <Suspense
+                fallback={
+                  <div className="flex justify-center py-12">
+                    <Loader2 className="h-10 w-10 animate-spin text-[#00E5FF]" />
+                  </div>
+                }
+              >
                 <VerifyEmailContent />
               </Suspense>
             </div>

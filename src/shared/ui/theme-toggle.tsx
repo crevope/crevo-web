@@ -10,7 +10,12 @@ export function ThemeToggle() {
   const current = (theme as keyof typeof cycles) ?? 'system'
   const Icon = icons[current] ?? Monitor
   return (
-    <Button variant="ghost" size="icon" onClick={() => setTheme(cycles[current])} title={`Tema: ${current}`}>
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(cycles[current])}
+      title={`Tema: ${current}`}
+    >
       <Icon className="h-4 w-4" />
       <span className="sr-only">Cambiar tema</span>
     </Button>

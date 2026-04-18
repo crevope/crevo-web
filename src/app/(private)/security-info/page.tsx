@@ -2,10 +2,31 @@
 import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
 import {
-  Lock, ShieldCheck, Key, Globe, IdCard, UserCheck, Fingerprint,
-  FileSignature, DoorClosed, Ticket, RotateCw, Gauge, Landmark,
-  FileLock, Scale, Percent, Handshake, Eye, List, Bell, Cloud,
-  ChevronRight, CircleHelp, Settings, Clock,
+  Lock,
+  ShieldCheck,
+  Key,
+  Globe,
+  IdCard,
+  UserCheck,
+  Fingerprint,
+  FileSignature,
+  DoorClosed,
+  Ticket,
+  RotateCw,
+  Gauge,
+  Landmark,
+  FileLock,
+  Scale,
+  Percent,
+  Handshake,
+  Eye,
+  List,
+  Bell,
+  Cloud,
+  ChevronRight,
+  CircleHelp,
+  Settings,
+  Clock,
 } from 'lucide-react'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -21,8 +42,8 @@ interface SecuritySection {
   icon: LucideIcon
   title: string
   subtitle: string
-  color: string       // text color
-  bg: string          // icon bg
+  color: string // text color
+  bg: string // icon bg
   border: string
   cardBg: string
   items: SecurityItem[]
@@ -181,10 +202,10 @@ const SECTIONS: SecuritySection[] = [
 // ─── Stats rápidos ─────────────────────────────────────────────────────────────
 
 const STATS: { icon: LucideIcon; value: string; label: string }[] = [
-  { icon: Lock,       value: 'AES-256',    label: 'Estándar de cifrado' },
-  { icon: ShieldCheck, value: '100%',       label: 'Tráfico cifrado HTTPS' },
-  { icon: Landmark,   value: 'UIF-Perú',   label: 'Sujeto Obligado PLAFT' },
-  { icon: Clock,      value: '15 min',     label: 'Expiración de sesión' },
+  { icon: Lock, value: 'AES-256', label: 'Estándar de cifrado' },
+  { icon: ShieldCheck, value: '100%', label: 'Tráfico cifrado HTTPS' },
+  { icon: Landmark, value: 'UIF-Perú', label: 'Sujeto Obligado PLAFT' },
+  { icon: Clock, value: '15 min', label: 'Expiración de sesión' },
 ]
 
 // ─── Componente ───────────────────────────────────────────────────────────────
@@ -192,17 +213,21 @@ const STATS: { icon: LucideIcon; value: string; label: string }[] = [
 export default function SecurityInfoPage() {
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
-
       {/* Breadcrumb + hero */}
       <div>
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
-          <Link href="/dashboard" className="hover:text-[#1A56FF] transition-colors">Dashboard</Link>
+          <Link href="/dashboard" className="hover:text-[#1A56FF] transition-colors">
+            Dashboard
+          </Link>
           <ChevronRight className="h-3 w-3" aria-hidden="true" />
           <span className="text-[#0A192F] dark:text-white">Seguridad y privacidad</span>
         </div>
 
         {/* Hero card */}
-        <div className="rounded-lg overflow-hidden border border-white/10" style={{ background: 'linear-gradient(135deg, #0A192F 0%, #1A365D 100%)' }}>
+        <div
+          className="rounded-lg overflow-hidden border border-white/10"
+          style={{ background: 'linear-gradient(135deg, #0A192F 0%, #1A365D 100%)' }}
+        >
           <div className="p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <div className="w-14 h-14 rounded-lg bg-[#00E5FF]/10 border border-[#00E5FF]/20 flex items-center justify-center shrink-0">
               <ShieldCheck className="h-7 w-7 text-[#00E5FF]" aria-hidden="true" />
@@ -213,10 +238,12 @@ export default function SecurityInfoPage() {
                   Protección activa
                 </span>
               </div>
-              <h1 className="text-2xl font-semibold text-white mb-1 tracking-tight">Seguridad y privacidad</h1>
+              <h1 className="text-2xl font-semibold text-white mb-1 tracking-tight">
+                Seguridad y privacidad
+              </h1>
               <p className="text-white/60 text-sm leading-relaxed max-w-xl">
-                Aquí explicamos con transparencia qué medidas técnicas y regulatorias protegen
-                tu información financiera y personal en Crevo.
+                Aquí explicamos con transparencia qué medidas técnicas y regulatorias protegen tu
+                información financiera y personal en Crevo.
               </p>
             </div>
           </div>
@@ -241,35 +268,45 @@ export default function SecurityInfoPage() {
       </div>
 
       {/* Sections */}
-      {SECTIONS.map(section => {
+      {SECTIONS.map((section) => {
         const SectionIcon = section.icon
         return (
           <div key={section.id} className="space-y-4">
             {/* Section header */}
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-lg ${section.bg} flex items-center justify-center shrink-0`}>
+              <div
+                className={`w-10 h-10 rounded-lg ${section.bg} flex items-center justify-center shrink-0`}
+              >
                 <SectionIcon className={`h-4 w-4 ${section.color}`} aria-hidden="true" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-[#0A192F] dark:text-white">{section.title}</h2>
+                <h2 className="text-base font-semibold text-[#0A192F] dark:text-white">
+                  {section.title}
+                </h2>
                 <p className="text-xs text-gray-400 dark:text-gray-500">{section.subtitle}</p>
               </div>
             </div>
 
             {/* Items */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {section.items.map(item => {
+              {section.items.map((item) => {
                 const ItemIcon = item.icon
                 return (
                   <div
                     key={item.title}
                     className={`p-5 rounded-lg border ${section.border} ${section.cardBg}`}
                   >
-                    <div className={`w-9 h-9 rounded-lg ${section.bg} flex items-center justify-center mb-3`}>
+                    <div
+                      className={`w-9 h-9 rounded-lg ${section.bg} flex items-center justify-center mb-3`}
+                    >
                       <ItemIcon className={`h-4 w-4 ${section.color}`} aria-hidden="true" />
                     </div>
-                    <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm mb-2">{item.title}</h3>
-                    <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{item.body}</p>
+                    <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm mb-2">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                      {item.body}
+                    </p>
                   </div>
                 )
               })}
@@ -279,7 +316,10 @@ export default function SecurityInfoPage() {
       })}
 
       {/* Footer CTA */}
-      <div className="rounded-lg p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-white/10" style={{ background: 'linear-gradient(135deg, #0A192F 0%, #1A365D 100%)' }}>
+      <div
+        className="rounded-lg p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-white/10"
+        style={{ background: 'linear-gradient(135deg, #0A192F 0%, #1A365D 100%)' }}
+      >
         <div className="flex items-start gap-4">
           <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
             <CircleHelp className="h-4 w-4 text-white" aria-hidden="true" />
@@ -288,7 +328,9 @@ export default function SecurityInfoPage() {
             <p className="font-semibold text-white text-sm">¿Tienes dudas sobre tu privacidad?</p>
             <p className="text-xs text-white/60 mt-0.5">
               Puedes solicitar la eliminación de tus datos o hacer consultas escribiéndonos a{' '}
-              <a href="mailto:privacidad@crevo.pe" className="text-[#00E5FF] hover:underline">privacidad@crevo.pe</a>
+              <a href="mailto:privacidad@crevo.pe" className="text-[#00E5FF] hover:underline">
+                privacidad@crevo.pe
+              </a>
             </p>
           </div>
         </div>
@@ -300,7 +342,6 @@ export default function SecurityInfoPage() {
           Configurar mi seguridad
         </Link>
       </div>
-
     </div>
   )
 }

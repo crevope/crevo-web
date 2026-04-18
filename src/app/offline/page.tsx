@@ -28,9 +28,9 @@ export default function OfflinePage() {
             Sin conexión
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-            No pudimos cargar esta página porque no hay conexión a internet. Revisa tu red e
-            intenta nuevamente — los datos de tu cuenta se sincronizarán automáticamente cuando
-            vuelvas a estar en línea.
+            No pudimos cargar esta página porque no hay conexión a internet. Revisa tu red e intenta
+            nuevamente — los datos de tu cuenta se sincronizarán automáticamente cuando vuelvas a
+            estar en línea.
           </p>
         </div>
       </div>

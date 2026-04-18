@@ -12,7 +12,7 @@ import { useCookieConsent } from '../lib/CookieConsentContext'
 // then — the banner stays under 2 KB on first paint instead of pulling the
 // full preferences UI with it.
 const CookiePreferencesDialog = dynamic(
-  () => import('./CookiePreferencesDialog').then(m => ({ default: m.CookiePreferencesDialog })),
+  () => import('./CookiePreferencesDialog').then((m) => ({ default: m.CookiePreferencesDialog })),
   { ssr: false },
 )
 
@@ -47,28 +47,23 @@ export function CookieBanner() {
                   Usamos cookies
                 </h2>
                 <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                  Las cookies necesarias nos permiten mantener tu sesión y
-                  proteger el sitio. Las analíticas y de marketing son opcionales
-                  y nos ayudan a entender cómo usas Crevo. Puedes aceptarlas
-                  todas, rechazarlas todas o elegir por categoría — tu decisión
-                  se guarda para las próximas visitas. Más información en
-                  nuestra{' '}
+                  Las cookies necesarias nos permiten mantener tu sesión y proteger el sitio. Las
+                  analíticas y de marketing son opcionales y nos ayudan a entender cómo usas Crevo.
+                  Puedes aceptarlas todas, rechazarlas todas o elegir por categoría — tu decisión se
+                  guarda para las próximas visitas. Más información en nuestra{' '}
                   <Link
                     href={LEGAL_URLS.COOKIES}
                     className="text-[#0A192F] dark:text-[#D4AF37] hover:underline font-medium"
                   >
                     Política de Cookies
-                  </Link>.
+                  </Link>
+                  .
                 </p>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-2 sm:justify-end mt-4">
-              <Button
-                variant="outline"
-                onClick={rejectAll}
-                className="sm:order-1 w-full sm:w-auto"
-              >
+              <Button variant="outline" onClick={rejectAll} className="sm:order-1 w-full sm:w-auto">
                 Rechazar opcionales
               </Button>
               <Button

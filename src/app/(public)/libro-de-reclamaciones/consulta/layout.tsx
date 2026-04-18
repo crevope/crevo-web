@@ -10,8 +10,6 @@ export const metadata = buildMetadata({
   path: '/libro-de-reclamaciones/consulta',
 })
 
-export default function ConsultaLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function ConsultaLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return children
 }

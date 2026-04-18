@@ -9,8 +9,7 @@ import { buildMetadata } from '@/shared/seo/buildMetadata'
 // noindex: account creation flow. Same rationale as /login.
 export const metadata = buildMetadata({
   title: 'Crear cuenta',
-  description:
-    'Regístrate en Crevo en menos de 2 minutos y solicita tu primer préstamo online.',
+  description: 'Regístrate en Crevo en menos de 2 minutos y solicita tu primer préstamo online.',
   path: '/register',
   index: false,
 })
@@ -22,7 +21,6 @@ export default function RegisterPage() {
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-10 flex items-center justify-center">
         <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-0 bg-white dark:bg-[#1E293B] rounded-lg shadow-sm overflow-hidden border border-gray-100 dark:border-white/6">
-
           {/* ── Left Hero ─────────────────────────────────────────────── */}
           <div className="hidden lg:flex flex-col justify-between bg-[#0A192F] p-10 text-white relative overflow-hidden">
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-[#00E5FF] rounded-full mix-blend-multiply filter blur-3xl opacity-15 z-0" />
@@ -36,10 +34,14 @@ export default function RegisterPage() {
 
               <h1 className="text-[33px] font-bold mb-4 leading-tight">
                 Gestiona tus préstamos en{' '}
-                <span className="bg-linear-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent">Soles</span>.
+                <span className="bg-linear-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent">
+                  Soles
+                </span>
+                .
               </h1>
               <p className="text-gray-300 text-md mb-8 max-w-md">
-                Únete a miles de peruanos que confían en Crevo para alcanzar sus metas financieras con procesos rápidos y seguros.
+                Únete a miles de peruanos que confían en Crevo para alcanzar sus metas financieras
+                con procesos rápidos y seguros.
               </p>
 
               <div className="space-y-4 mt-8">
@@ -67,9 +69,27 @@ export default function RegisterPage() {
             <div className="relative z-10 mt-10">
               <div className="flex -space-x-2.5 mb-2">
                 {/* Decorative avatars — meaningful signal is the "+1M Peruanos" badge. */}
-                <Image className="w-9 h-9 rounded-full border-2 border-[#0A192F] object-cover" src="/images/avatars/avatar-1.jpg" alt="" width={36} height={36} />
-                <Image className="w-9 h-9 rounded-full border-2 border-[#0A192F] object-cover" src="/images/avatars/avatar-2.jpg" alt="" width={36} height={36} />
-                <Image className="w-9 h-9 rounded-full border-2 border-[#0A192F] object-cover" src="/images/avatars/avatar-3.jpg" alt="" width={36} height={36} />
+                <Image
+                  className="w-9 h-9 rounded-full border-2 border-[#0A192F] object-cover"
+                  src="/images/avatars/avatar-1.jpg"
+                  alt=""
+                  width={36}
+                  height={36}
+                />
+                <Image
+                  className="w-9 h-9 rounded-full border-2 border-[#0A192F] object-cover"
+                  src="/images/avatars/avatar-2.jpg"
+                  alt=""
+                  width={36}
+                  height={36}
+                />
+                <Image
+                  className="w-9 h-9 rounded-full border-2 border-[#0A192F] object-cover"
+                  src="/images/avatars/avatar-3.jpg"
+                  alt=""
+                  width={36}
+                  height={36}
+                />
                 <div className="w-9 h-9 rounded-full border-2 border-[#0A192F] bg-[#D4AF37] text-[#0A192F] flex items-center justify-center text-xs font-bold">
                   +1M
                 </div>
@@ -81,8 +101,12 @@ export default function RegisterPage() {
           {/* ── Right Form ────────────────────────────────────────────── */}
           <div className="p-8 sm:p-10 flex flex-col justify-center bg-white dark:bg-[#1E293B]">
             <div className="mb-5">
-              <h2 className="text-xl sm:text-2xl font-semibold text-[#0A192F] dark:text-white mb-1">Crear tu cuenta</h2>
-              <p className="text-sm text-gray-400 dark:text-gray-500">Comienza tu viaje financiero hoy mismo.</p>
+              <h2 className="text-xl sm:text-2xl font-semibold text-[#0A192F] dark:text-white mb-1">
+                Crear tu cuenta
+              </h2>
+              <p className="text-sm text-gray-400 dark:text-gray-500">
+                Comienza tu viaje financiero hoy mismo.
+              </p>
             </div>
 
             <RegisterForm />
@@ -90,7 +114,10 @@ export default function RegisterPage() {
             <div className="mt-5 text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 ¿Ya tienes una cuenta?{' '}
-                <Link href="/login" className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline ml-1">
+                <Link
+                  href="/login"
+                  className="text-[#0A192F] dark:text-[#D4AF37] font-medium hover:underline ml-1"
+                >
                   Iniciar sesión
                 </Link>
               </p>
@@ -101,8 +128,8 @@ export default function RegisterPage() {
 
       <footer className="w-full py-5 px-4 text-center">
         <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-2">
-          <Lock className="h-3 w-3" aria-hidden="true" />
-          © {CURRENT_YEAR} Crevo. Conexión segura 256-bits • Sujeto Obligado UIF-Perú
+          <Lock className="h-3 w-3" aria-hidden="true" />© {CURRENT_YEAR} Crevo. Conexión segura
+          256-bits • Sujeto Obligado UIF-Perú
         </p>
       </footer>
     </div>
