@@ -55,6 +55,14 @@ export interface ChatBroadcastConversationClosedEvent {
   closedAt: string
 }
 
+/** Symmetric to conversation_closed — agent re-opened a CLOSED thread.
+ *  Widget flips status back to OPEN so the composer re-enables. */
+export interface ChatBroadcastConversationReopenedEvent {
+  type: 'conversation_reopened'
+  conversationId: string
+  reopenedAt: string
+}
+
 /**
  * Transient "X is typing" signal. Emitted client→client directly via
  * Supabase Realtime (no backend involvement, no DB row), debounced on
@@ -73,6 +81,7 @@ export type ChatBroadcastEvent =
   | ChatBroadcastMessageEvent
   | ChatBroadcastReadReceiptEvent
   | ChatBroadcastConversationClosedEvent
+  | ChatBroadcastConversationReopenedEvent
   | ChatBroadcastTypingEvent
 
 // ─── Helpers shared across UI ────────────────────────────────────────────────

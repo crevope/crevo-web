@@ -322,6 +322,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
       .on('broadcast', { event: 'conversation_closed' }, (payload) =>
         _handleEvent(get, set, payload.payload as ChatBroadcastEvent),
       )
+      .on('broadcast', { event: 'conversation_reopened' }, (payload) =>
+        _handleEvent(get, set, payload.payload as ChatBroadcastEvent),
+      )
       .on('broadcast', { event: 'typing' }, (payload) =>
         _handleEvent(get, set, payload.payload as ChatBroadcastEvent),
       )
@@ -421,6 +424,25 @@ function _handleEvent(
           ...state.conversation,
           status: 'CLOSED',
           closedAt: event.closedAt,
+        },
+      })
+      break
+    }
+
+    case 'conversation_reopened': {
+      // Agent re-opened a previously CLOSED conversation. Flip our
+      // local view back to OPEN so the composer re-enables and the
+      // closed-banner disappears. The accompanying SYSTEM message
+      // arrives as its own broadcast right before this event.
+      const state = get()
+      if (!state.conversation || state.conversation.id !== event.conversationId) {
+        return
+      }
+      set({
+        conversation: {
+          ...state.conversation,
+          status: 'OPEN',
+          closedAt: null,
         },
       })
       break

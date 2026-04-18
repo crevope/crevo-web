@@ -1,4 +1,6 @@
 'use client'
+import { useEffect } from 'react'
+import { useSearchParams, usePathname, useRouter } from 'next/navigation'
 import { MessageCircle } from 'lucide-react'
 import { useChatStore } from '../model/useChatStore'
 import { ChatPanel } from './ChatPanel'
@@ -12,14 +14,46 @@ import { ChatPanel } from './ChatPanel'
  * The badge surfaces the unread count from agent messages received while
  * the panel was closed. SYSTEM messages (welcome, close notice) don't
  * count — only actual support replies.
+ *
+ * Deep-link: when the URL carries `?chat=open`, auto-open the panel on
+ * mount and strip the param from the URL so a refresh doesn't re-open
+ * after the user has explicitly closed it. Used by the FCM push
+ * notification's `data.url` so a tap on the OS notification lands the
+ * user inside the conversation, not just on the dashboard with a
+ * closed widget.
  */
 export function ChatWidget() {
   return (
     <>
+      <DeepLinkAutoOpen />
       <ChatLauncherButton />
       <ChatPanel />
     </>
   )
+}
+
+function DeepLinkAutoOpen() {
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+  const router = useRouter()
+  const openPanel = useChatStore((s) => s.openPanel)
+
+  useEffect(() => {
+    if (searchParams?.get('chat') !== 'open') return
+
+    void openPanel()
+
+    // Strip the param so a refresh doesn't re-trigger and so back-button
+    // navigation doesn't re-open after the user explicitly closes. Use
+    // router.replace (not push) to avoid polluting the history stack.
+    const next = new URLSearchParams(searchParams.toString())
+    next.delete('chat')
+    next.delete('conv') // future-proof: backend may add conv id later
+    const qs = next.toString()
+    router.replace(qs ? `${pathname}?${qs}` : pathname)
+  }, [searchParams, openPanel, pathname, router])
+
+  return null
 }
 
 function ChatLauncherButton() {
