@@ -10,7 +10,7 @@ import { CITIES } from '@/features/city-landing/lib/cities'
  *
  * Surfaces every navigable page Crevo wants Google (and humans) to find:
  *   - Productos: /simulador, /tarifas, /preguntas-frecuentes, /register
- *   - Empresa: /sobre-nosotros, /blog, /blog/rss.xml, contact
+ *   - Empresa: /sobre-nosotros, /blog, contact
  *   - Atención al cliente: support email, /libro-de-reclamaciones,
  *     /libro-de-reclamaciones/consulta, /derechos-del-usuario
  *   - Información legal: T&C, Privacidad, Cookies, Cobranza
@@ -55,7 +55,6 @@ export function LandingFooter() {
             <FooterLink href="/sobre-nosotros">Sobre nosotros</FooterLink>
             <FooterLink href="/blog">Blog</FooterLink>
             <FooterMail href="hola@crevo.pe">Contacto</FooterMail>
-            <FooterLink href="/blog/rss.xml">RSS feed</FooterLink>
           </FooterColumn>
 
           <FooterColumn title="Atención al cliente">
