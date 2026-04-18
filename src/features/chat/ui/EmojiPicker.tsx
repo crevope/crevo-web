@@ -9,14 +9,51 @@ import { useEffect, useRef, useState } from 'react'
  *
  * The order within each category roughly tracks usage frequency in
  * customer-service contexts (Crevo's audience: PE consumer fintech).
+ *
+ * Each category exposes a representative `icon` emoji used as the tab
+ * label (matches the iOS / Android emoji keyboard mental model the user
+ * already has, and avoids the cramped-text-tab problem of name labels
+ * in a 280px popover).
  */
-const EMOJI_GROUPS: Record<string, string[]> = {
-  Comunes: ['😊', '😀', '😅', '🤗', '🙂', '😉', '😌', '🤔', '😎', '🥲', '😂', '🙃', '😬', '😢'],
-  Reacciones: ['👍', '👎', '👌', '🙏', '💪', '👏', '🙌', '🤝', '✅', '❌', '⚠️', '❗', '❓'],
-  Comunicación: ['💬', '📧', '📞', '✍️', '📝', '👀', '💡', '📌', '🔔'],
-  Finanzas: ['💰', '💸', '💳', '📊', '📈', '📉', '💼', '💵', '🏦'],
-  Otros: ['🎉', '🎁', '❤️', '✨', '🚀', '⭐', '🔥', '💯', '🌟'],
+interface EmojiCategory {
+  id: string
+  label: string
+  icon: string
+  emojis: string[]
 }
+
+const EMOJI_GROUPS: EmojiCategory[] = [
+  {
+    id: 'common',
+    label: 'Comunes',
+    icon: '😊',
+    emojis: ['😊', '😀', '😅', '🤗', '🙂', '😉', '😌', '🤔', '😎', '🥲', '😂', '🙃', '😬', '😢'],
+  },
+  {
+    id: 'reactions',
+    label: 'Reacciones',
+    icon: '👍',
+    emojis: ['👍', '👎', '👌', '🙏', '💪', '👏', '🙌', '🤝', '✅', '❌', '⚠️', '❗', '❓'],
+  },
+  {
+    id: 'comm',
+    label: 'Comunicación',
+    icon: '💬',
+    emojis: ['💬', '📧', '📞', '✍️', '📝', '👀', '💡', '📌', '🔔'],
+  },
+  {
+    id: 'finance',
+    label: 'Finanzas',
+    icon: '💰',
+    emojis: ['💰', '💸', '💳', '📊', '📈', '📉', '💼', '💵', '🏦'],
+  },
+  {
+    id: 'other',
+    label: 'Otros',
+    icon: '🎉',
+    emojis: ['🎉', '🎁', '❤️', '✨', '🚀', '⭐', '🔥', '💯', '🌟'],
+  },
+]
 
 interface Props {
   /** Called when the user picks an emoji. The composer should insert it
@@ -28,24 +65,9 @@ interface Props {
   onClose: () => void
 }
 
-/**
- * Floating emoji picker positioned above the composer. Anchors to its
- * parent (the composer's emoji button), which means the parent must be
- * `position: relative`.
- *
- * Closes on:
- *   - Escape key (anywhere)
- *   - Click outside the picker
- *
- * Stays open when the user picks an emoji, so emoji-strings like "✅✅"
- * are easy. The composer also updates the textarea selection so the
- * cursor sits AFTER the inserted emoji.
- */
 export function EmojiPicker({ onSelect, onClose }: Readonly<Props>) {
   const ref = useRef<HTMLDivElement | null>(null)
-  // Track the currently active category tab. Defaults to "Comunes" since
-  // that covers ~80% of natural usage.
-  const [activeCategory, setActiveCategory] = useState<string>(Object.keys(EMOJI_GROUPS)[0])
+  const [activeCategoryId, setActiveCategoryId] = useState<string>(EMOJI_GROUPS[0].id)
 
   // Click outside → close. Mousedown (not click) so the close fires
   // before the outside element gets its own click handler — matters
@@ -60,7 +82,6 @@ export function EmojiPicker({ onSelect, onClose }: Readonly<Props>) {
     return () => document.removeEventListener('mousedown', onMouseDown)
   }, [onClose])
 
-  // Escape closes — symmetric with the panel's own Escape close.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -69,7 +90,7 @@ export function EmojiPicker({ onSelect, onClose }: Readonly<Props>) {
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  const emojis = EMOJI_GROUPS[activeCategory] ?? []
+  const active = EMOJI_GROUPS.find((g) => g.id === activeCategoryId) ?? EMOJI_GROUPS[0]
 
   return (
     <div
@@ -79,35 +100,40 @@ export function EmojiPicker({ onSelect, onClose }: Readonly<Props>) {
       className="
         absolute bottom-full left-0 mb-2 z-50
         w-[280px] bg-white dark:bg-[#0F172A]
-        border border-gray-200 dark:border-[#334155] rounded-xl shadow-xl
+        border border-gray-200 dark:border-[#334155] rounded-md shadow-xl
         overflow-hidden
         animate-in fade-in slide-in-from-bottom-2 duration-150
       "
     >
-      {/* Category tabs */}
+      {/* Category tabs — emoji icons instead of text labels.
+          Matches the iOS / Android keyboard pattern (each tab is a
+          representative glyph) and avoids the cramped-text problem
+          a 280px popover has with 5 Spanish category names. */}
       <div className="flex border-b border-gray-200 dark:border-[#334155] bg-gray-50 dark:bg-[#1E293B]">
-        {Object.keys(EMOJI_GROUPS).map((cat) => (
+        {EMOJI_GROUPS.map((g) => (
           <button
-            key={cat}
+            key={g.id}
             type="button"
-            onClick={() => setActiveCategory(cat)}
+            onClick={() => setActiveCategoryId(g.id)}
+            aria-label={g.label}
+            title={g.label}
             className={`
-              flex-1 py-1.5 text-[11px] font-medium transition-colors
+              flex-1 py-2 text-base flex items-center justify-center transition-colors
               ${
-                activeCategory === cat
-                  ? 'text-[#0A192F] dark:text-[#D4AF37] border-b-2 border-[#0A192F] dark:border-[#D4AF37] -mb-px'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                activeCategoryId === g.id
+                  ? 'bg-white dark:bg-[#0F172A] border-b-2 border-[#0A192F] dark:border-[#D4AF37] -mb-px'
+                  : 'opacity-60 hover:opacity-100 hover:bg-white/50 dark:hover:bg-[#0F172A]/50'
               }
             `}
           >
-            {cat}
+            <span aria-hidden="true">{g.icon}</span>
           </button>
         ))}
       </div>
 
       {/* Grid */}
       <div className="p-2 grid grid-cols-7 gap-1 max-h-[200px] overflow-y-auto">
-        {emojis.map((e) => (
+        {active.emojis.map((e) => (
           <button
             key={e}
             type="button"
