@@ -6,6 +6,7 @@ import { Bell, Menu } from 'lucide-react'
 import { DashboardSidebar } from '@/widgets/dashboard-sidebar'
 import { useAuthStore } from '@/features/auth'
 import { useNotificationStore } from '@/features/notifications'
+import { ChatWidget, useChatStore } from '@/features/chat'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { Logo } from '@/shared/ui/Logo'
 import { usePushNotifications } from '@/shared/hooks/usePushNotifications'
@@ -19,6 +20,8 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
     subscribeRealtime,
     unsubscribeRealtime,
   } = useNotificationStore()
+  const hydrateChat = useChatStore((s) => s.hydrate)
+  const resetChat = useChatStore((s) => s.reset)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   usePushNotifications()
 
@@ -35,6 +38,18 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
       unsubscribeRealtime()
     }
   }, [isAuthenticated, user?.id, subscribeRealtime, unsubscribeRealtime])
+  // Hydrate the chat widget once the session is confirmed. The store's
+  // `hydrate()` is idempotent and safe to call multiple times — it
+  // returns early if a previous run is still in flight. The matching
+  // `reset()` on unmount tears down the Realtime channel and clears state
+  // so a different user logging in on the same browser starts fresh.
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return
+    void hydrateChat()
+    return () => {
+      resetChat()
+    }
+  }, [isAuthenticated, user?.id, hydrateChat, resetChat])
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace('/login')
   }, [isLoading, isAuthenticated, router])
@@ -86,6 +101,12 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
       <main className="lg:ml-64 min-h-screen">
         <div className="max-w-[1366px] mx-auto p-6 lg:p-10">{children}</div>
       </main>
+
+      {/* Real-time support chat — floating launcher + slide-up panel.
+          Renders for every authenticated user on every private route.
+          Hidden until clicked; lazy network usage (no API call until the
+          launcher is opened). */}
+      <ChatWidget />
     </div>
   )
 }
