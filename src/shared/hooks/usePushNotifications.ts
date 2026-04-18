@@ -66,9 +66,21 @@ export function usePushNotifications() {
           await notificationsRepository.saveFcmToken(token)
         }
 
-        // Notificaciones recibidas con la app abierta (foreground)
+        // Notificaciones recibidas con la app abierta (foreground).
+        //
+        // Para `chat_message`: se SALTA la notificación nativa porque el
+        // widget de chat ya está suscrito al canal Realtime y va a mostrar
+        // el mensaje en línea + bumpear el badge del launcher. Una
+        // notificación adicional sería ruido. Cuando la pestaña está en
+        // background o la página está cerrada, el SW (firebase-messaging-sw)
+        // sí muestra la notificación nativa porque ahí no hay Realtime.
+        //
+        // Para los otros tipos (loan_approved, payment_reminder, etc.) sí
+        // mostramos foreground porque no hay otra señal.
         if (cancelled) return
         unsubscribe = onMessage(messaging, (payload) => {
+          if (payload.data?.type === 'chat_message') return
+
           const title = payload.notification?.title
           const body = payload.notification?.body
           if (title) {
