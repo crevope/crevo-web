@@ -63,6 +63,7 @@ export function ChatPanel() {
         rounded-t-2xl sm:rounded-2xl shadow-2xl
         h-[80vh] sm:h-[600px] sm:w-[380px] max-h-[700px]
         animate-in slide-in-from-bottom-4 duration-200
+        overflow-hidden
       "
     >
       {/* Header */}
