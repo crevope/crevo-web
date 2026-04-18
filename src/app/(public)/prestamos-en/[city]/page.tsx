@@ -13,7 +13,7 @@ interface Props {
 }
 
 /**
- * City-specific landing pages at `/prestamos-en-{slug}`.
+ * City-specific landing pages at `/prestamos-en/{slug}`.
  *
  * Each page is a standalone SEO surface for long-tail queries like
  * "préstamos online arequipa" or "crédito rápido trujillo". Google
@@ -38,14 +38,14 @@ export async function generateMetadata({ params }: Props) {
     return buildMetadata({
       title: 'Página no encontrada',
       description: 'La ciudad que buscas no existe o aún no está publicada.',
-      path: `/prestamos-en-${city}`,
+      path: `/prestamos-en/${city}`,
       index: false,
     })
   }
   return buildMetadata({
     title: `Préstamos online ${data.locativeName}`,
     description: `Solicita un préstamo online ${data.locativeName} con Crevo. De S/ 200 a S/ 2 000, aprobación en minutos y desembolso el mismo día a tu cuenta bancaria.`,
-    path: `/prestamos-en-${data.slug}`,
+    path: `/prestamos-en/${data.slug}`,
     keywords: [
       `préstamos ${data.name.toLowerCase()}`,
       `préstamos online ${data.name.toLowerCase()}`,
@@ -62,7 +62,7 @@ export default async function CityLandingPage({ params }: Props) {
   if (!data) notFound()
 
   const breadcrumb = breadcrumbSchema([
-    { name: `Préstamos ${data.locativeName}`, path: `/prestamos-en-${data.slug}` },
+    { name: `Préstamos ${data.locativeName}`, path: `/prestamos-en/${data.slug}` },
   ])
 
   return (
@@ -204,7 +204,7 @@ export default async function CityLandingPage({ params }: Props) {
             {CITIES.filter((c) => c.slug !== data.slug).map((c) => (
               <li key={c.slug}>
                 <Link
-                  href={`/prestamos-en-${c.slug}`}
+                  href={`/prestamos-en/${c.slug}`}
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 text-sm text-gray-700 dark:text-gray-300 hover:border-[#00E5FF]/40 transition-colors"
                 >
                   <MapPin className="h-3 w-3" aria-hidden="true" />

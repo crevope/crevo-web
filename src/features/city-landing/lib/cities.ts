@@ -1,5 +1,5 @@
 export interface CityLanding {
-  /** URL slug — used at `/prestamos-en-{slug}`. */
+  /** URL slug — used at `/prestamos-en/{slug}`. */
   slug: string
   /** Display name in running prose. */
   name: string
@@ -21,7 +21,7 @@ export interface CityLanding {
 /**
  * City landing registry.
  *
- * Each entry gets a dedicated page at `/prestamos-en-{slug}` with content
+ * Each entry gets a dedicated page at `/prestamos-en/{slug}` with content
  * tailored for long-tail SEO ("préstamos online arequipa", "crédito rápido
  * trujillo"). The page layout is shared; only copy varies.
  *

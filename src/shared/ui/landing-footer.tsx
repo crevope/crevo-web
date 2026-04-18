@@ -18,7 +18,7 @@ import { CITIES } from '@/features/city-landing/lib/cities'
  *
  * Mounted at the bottom of the landing AND every standalone marketing
  * page (sobre-nosotros, preguntas-frecuentes, simulador, blog, blog/[slug],
- * prestamos-en-[city]) so the SEO link graph is consistent across all
+ * prestamos-en/[city]) so the SEO link graph is consistent across all
  * entry points and pre-rendered into the HTML for crawlers.
  *
  * Server Component — zero client JS, just `<Link>` and `<a>` elements.
@@ -73,7 +73,7 @@ export function LandingFooter() {
           </FooterColumn>
         </div>
 
-        {/* Cities strip — every /prestamos-en-{city} landing surfaces here
+        {/* Cities strip — every /prestamos-en/{city} landing surfaces here
             so each one accumulates internal-link equity from every page
             that renders this footer. Pure server-rendered, no JS. */}
         <div className="pt-8 border-t border-gray-700">
@@ -85,7 +85,7 @@ export function LandingFooter() {
             {CITIES.map((city) => (
               <li key={city.slug}>
                 <Link
-                  href={`/prestamos-en-${city.slug}`}
+                  href={`/prestamos-en/${city.slug}`}
                   className="inline-flex items-center px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-gray-300 hover:bg-white/10 hover:text-[#D4AF37] hover:border-[#D4AF37]/30 transition-colors"
                 >
                   Préstamos en {city.name}

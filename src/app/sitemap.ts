@@ -92,7 +92,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // long-tail "préstamos {ciudad}" queries so each gets its own
   // higher-than-legal priority to nudge crawl frequency.
   const cityEntries: MetadataRoute.Sitemap = CITIES.map((c) => ({
-    url: `${SITE_URL}/prestamos-en-${c.slug}`,
+    url: `${SITE_URL}/prestamos-en/${c.slug}`,
     lastModified: now,
     changeFrequency: 'monthly',
     priority: 0.7,

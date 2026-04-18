@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { loanRepository } from '../api/loanRepository'
-import { isActiveLoan, type Loan, type LoanBalance, type Installment } from '@/entities/loan'
+import { isActiveLoan, type Loan, type Installment } from '@/entities/loan'
 
 export interface LoanSummary {
   /** Live remaining principal + interest + mora, from `/payments/balance/:id`. */
