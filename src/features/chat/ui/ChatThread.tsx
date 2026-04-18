@@ -3,10 +3,14 @@ import { useEffect, useRef } from 'react'
 import { Loader2, MessageCircle } from 'lucide-react'
 import type { ChatMessageView } from '../types'
 import { ChatBubble } from './ChatBubble'
+import { TypingIndicator } from './TypingIndicator'
 
 interface Props {
   messages: ChatMessageView[]
   isLoading?: boolean
+  /** When true, renders a "Soporte está escribiendo…" bubble at the
+   *  end of the thread. Driven by the agent typing in their inbox. */
+  isAgentTyping?: boolean
 }
 
 /**
@@ -30,17 +34,19 @@ function dayLabel(iso: string): string {
   return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })
 }
 
-export function ChatThread({ messages, isLoading = false }: Readonly<Props>) {
+export function ChatThread({
+  messages,
+  isLoading = false,
+  isAgentTyping = false,
+}: Readonly<Props>) {
   const endRef = useRef<HTMLDivElement | null>(null)
 
-  // Auto-scroll to bottom on every message addition. This is what makes
-  // the thread feel "live" — when an agent reply lands the user's eyes
-  // follow it without a manual scroll. We use scrollIntoView with
-  // smooth behavior so the scroll itself reads as movement, not as a
-  // jarring jump.
+  // Auto-scroll to bottom on every message addition AND when the typing
+  // indicator appears, so the user sees "Soporte escribiendo…" without
+  // a manual scroll. Smooth behavior reads as movement, not as a jump.
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [messages.length])
+  }, [messages.length, isAgentTyping])
 
   if (isLoading) {
     return (
@@ -89,6 +95,11 @@ export function ChatThread({ messages, isLoading = false }: Readonly<Props>) {
           <ChatBubble message={m} />
         </div>
       ))}
+      {isAgentTyping && (
+        <li className="pt-1">
+          <TypingIndicator label="Soporte está escribiendo" />
+        </li>
+      )}
       <div ref={endRef} />
     </ol>
   )

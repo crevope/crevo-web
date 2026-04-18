@@ -55,10 +55,25 @@ export interface ChatBroadcastConversationClosedEvent {
   closedAt: string
 }
 
+/**
+ * Transient "X is typing" signal. Emitted client→client directly via
+ * Supabase Realtime (no backend involvement, no DB row), debounced on
+ * the sender, auto-cleared after 5s on the receiver in case the
+ * "stopped" event is lost.
+ */
+export interface ChatBroadcastTypingEvent {
+  type: 'typing'
+  conversationId: string
+  senderType: 'user' | 'agent'
+  isTyping: boolean
+  at: string
+}
+
 export type ChatBroadcastEvent =
   | ChatBroadcastMessageEvent
   | ChatBroadcastReadReceiptEvent
   | ChatBroadcastConversationClosedEvent
+  | ChatBroadcastTypingEvent
 
 // ─── Helpers shared across UI ────────────────────────────────────────────────
 

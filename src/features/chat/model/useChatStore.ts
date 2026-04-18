@@ -37,6 +37,9 @@ interface ChatState {
   /** Has the user viewed the panel since the last broadcast? Powers the
    *  unread badge on the launcher when the panel is closed. */
   unreadInPanel: number
+  /** "Soporte está escribiendo…" — driven by typing broadcast events
+   *  emitted by the agent inbox. Auto-clears 5s after the last event. */
+  isAgentTyping: boolean
   _channel: RealtimeChannel | null
   _subscribedConversationId: string | null
 
@@ -51,6 +54,9 @@ interface ChatState {
   send: (body: string) => Promise<void>
   markPanelRead: () => Promise<void>
 
+  // Typing — sender side (debounced)
+  notifyTyping: () => void
+
   // Realtime
   subscribe: (conversationId: string) => void
   unsubscribe: () => void
@@ -64,8 +70,35 @@ const initialState = {
   isPanelOpen: false,
   isSending: false,
   unreadInPanel: 0,
+  isAgentTyping: false,
   _channel: null as RealtimeChannel | null,
   _subscribedConversationId: null as string | null,
+}
+
+// ─── Module-level transients ─────────────────────────────────────────────
+// Timers / debounce state for typing indicators. Module-scoped (not in the
+// zustand store) because they're true ephemeral state that doesn't drive
+// renders and shouldn't trigger subscribers when they change.
+
+/** Last "I am typing" emit timestamp. Throttle to once per 2s. */
+let _typingLastEmit = 0
+/** Pending "I stopped typing" emit, scheduled 3s after last keystroke. */
+let _typingStoppedTimer: ReturnType<typeof setTimeout> | null = null
+/** Auto-clear of the OTHER party's typing indicator. Drops 5s after
+ *  the most recent typing=true event in case the typing=false signal
+ *  is dropped on the wire. */
+let _agentTypingClearTimer: ReturnType<typeof setTimeout> | null = null
+
+function _clearTypingTimers(): void {
+  if (_typingStoppedTimer) {
+    clearTimeout(_typingStoppedTimer)
+    _typingStoppedTimer = null
+  }
+  if (_agentTypingClearTimer) {
+    clearTimeout(_agentTypingClearTimer)
+    _agentTypingClearTimer = null
+  }
+  _typingLastEmit = 0
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -203,6 +236,61 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
+  // ── Typing (sender side) ────────────────────────────────────────────────
+
+  /**
+   * Tell the agent we're typing. Throttled to one "true" emit per 2s and
+   * schedules a "false" emit 3s after the last keystroke. The composer
+   * calls this on every keypress; debounce lives here so callers don't
+   * have to worry about it.
+   *
+   * Uses the active Supabase channel directly (client→client broadcast,
+   * no backend round-trip). If the channel isn't ready yet (race during
+   * subscribe), the send is silently dropped — typing is best-effort.
+   */
+  notifyTyping: () => {
+    const channel = get()._channel
+    const conversationId = get()._subscribedConversationId
+    if (!channel || !conversationId) return
+
+    const now = Date.now()
+    if (now - _typingLastEmit > 2000) {
+      void channel.send({
+        type: 'broadcast',
+        event: 'typing',
+        payload: {
+          type: 'typing',
+          conversationId,
+          senderType: 'user',
+          isTyping: true,
+          at: new Date().toISOString(),
+        },
+      })
+      _typingLastEmit = now
+    }
+
+    if (_typingStoppedTimer) clearTimeout(_typingStoppedTimer)
+    _typingStoppedTimer = setTimeout(() => {
+      const c = get()._channel
+      const id = get()._subscribedConversationId
+      if (c && id) {
+        void c.send({
+          type: 'broadcast',
+          event: 'typing',
+          payload: {
+            type: 'typing',
+            conversationId: id,
+            senderType: 'user',
+            isTyping: false,
+            at: new Date().toISOString(),
+          },
+        })
+      }
+      _typingLastEmit = 0
+      _typingStoppedTimer = null
+    }, 3000)
+  },
+
   // ── Realtime ────────────────────────────────────────────────────────────
 
   subscribe: (conversationId: string) => {
@@ -219,11 +307,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
         config: {
           // We don't want to receive our own broadcasts — when the user
           // sends a message via REST, the backend broadcasts it; without
-          // self:false we'd see our own optimistic message twice.
-          // (The backend uses a different channel client, so technically
-          // it never echoes to our subscription anyway, but setting this
-          // makes the intent explicit and protects us from future
-          // refactors.)
+          // self:false we'd see our own optimistic message twice. Also
+          // applies to typing events emitted by us (we don't render our
+          // own "you are typing").
           broadcast: { self: false },
         },
       })
@@ -236,6 +322,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
       .on('broadcast', { event: 'conversation_closed' }, (payload) =>
         _handleEvent(get, set, payload.payload as ChatBroadcastEvent),
       )
+      .on('broadcast', { event: 'typing' }, (payload) =>
+        _handleEvent(get, set, payload.payload as ChatBroadcastEvent),
+      )
       .subscribe()
 
     set({ _channel: channel, _subscribedConversationId: conversationId })
@@ -246,7 +335,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
     if (_channel) {
       void supabase.removeChannel(_channel)
     }
-    set({ _channel: null, _subscribedConversationId: null })
+    _clearTypingTimers()
+    set({ _channel: null, _subscribedConversationId: null, isAgentTyping: false })
   },
 
   /** Full reset on logout — clears state AND tears down the channel. */
@@ -333,6 +423,30 @@ function _handleEvent(
           closedAt: event.closedAt,
         },
       })
+      break
+    }
+
+    case 'typing': {
+      // The user widget only cares about the AGENT typing — we don't
+      // render an indicator for ourselves.
+      if (event.senderType !== 'agent') return
+
+      // Always reset the auto-clear timer so back-to-back "true" events
+      // keep the indicator alive.
+      if (_agentTypingClearTimer) clearTimeout(_agentTypingClearTimer)
+
+      if (event.isTyping) {
+        set({ isAgentTyping: true })
+        // Failsafe: if the matching "stopped" event never arrives
+        // (network blip, tab close), drop the indicator after 5s.
+        _agentTypingClearTimer = setTimeout(() => {
+          set({ isAgentTyping: false })
+          _agentTypingClearTimer = null
+        }, 5000)
+      } else {
+        set({ isAgentTyping: false })
+        _agentTypingClearTimer = null
+      }
       break
     }
   }

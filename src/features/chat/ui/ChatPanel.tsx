@@ -24,6 +24,7 @@ export function ChatPanel() {
   const conversation = useChatStore((s) => s.conversation)
   const messages = useChatStore((s) => s.messages)
   const isHydrating = useChatStore((s) => s.isHydrating)
+  const isAgentTyping = useChatStore((s) => s.isAgentTyping)
   const closePanel = useChatStore((s) => s.closePanel)
   const markPanelRead = useChatStore((s) => s.markPanelRead)
 
@@ -90,7 +91,11 @@ export function ChatPanel() {
       </div>
 
       {/* Thread (grows to fill) */}
-      <ChatThread messages={messages} isLoading={isHydrating && messages.length === 0} />
+      <ChatThread
+        messages={messages}
+        isLoading={isHydrating && messages.length === 0}
+        isAgentTyping={isAgentTyping}
+      />
 
       {/* Composer */}
       <ChatComposer isClosed={isClosed} />

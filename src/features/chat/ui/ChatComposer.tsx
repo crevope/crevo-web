@@ -22,6 +22,7 @@ interface Props {
  */
 export function ChatComposer({ isClosed }: Readonly<Props>) {
   const send = useChatStore((s) => s.send)
+  const notifyTyping = useChatStore((s) => s.notifyTyping)
   const isSending = useChatStore((s) => s.isSending)
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
@@ -76,7 +77,13 @@ export function ChatComposer({ isClosed }: Readonly<Props>) {
         <textarea
           ref={textareaRef}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+            setValue(e.target.value)
+            // Fire-and-forget — store debounces internally so this is safe
+            // to call on every keystroke. Only emits when value actually
+            // changes (no point on focus/blur events).
+            if (e.target.value.length > 0) notifyTyping()
+          }}
           onKeyDown={handleKeyDown}
           placeholder="Escribe tu mensaje…"
           rows={1}
