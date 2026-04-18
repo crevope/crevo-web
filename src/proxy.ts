@@ -46,6 +46,11 @@ const CSP_SCRIPT_SRC_EXTRA = [
   // which inherits its own CSP rules, but the compat loader initializes
   // a nested script element in the main thread during token registration.
   'https://www.gstatic.com',
+  // @vercel/analytics + @vercel/speed-insights load `script.debug.js`
+  // (dev) and `script.js` (prod) from this CDN. Without it the browser
+  // blocks both with "Content Security Policy directive" errors that
+  // surface in DevTools as red rows in the Network tab.
+  'https://va.vercel-scripts.com',
 ].join(' ')
 
 /** Security headers that don't depend on the per-request nonce. */
