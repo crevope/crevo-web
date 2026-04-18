@@ -95,10 +95,17 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
         `}
       >
         {/* Logo — sidebar is always navy bg, so use white mark + gold "revo"
-            via two-tone for premium contrast. */}
-        <div className="hidden lg:flex items-center mb-8 px-1">
+            via two-tone for premium contrast. Links to `/dashboard` (the
+            home of the authenticated section) and closes the mobile drawer
+            on tap so it behaves like the rest of the nav items. */}
+        <Link
+          href="/dashboard"
+          onClick={onClose}
+          aria-label="Ir al dashboard"
+          className="hidden lg:flex items-center mb-8 px-1 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00E5FF]/60"
+        >
           <Logo size={28} markColor="#FFFFFF" textColor="#D4AF37" />
-        </div>
+        </Link>
 
         {/* User card */}
         <div className="flex items-center gap-3 mb-7 px-3 py-3 rounded-lg bg-white/5">
