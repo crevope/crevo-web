@@ -1,7 +1,9 @@
 'use client'
-import { Check, CheckCheck, Info } from 'lucide-react'
+import { useState } from 'react'
+import { Check, CheckCheck, Info, ImageOff } from 'lucide-react'
 import type { ChatMessageView } from '../types'
 import { isTempId } from '../types'
+import { ImageLightbox } from './ImageLightbox'
 
 interface Props {
   message: ChatMessageView
@@ -18,6 +20,8 @@ function formatTime(iso: string): string {
 }
 
 export function ChatBubble({ message }: Readonly<Props>) {
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+
   // SYSTEM messages are centered, neutral, no avatar — they're meta-events
   // (welcome, "esta conversación se cerró"), not actual conversation lines.
   if (message.senderType === 'system') {
@@ -34,47 +38,92 @@ export function ChatBubble({ message }: Readonly<Props>) {
   const isUser = message.senderType === 'user'
   const pending = isTempId(message.id)
   const seen = Boolean(message.readAt)
+  const hasAttachment = Boolean(message.attachmentPath)
+  const hasBody = Boolean(message.body)
 
   return (
-    <li
-      className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'}`}
-      aria-label={isUser ? 'Mi mensaje' : 'Mensaje de soporte'}
-    >
-      <div
-        className={`
-          max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-snug whitespace-pre-wrap break-words
-          ${
-            isUser
-              ? 'bg-[#0A192F] text-white rounded-br-sm dark:bg-[#1E293B]'
-              : 'bg-white text-[#0A192F] rounded-bl-sm border border-gray-200 dark:bg-[#0F172A] dark:text-[#F1F5F9] dark:border-[#334155]'
-          }
-        `}
+    <>
+      <li
+        className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'}`}
+        aria-label={isUser ? 'Mi mensaje' : 'Mensaje de soporte'}
       >
-        <p>{message.body}</p>
         <div
           className={`
-            mt-1 flex items-center gap-1 justify-end text-[10px]
-            ${isUser ? 'text-white/60' : 'text-gray-400 dark:text-gray-500'}
+            max-w-[85%] rounded-2xl text-sm leading-snug whitespace-pre-wrap break-words overflow-hidden
+            ${
+              isUser
+                ? 'bg-[#0A192F] text-white rounded-br-sm dark:bg-[#1E293B]'
+                : 'bg-white text-[#0A192F] rounded-bl-sm border border-gray-200 dark:bg-[#0F172A] dark:text-[#F1F5F9] dark:border-[#334155]'
+            }
           `}
         >
-          <span>{formatTime(message.createdAt)}</span>
-          {/* Read receipt — only on the user's own messages */}
-          {isUser &&
-            (pending ? (
-              <span aria-label="Enviando" title="Enviando">
-                <Check className="h-3 w-3 opacity-50" />
-              </span>
-            ) : seen ? (
-              <span aria-label="Leído" title="Leído">
-                <CheckCheck className="h-3 w-3 text-[#00E5FF]" />
-              </span>
-            ) : (
-              <span aria-label="Enviado" title="Enviado">
-                <Check className="h-3 w-3" />
-              </span>
-            ))}
+          {/* Attachment image — flush to the bubble edges (no padding) so
+              it reads as part of the bubble shape. Click → lightbox. */}
+          {hasAttachment && (
+            <button
+              type="button"
+              onClick={() => message.attachmentUrl && setLightboxOpen(true)}
+              disabled={!message.attachmentUrl}
+              aria-label="Ver imagen completa"
+              className="block w-full max-w-[280px]"
+            >
+              {message.attachmentUrl ? (
+                <img
+                  src={message.attachmentUrl}
+                  alt={message.attachmentFilename ?? ''}
+                  className="block w-full h-auto max-h-[280px] object-cover"
+                />
+              ) : (
+                // Signed URL failed (rare — backend logs it). Render a
+                // placeholder so the bubble doesn't look broken.
+                <div className="flex items-center justify-center gap-2 h-[120px] bg-gray-200 dark:bg-[#334155] text-gray-500 text-xs">
+                  <ImageOff className="h-4 w-4" aria-hidden="true" />
+                  <span>Imagen no disponible</span>
+                </div>
+              )}
+            </button>
+          )}
+
+          {/* Body — padded only when present. When there's no body and
+              just an attachment, we still need the time stamp + receipt
+              line, so the padding goes there. */}
+          {hasBody && (
+            <p className={hasAttachment ? 'px-3.5 pt-2' : 'px-3.5 pt-2'}>{message.body}</p>
+          )}
+
+          {/* Time + receipt rail — same padding regardless of attachment. */}
+          <div
+            className={`
+              flex items-center gap-1 justify-end text-[10px] px-3.5 pb-1.5
+              ${hasBody ? 'pt-1' : 'pt-1.5'}
+              ${isUser ? 'text-white/60' : 'text-gray-400 dark:text-gray-500'}
+            `}
+          >
+            <span>{formatTime(message.createdAt)}</span>
+            {isUser &&
+              (pending ? (
+                <span aria-label="Enviando" title="Enviando">
+                  <Check className="h-3 w-3 opacity-50" />
+                </span>
+              ) : seen ? (
+                <span aria-label="Leído" title="Leído">
+                  <CheckCheck className="h-3 w-3 text-[#00E5FF]" />
+                </span>
+              ) : (
+                <span aria-label="Enviado" title="Enviado">
+                  <Check className="h-3 w-3" />
+                </span>
+              ))}
+          </div>
         </div>
-      </div>
-    </li>
+      </li>
+      {lightboxOpen && message.attachmentUrl && (
+        <ImageLightbox
+          url={message.attachmentUrl}
+          filename={message.attachmentFilename}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
+    </>
   )
 }

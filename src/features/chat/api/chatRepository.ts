@@ -1,5 +1,6 @@
 import { apiClient } from '@/shared/api/client'
-import type { ChatConversationView, ChatMessageView } from '../types'
+import { supabase } from '@/shared/lib/supabase'
+import type { ChatAttachmentUploadUrl, ChatConversationView, ChatMessageView } from '../types'
 
 /**
  * REST client for the user-facing chat endpoints.
@@ -50,10 +51,56 @@ export const chatRepository = {
    * Send a message from the user. Returns the persisted ChatMessageView
    * (with the canonical server-side id + createdAt). The store uses this
    * to swap out the optimistic temp message.
+   *
+   * `attachment` is only populated when the user attached a file (the
+   * upload flow is: requestUploadUrl → uploadAttachment → sendMessage
+   * with the resulting path). Body and attachment can be sent together
+   * (image with caption) or independently.
    */
-  async sendMessage(body: string): Promise<ChatMessageView> {
-    const { data } = await apiClient.post('/chat/messages', { body })
+  async sendMessage(
+    body: string,
+    attachment?: {
+      path: string
+      mimeType: string
+      filename: string
+      sizeBytes?: number
+    },
+  ): Promise<ChatMessageView> {
+    const { data } = await apiClient.post('/chat/messages', { body, attachment })
     return data?.data as ChatMessageView
+  },
+
+  /**
+   * Step 1 of the attachment flow: ask the backend for a one-shot
+   * signed URL the browser can PUT a file to. The backend validates
+   * MIME + size + ownership before signing. Path is opaque to the
+   * caller — just needs to be passed back into sendMessage().
+   */
+  async requestUploadUrl(params: {
+    conversationId: string
+    filename: string
+    mimeType: string
+    sizeBytes: number
+  }): Promise<ChatAttachmentUploadUrl> {
+    const { data } = await apiClient.post('/chat/attachments/upload-url', params)
+    return data?.data as ChatAttachmentUploadUrl
+  },
+
+  /**
+   * Step 2 of the attachment flow: actually upload the file using the
+   * signed URL. Uses the Supabase JS SDK helper which handles the
+   * Bearer token + multipart envelope correctly. Throws on failure;
+   * caller should rollback any optimistic UI.
+   */
+  async uploadAttachment(file: File, signed: ChatAttachmentUploadUrl): Promise<void> {
+    const { error } = await supabase.storage
+      .from('chat-attachments')
+      .uploadToSignedUrl(signed.path, signed.token, file, {
+        contentType: file.type,
+      })
+    if (error) {
+      throw new Error(error.message || 'No se pudo subir el archivo')
+    }
   },
 
   /**

@@ -6,6 +6,20 @@ import type { ChatBroadcastEvent, ChatConversationView, ChatMessageView } from '
 import { TEMP_ID_PREFIX, isTempId } from '../types'
 
 /**
+ * Attachment payload for the `send()` action. `localUrl` is an
+ * `URL.createObjectURL(file)` so the optimistic bubble can render
+ * the user's own image instantly while the canonical signed URL is
+ * still being generated server-side.
+ */
+export interface ChatSendAttachment {
+  path: string
+  mimeType: string
+  filename: string
+  sizeBytes?: number
+  localUrl?: string
+}
+
+/**
  * Chat widget state machine.
  *
  * Lifecycle:
@@ -51,7 +65,7 @@ interface ChatState {
 
   // Conversation
   startConversation: () => Promise<void>
-  send: (body: string) => Promise<void>
+  send: (body: string, attachment?: ChatSendAttachment) => Promise<void>
   markPanelRead: () => Promise<void>
 
   // Typing — sender side (debounced)
@@ -172,9 +186,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  send: async (body: string) => {
+  send: async (body: string, attachment?: ChatSendAttachment) => {
     const trimmed = body.trim()
-    if (!trimmed) return
+    if (!trimmed && !attachment) return
 
     const { conversation } = get()
     if (!conversation || conversation.status === 'CLOSED') return
@@ -189,6 +203,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
       body: trimmed,
       readAt: null,
       createdAt: new Date().toISOString(),
+      // Optimistic attachment: use the local blob URL so the user sees
+      // their own image instantly. The signed URL from the server replaces
+      // it when the canonical message arrives.
+      attachmentPath: attachment?.path ?? null,
+      attachmentMimeType: attachment?.mimeType ?? null,
+      attachmentFilename: attachment?.filename ?? null,
+      attachmentSizeBytes: attachment?.sizeBytes ?? null,
+      attachmentUrl: attachment?.localUrl ?? null,
     }
     set((s) => ({
       messages: [...s.messages, tempMessage],
@@ -196,7 +218,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }))
 
     try {
-      const saved = await chatRepository.sendMessage(trimmed)
+      const saved = await chatRepository.sendMessage(
+        trimmed,
+        attachment
+          ? {
+              path: attachment.path,
+              mimeType: attachment.mimeType,
+              filename: attachment.filename,
+              sizeBytes: attachment.sizeBytes,
+            }
+          : undefined,
+      )
 
       // Swap the temp for the canonical entry. The Realtime broadcast
       // for THIS message will arrive shortly; _mergeMessage dedupes by
@@ -205,12 +237,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
         messages: s.messages.map((m) => (m.id === tempId ? saved : m)),
         isSending: false,
       }))
+
+      // Revoke the local blob URL — the server-signed URL on `saved`
+      // is the authoritative one from now on.
+      if (attachment?.localUrl) URL.revokeObjectURL(attachment.localUrl)
     } catch (err) {
       // Rollback the optimistic append + surface the error to the UI.
       set((s) => ({
         messages: s.messages.filter((m) => m.id !== tempId),
         isSending: false,
       }))
+      if (attachment?.localUrl) URL.revokeObjectURL(attachment.localUrl)
       console.error('[chat] send failed:', err)
       throw err
     }
