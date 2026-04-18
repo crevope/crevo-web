@@ -37,10 +37,14 @@ export function LoginForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {/* Email */}
       <div className="space-y-1.5">
-        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor="login-email"
+          className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+        >
           Email
         </label>
         <input
+          id="login-email"
           type="email"
           placeholder="tu@email.com"
           autoComplete="email"
@@ -56,11 +60,15 @@ export function LoginForm() {
 
       {/* Password */}
       <div className="space-y-1.5">
-        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor="login-password"
+          className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+        >
           Contraseña
         </label>
         <div className="relative">
           <input
+            id="login-password"
             type={showPass ? 'text' : 'password'}
             placeholder="Tu contraseña"
             autoComplete="current-password"

@@ -37,6 +37,11 @@ const CSP_CONNECT_SRC = [
   'https://firebaseinstallations.googleapis.com',
   // WebSocket for Firestore realtime (if/when used).
   'wss://*.firebaseio.com',
+  // Supabase — REST + realtime (websocket). The notifications store
+  // subscribes to the `notifications` table over Supabase Realtime so
+  // both protocols need to be allowlisted.
+  'https://*.supabase.co',
+  'wss://*.supabase.co',
   // Backend API when NEXT_PUBLIC_API_URL points to an absolute origin.
   // Parsed at request time since middleware is an Edge runtime.
 ].join(' ')

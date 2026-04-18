@@ -284,12 +284,17 @@ export default function LandingPage() {
             <div className="relative w-full max-w-xl aspect-4/5 rounded-lg overflow-hidden shadow-md border border-gray-200/80 z-10">
               {/* `priority` because this is above-the-fold and the largest LCP
                   candidate on first paint. `sizes` matches the parent's
-                  responsive width (full-width mobile → half-width desktop). */}
+                  responsive width (full-width mobile → half-width desktop).
+                  Fixed width/height (instead of `fill`) so Next 16 doesn't
+                  warn when the OTHER theme variant has us in `display: none`
+                  — `fill` requires a measurable parent and `display: none`
+                  collapses both axes to zero. */}
               <Image
-                className="object-cover"
+                className="w-full h-auto object-cover"
                 src="/images/landing/app-light.png"
                 alt="Pantalla de la app móvil de Crevo en modo claro mostrando un préstamo activo"
-                fill
+                width={576}
+                height={720}
                 sizes="(min-width: 1024px) 50vw, 100vw"
                 priority
               />
@@ -352,11 +357,14 @@ export default function LandingPage() {
             <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-[#00E5FF]/10 via-transparent to-[#D4AF37]/5 rounded-bl-[120px]" />
 
             <div className="relative w-full max-w-xl aspect-4/5 rounded-lg overflow-hidden shadow-md border border-white/10 z-10">
+              {/* Fixed width/height — see the light variant above for the
+                  rationale (avoids fill+display:none warnings). */}
               <Image
-                className="object-cover"
+                className="w-full h-auto object-cover"
                 src="/images/landing/app-dark.png"
                 alt="Pantalla de la app móvil de Crevo en modo oscuro mostrando un préstamo activo"
-                fill
+                width={576}
+                height={720}
                 sizes="(min-width: 1024px) 50vw, 100vw"
                 priority
               />

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { headers } from 'next/headers'
 import { SITE, SITE_URL, BRAND_COLORS } from '@/shared/config/seo'
 
 /**
@@ -33,7 +34,17 @@ import { SITE, SITE_URL, BRAND_COLORS } from '@/shared/config/seo'
  * (Next.js auto-serves it from the file convention) — it bundles 16/32/48
  * raster sizes for browsers that fetch the .ico before reading <link> tags.
  */
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  // Resolve the icon base URL from the actual request origin so dev
+  // browsers don't try to fetch icons from `crevo.pe` (and trip CSP).
+  // Falls back to the canonical SITE_URL when the headers aren't
+  // available (e.g. during prerender on a Vercel deploy where the
+  // canonical URL is the right answer anyway).
+  const h = await headers()
+  const host = h.get('host')
+  const proto = h.get('x-forwarded-proto') ?? (host?.startsWith('localhost') ? 'http' : 'https')
+  const baseUrl = host ? `${proto}://${host}` : SITE_URL
+
   return {
     name: `${SITE.name} — ${SITE.shortDescription}`,
     short_name: SITE.name,
@@ -115,13 +126,13 @@ export default function manifest(): MetadataRoute.Manifest {
 
       // Standard rasters — Android home screen + browser favicons.
       {
-        src: `${SITE_URL}/icon0`,
+        src: `${baseUrl}/icon0`,
         sizes: '192x192',
         type: 'image/png',
         purpose: 'any',
       },
       {
-        src: `${SITE_URL}/icon1`,
+        src: `${baseUrl}/icon1`,
         sizes: '512x512',
         type: 'image/png',
         purpose: 'any',
@@ -129,13 +140,13 @@ export default function manifest(): MetadataRoute.Manifest {
       // Maskable — adaptive icons on Android. Mark within the safe zone
       // so circle/squircle masks never crop the brand.
       {
-        src: `${SITE_URL}/icons/maskable-192`,
+        src: `${baseUrl}/icons/maskable-192`,
         sizes: '192x192',
         type: 'image/png',
         purpose: 'maskable',
       },
       {
-        src: `${SITE_URL}/icons/maskable-512`,
+        src: `${baseUrl}/icons/maskable-512`,
         sizes: '512x512',
         type: 'image/png',
         purpose: 'maskable',
@@ -143,14 +154,14 @@ export default function manifest(): MetadataRoute.Manifest {
       // Monochrome — Android 13+ Material You themed icons. Transparent
       // background; the OS tints the silhouette with the user's theme color.
       {
-        src: `${SITE_URL}/icons/monochrome-512`,
+        src: `${baseUrl}/icons/monochrome-512`,
         sizes: '512x512',
         type: 'image/png',
         purpose: 'monochrome',
       },
       // iOS home-screen icon.
       {
-        src: `${SITE_URL}/apple-icon`,
+        src: `${baseUrl}/apple-icon`,
         sizes: '180x180',
         type: 'image/png',
         purpose: 'any',
