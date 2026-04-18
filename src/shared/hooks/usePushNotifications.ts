@@ -31,6 +31,10 @@ export function usePushNotifications() {
     if (!isAuthenticated || !userId) return
     if (typeof window === 'undefined') return
     if (!('Notification' in window) || !('serviceWorker' in navigator)) return
+    // Push only runs in production. In dev the SW is not registered (see
+    // `useServiceWorker`), so `navigator.serviceWorker.ready` would hang
+    // forever and we'd never resolve the FCM token request.
+    if (process.env.NODE_ENV !== 'production') return
 
     let unsubscribe: (() => void) | undefined
     let cancelled = false
