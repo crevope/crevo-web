@@ -2,8 +2,9 @@
 import { useState } from 'react'
 import { Check, CheckCheck, Info, ImageOff } from 'lucide-react'
 import type { ChatMessageView } from '../types'
-import { isTempId } from '../types'
+import { isTempId, isImageMime } from '../types'
 import { ImageLightbox } from './ImageLightbox'
+import { AttachmentFileCard } from './AttachmentFileCard'
 
 interface Props {
   message: ChatMessageView
@@ -40,6 +41,7 @@ export function ChatBubble({ message }: Readonly<Props>) {
   const seen = Boolean(message.readAt)
   const hasAttachment = Boolean(message.attachmentPath)
   const hasBody = Boolean(message.body)
+  const attachmentIsImage = isImageMime(message.attachmentMimeType)
 
   return (
     <>
@@ -57,9 +59,11 @@ export function ChatBubble({ message }: Readonly<Props>) {
             }
           `}
         >
-          {/* Attachment image — flush to the bubble edges (no padding) so
-              it reads as part of the bubble shape. Click → lightbox. */}
-          {hasAttachment && (
+          {/* Attachment renderer — images inline (flush to edges,
+              click → lightbox); non-images (PDF) as a compact file card
+              (click → open in new tab). Keeps the bubble's visual
+              identity tight to the message type. */}
+          {hasAttachment && attachmentIsImage && (
             <button
               type="button"
               onClick={() => message.attachmentUrl && setLightboxOpen(true)}
@@ -74,14 +78,20 @@ export function ChatBubble({ message }: Readonly<Props>) {
                   className="block w-full h-auto max-h-[280px] object-cover"
                 />
               ) : (
-                // Signed URL failed (rare — backend logs it). Render a
-                // placeholder so the bubble doesn't look broken.
                 <div className="flex items-center justify-center gap-2 h-[120px] bg-gray-200 dark:bg-[#334155] text-gray-500 text-xs">
                   <ImageOff className="h-4 w-4" aria-hidden="true" />
                   <span>Imagen no disponible</span>
                 </div>
               )}
             </button>
+          )}
+          {hasAttachment && !attachmentIsImage && (
+            <AttachmentFileCard
+              url={message.attachmentUrl ?? null}
+              filename={message.attachmentFilename}
+              sizeBytes={message.attachmentSizeBytes}
+              variant={isUser ? 'user' : 'agent'}
+            />
           )}
 
           {/* Body — padded only when present. When there's no body and

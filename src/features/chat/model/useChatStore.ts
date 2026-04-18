@@ -230,13 +230,27 @@ export const useChatStore = create<ChatState>((set, get) => ({
           : undefined,
       )
 
-      // Swap the temp for the canonical entry. The Realtime broadcast
-      // for THIS message will arrive shortly; _mergeMessage dedupes by
-      // canonical id so it's a no-op when it lands.
-      set((s) => ({
-        messages: s.messages.map((m) => (m.id === tempId ? saved : m)),
-        isSending: false,
-      }))
+      // Swap the temp for the canonical entry. Two possible race orders:
+      //   (A) REST response wins: the temp (tempId) is still in the
+      //       array → replace by tempId.
+      //   (B) Broadcast wins (rare but real — matters for attachments
+      //       because the broadcast carries NO signed download URL, so
+      //       without this fix the bubble ends up showing "Imagen no
+      //       disponible" until refresh). The broadcast handler already
+      //       replaced temp with an incoming-id entry; we find it by
+      //       saved.id and overwrite so the richer `saved` (with the
+      //       server-signed URL) wins.
+      set((s) => {
+        const idx = s.messages.findIndex((m) => m.id === tempId || m.id === saved.id)
+        if (idx >= 0) {
+          const next = [...s.messages]
+          next[idx] = saved
+          return { messages: next, isSending: false }
+        }
+        // Defensive: neither matched (message was somehow removed?) →
+        // append so we never lose it.
+        return { messages: [...s.messages, saved], isSending: false }
+      })
 
       // Revoke the local blob URL — the server-signed URL on `saved`
       // is the authoritative one from now on.
@@ -415,7 +429,18 @@ function _handleEvent(
       )
       if (tempIdx >= 0) {
         const next = [...state.messages]
-        next[tempIdx] = incoming
+        const previousTemp = state.messages[tempIdx]
+        // Preserve the optimistic local blob URL on attachments — the
+        // broadcast event carries `attachmentPath` but NOT a signed
+        // download URL (signed URLs would expire while sitting in the
+        // Realtime envelope). If we blindly replace, the bubble flashes
+        // "Imagen no disponible" until the REST response catches up.
+        // Holding the blob URL bridges that gap smoothly; the actual
+        // server-signed URL lands when the REST `send` resolves.
+        next[tempIdx] = {
+          ...incoming,
+          attachmentUrl: incoming.attachmentUrl ?? previousTemp.attachmentUrl ?? null,
+        }
         set({ messages: next })
         return
       }

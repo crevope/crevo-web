@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState, type KeyboardEvent, type ChangeEvent } from 'react'
-import { Send, Loader2, Smile, Paperclip, X as XIcon } from 'lucide-react'
+import { Send, Loader2, Smile, Paperclip, X as XIcon, FileText } from 'lucide-react'
 import { toast } from 'sonner'
 import { useChatStore } from '../model/useChatStore'
 import { chatRepository } from '../api/chatRepository'
@@ -8,6 +8,7 @@ import { EmojiPicker } from './EmojiPicker'
 import {
   ALLOWED_ATTACHMENT_MIME_TYPES,
   MAX_ATTACHMENT_SIZE_BYTES,
+  isImageMime,
   type ChatAttachmentMimeType,
 } from '../types'
 
@@ -176,12 +177,12 @@ export function ChatComposer({ isClosed }: Readonly<Props>) {
 
     // Local validation — backend re-validates so this is a friendliness layer.
     if (!ALLOWED_ATTACHMENT_MIME_TYPES.includes(file.type as ChatAttachmentMimeType)) {
-      toast.error('Solo se aceptan imágenes (PNG, JPG, WebP, GIF).')
+      toast.error('Solo se aceptan imágenes (PNG, JPG, WebP, GIF) y PDF.')
       return
     }
     if (file.size > MAX_ATTACHMENT_SIZE_BYTES) {
       const maxMb = Math.round(MAX_ATTACHMENT_SIZE_BYTES / (1024 * 1024))
-      toast.error(`La imagen supera el límite de ${maxMb} MB.`)
+      toast.error(`El archivo supera el límite de ${maxMb} MB.`)
       return
     }
 
@@ -203,15 +204,22 @@ export function ChatComposer({ isClosed }: Readonly<Props>) {
 
   return (
     <div className="border-t border-gray-200 dark:border-[#334155] bg-white dark:bg-[#0F172A] px-3 py-2.5">
-      {/* Staged-attachment preview row. Shows above the input when an
-          image is selected but not yet sent. Click X to discard. */}
+      {/* Staged-attachment preview row. Images use a thumbnail; PDFs
+          use a generic document icon (rendering a PDF page thumb would
+          require pdf.js which is heavy + overkill). Click X to discard. */}
       {staged && (
         <div className="mb-2 inline-flex items-start gap-2 rounded-lg border border-gray-200 dark:border-[#334155] bg-gray-50 dark:bg-[#1E293B] p-1.5 max-w-full">
-          <img
-            src={staged.localUrl}
-            alt={staged.file.name}
-            className="h-14 w-14 rounded object-cover shrink-0"
-          />
+          {isImageMime(staged.file.type) ? (
+            <img
+              src={staged.localUrl}
+              alt={staged.file.name}
+              className="h-14 w-14 rounded object-cover shrink-0"
+            />
+          ) : (
+            <div className="h-14 w-14 rounded bg-red-500/10 flex items-center justify-center shrink-0">
+              <FileText className="h-6 w-6 text-red-500" aria-hidden="true" />
+            </div>
+          )}
           <div className="min-w-0 flex-1 pr-1 py-0.5">
             <p
               className="text-xs text-[#0A192F] dark:text-[#F1F5F9] truncate"
@@ -231,7 +239,7 @@ export function ChatComposer({ isClosed }: Readonly<Props>) {
               setStaged(null)
             }}
             disabled={isUploading}
-            aria-label="Quitar imagen"
+            aria-label="Quitar archivo"
             className="shrink-0 h-6 w-6 rounded hover:bg-gray-200 dark:hover:bg-[#334155] flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:opacity-50"
           >
             <XIcon className="h-3.5 w-3.5" aria-hidden="true" />
@@ -255,7 +263,7 @@ export function ChatComposer({ isClosed }: Readonly<Props>) {
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading || isSending}
-          aria-label="Adjuntar imagen"
+          aria-label="Adjuntar archivo"
           className="shrink-0 h-9 w-9 rounded-lg flex items-center justify-center text-gray-500 hover:text-[#0A192F] hover:bg-gray-100 dark:text-gray-400 dark:hover:text-[#D4AF37] dark:hover:bg-[#1E293B] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Paperclip className="h-4 w-4" aria-hidden="true" />

@@ -47,15 +47,23 @@ export interface ChatMessageView {
   attachmentUrl?: string | null
 }
 
-/** Phase 1 attachment whitelist — kept in sync with backend. */
+/** Attachment whitelist — kept in sync with backend.
+ *  Images render inline in bubbles; PDFs render as a file card. */
 export const ALLOWED_ATTACHMENT_MIME_TYPES = [
   'image/png',
   'image/jpeg',
   'image/webp',
   'image/gif',
+  'application/pdf',
 ] as const
 export type ChatAttachmentMimeType = (typeof ALLOWED_ATTACHMENT_MIME_TYPES)[number]
 export const MAX_ATTACHMENT_SIZE_BYTES = 5 * 1024 * 1024
+
+/** True when the attachment MIME is one we render inline as an image;
+ *  otherwise (currently PDF) the bubble renders a file-card UI. */
+export function isImageMime(mime: string | null | undefined): boolean {
+  return Boolean(mime && mime.startsWith('image/'))
+}
 
 /** Response shape from POST /chat/attachments/upload-url. */
 export interface ChatAttachmentUploadUrl {
