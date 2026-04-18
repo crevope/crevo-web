@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, Clock, Tag } from 'lucide-react'
-import { AuthHeader } from '@/shared/ui/auth-header'
-import { CURRENT_YEAR } from '@/shared/lib/constants'
+import { LandingHeader } from '@/shared/ui/landing-header'
+import { LandingFooter } from '@/shared/ui/landing-footer'
 import { buildMetadata } from '@/shared/seo/buildMetadata'
 import { JsonLd } from '@/shared/seo/JsonLd'
 import { breadcrumbSchema } from '@/shared/seo/schemas/breadcrumb'
@@ -91,7 +91,7 @@ export default async function BlogPostPage({ params }: Props) {
     <div className="bg-[#F8FAFC] dark:bg-[#0F172A] min-h-screen flex flex-col text-gray-800 dark:text-[#F1F5F9] antialiased">
       <JsonLd id="ld-breadcrumb" data={breadcrumb} />
       <JsonLd id="ld-article" data={articleJsonLd} />
-      <AuthHeader />
+      <LandingHeader />
 
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 space-y-10">
         <Link
@@ -156,9 +156,7 @@ export default async function BlogPostPage({ params }: Props) {
         </section>
       </main>
 
-      <footer className="border-t border-gray-100 dark:border-white/5 py-6 text-center text-xs text-gray-500 dark:text-gray-400">
-        © {CURRENT_YEAR} Crevo
-      </footer>
+      <LandingFooter />
     </div>
   )
 }

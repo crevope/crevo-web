@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, MessagesSquare } from 'lucide-react'
-import { AuthHeader } from '@/shared/ui/auth-header'
-import { CURRENT_YEAR } from '@/shared/lib/constants'
+import { LandingHeader } from '@/shared/ui/landing-header'
+import { LandingFooter } from '@/shared/ui/landing-footer'
 import { buildMetadata } from '@/shared/seo/buildMetadata'
 import { JsonLd } from '@/shared/seo/JsonLd'
 import { breadcrumbSchema } from '@/shared/seo/schemas/breadcrumb'
@@ -45,7 +45,7 @@ export default function FaqPage() {
           adds the "Crevo › Preguntas frecuentes" trail on the SERP. */}
       <JsonLd id="ld-breadcrumb" data={breadcrumb} />
       <JsonLd id="ld-faq" data={faqJsonLd()} />
-      <AuthHeader />
+      <LandingHeader />
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 space-y-12">
         {/* Hero */}
@@ -92,9 +92,7 @@ export default function FaqPage() {
         </section>
       </main>
 
-      <footer className="border-t border-gray-100 dark:border-white/5 py-6 text-center text-xs text-gray-500 dark:text-gray-400">
-        © {CURRENT_YEAR} Crevo
-      </footer>
+      <LandingFooter />
     </div>
   )
 }

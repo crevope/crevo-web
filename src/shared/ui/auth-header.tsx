@@ -17,7 +17,7 @@ export function AuthHeader({ cta }: AuthHeaderProps) {
       <div className="flex items-center gap-4 sm:gap-5">
         <LandingThemeToggle />
         <Link
-          href="#ayuda"
+          href="/preguntas-frecuentes"
           className="text-sm text-gray-500 dark:text-gray-400 hover:text-[#0A192F] dark:hover:text-[#D4AF37] transition-colors hidden md:block"
         >
           Ayuda
