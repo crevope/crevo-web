@@ -13,8 +13,12 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Vercel's production build also runs typecheck + lint, so these match.
-  NODE_VERSION: '20'
+  # Node 22 (Jod LTS, EOL April 2027). Node 20 LTS reaches EOL on
+  # 2026-04-30 — `actions/setup-node@v4` already prints a deprecation
+  # warning when you pin to it. Vercel's production build runs on the
+  # same major (configurable in Project Settings → General → Node.js
+  # Version), so keep these in lockstep.
+  NODE_VERSION: '22'
 
 jobs:
   lint-typecheck:

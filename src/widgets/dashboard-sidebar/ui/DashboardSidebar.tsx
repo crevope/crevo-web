@@ -2,8 +2,8 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
+import { useIsClient } from '@/shared/hooks/useIsClient'
 import {
   Home,
   HandCoins,
@@ -51,9 +51,7 @@ export function DashboardSidebar({ isOpen, onClose }: Props) {
   const { user, logout } = useAuthStore()
   const { resolvedTheme, setTheme } = useTheme()
   const { unreadCount } = useNotificationStore()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => setMounted(true), [])
+  const mounted = useIsClient()
 
   const isDark = mounted && resolvedTheme === 'dark'
 

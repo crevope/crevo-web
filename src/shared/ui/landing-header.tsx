@@ -6,6 +6,7 @@ import { useAuthStore } from '@/features/auth'
 import { LandingThemeToggle } from './landing-theme-toggle'
 import { Logo } from './Logo'
 import { shortName } from '@/shared/lib/utils'
+import { useIsClient } from '@/shared/hooks/useIsClient'
 
 /**
  * Public navigation entries. Order is the funnel order — calculator first
@@ -34,10 +35,11 @@ export function LandingHeader() {
   // client immediately renders the dashboard avatar — that's a hard
   // hydration error in Next 16. Once `mounted` is true we can safely show
   // the authenticated CTA based on the in-memory store value.
-  const [mounted, setMounted] = useState(false)
+  const mounted = useIsClient()
 
+  // Hydrate the auth store from localStorage on mount. This is the actual
+  // side effect (the `mounted` gate above is purely a render fence).
   useEffect(() => {
-    setMounted(true)
     loadUser()
   }, [loadUser])
 

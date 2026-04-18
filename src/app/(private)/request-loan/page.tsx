@@ -38,6 +38,7 @@ import { useAuthStore, authRepository } from '@/features/auth'
 import { legalRepository, LEGAL_DOCUMENT_TYPES, LEGAL_VERSIONS, LEGAL_URLS } from '@/features/legal'
 import { formatCurrency, shortName } from '@/shared/lib/utils'
 import { InfoTooltip } from '@/shared/ui/info-tooltip'
+import { useIsClient } from '@/shared/hooks/useIsClient'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 import Link from 'next/link'
 
@@ -171,7 +172,7 @@ export default function RequestLoanPage() {
   const [kycApproved, setKycApproved] = useState<boolean | null>(null)
   const [simulation, setSimulation] = useState<SimulationResult | null>(null)
   const [simLoading, setSimLoading] = useState(true)
-  const [mounted, setMounted] = useState(false)
+  const mounted = useIsClient()
   const [resendLoading, setResendLoading] = useState(false)
   const [resendSent, setResendSent] = useState(false)
   const { resolvedTheme } = useTheme()
@@ -192,9 +193,35 @@ export default function RequestLoanPage() {
   const [addingAccount, setAddingAccount] = useState(false)
   const [bankCatalog, setBankCatalog] = useState<BankEntry[]>([])
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  // Forms must be declared BEFORE the effects that reference their `setValue`
+  // — the effects run after all hooks, but ESLint's exhaustive-deps rule
+  // (correctly) flags TDZ access if you reference them in an effect that's
+  // declared earlier in the function body.
+  const form = useForm<RequestInput>({
+    resolver: zodResolver(requestSchema),
+    mode: 'onSubmit',
+    defaultValues: {
+      amount: PRODUCT_CONFIG.EXPRESS.defaultAmount,
+      productType: 'EXPRESS',
+      frequency: 'MENSUAL',
+      installments: 1,
+      bankAccountId: '',
+      consentCredit: false,
+      consentTerms: false,
+    },
+  })
+
+  const addAccountForm = useForm<AddAccountInput>({
+    resolver: zodResolver(addAccountSchema),
+    mode: 'onChange',
+    defaultValues: { bank: '', cci: '' },
+  })
+
+  const frequency = form.watch('frequency')
+  const installments = form.watch('installments')
+  const selectedAccountId = form.watch('bankAccountId')
+  const consentCredit = form.watch('consentCredit')
+  const consentTerms = form.watch('consentTerms')
 
   useEffect(() => {
     kycRepository
@@ -224,7 +251,8 @@ export default function RequestLoanPage() {
       })
       .catch(() => setShowAddForm(true))
       .finally(() => setBankAccountsLoading(false))
-  }, [])
+    // form.setValue is stable per RHF docs; including `form` in deps would re-fetch on every render
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     catalogRepository
@@ -234,33 +262,8 @@ export default function RequestLoanPage() {
         if (banks[0]) addAccountForm.setValue('bank', banks[0].id)
       })
       .catch(() => {})
-  }, [])
-
-  const form = useForm<RequestInput>({
-    resolver: zodResolver(requestSchema),
-    mode: 'onSubmit',
-    defaultValues: {
-      amount: PRODUCT_CONFIG.EXPRESS.defaultAmount,
-      productType: 'EXPRESS',
-      frequency: 'MENSUAL',
-      installments: 1,
-      bankAccountId: '',
-      consentCredit: false,
-      consentTerms: false,
-    },
-  })
-
-  const frequency = form.watch('frequency')
-  const installments = form.watch('installments')
-  const selectedAccountId = form.watch('bankAccountId')
-  const consentCredit = form.watch('consentCredit')
-  const consentTerms = form.watch('consentTerms')
-
-  const addAccountForm = useForm<AddAccountInput>({
-    resolver: zodResolver(addAccountSchema),
-    mode: 'onChange',
-    defaultValues: { bank: '', cci: '' },
-  })
+    // addAccountForm.setValue is stable per RHF docs; including the form in deps would re-fetch on every render
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const amount = form.watch('amount')
   const cfg = PRODUCT_CONFIG[productType]

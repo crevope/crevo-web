@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes'
 import { Zap, TrendingUp, Star, Info, Download, Loader2, Lock } from 'lucide-react'
 import { Skeleton } from '@/shared/ui/skeleton'
 import Link from 'next/link'
+import { useIsClient } from '@/shared/hooks/useIsClient'
 import {
   simulate,
   downloadSummary,
@@ -78,10 +79,8 @@ export function LoanSimulator() {
   const [error, setError] = useState<string | null>(null)
   const [downloadingSummary, setDownloadingSummary] = useState(false)
   const [summaryError, setSummaryError] = useState<string | null>(null)
-  const [mounted, setMounted] = useState(false)
+  const mounted = useIsClient()
   const { resolvedTheme } = useTheme()
-
-  useEffect(() => setMounted(true), [])
 
   const cfg = PRODUCT_CONFIG[product]
 

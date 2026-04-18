@@ -20,7 +20,12 @@ import prettierConfig from 'eslint-config-prettier'
  *
  * Run with `yarn lint` (aliased to `eslint .`).
  */
-export default [
+/**
+ * Named const so `import/no-anonymous-default-export` doesn't flag the
+ * config — anonymous default arrays are hard to identify in stack traces
+ * and disable any tooling that relies on the export name.
+ */
+const config = [
   {
     ignores: [
       '.next/**',
@@ -66,3 +71,5 @@ export default [
   // the last entry in the array so it overrides the presets above.
   prettierConfig,
 ]
+
+export default config

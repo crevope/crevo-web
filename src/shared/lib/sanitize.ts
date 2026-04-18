@@ -37,12 +37,10 @@ export function sanitizeUserText(input: string): string {
   // Strip BiDi control + format characters that don't appear in natural
   // Spanish / English text. Explicit ranges so we don't accidentally strip
   // emoji or non-Latin scripts.
-  // eslint-disable-next-line no-misleading-character-class
   out = out.replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\u2028\u2029]/g, '')
 
   // Strip C0 controls (0x00-0x08, 0x0B, 0x0C, 0x0E-0x1F) + DEL (0x7F) +
   // C1 controls (0x80-0x9F). Keep tab (0x09), LF (0x0A), CR (0x0D).
-  // eslint-disable-next-line no-control-regex
   out = out.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '')
 
   // Collapse runs of 3+ newlines down to 2 (preserves paragraph breaks,
