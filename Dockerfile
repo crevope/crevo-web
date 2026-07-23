@@ -21,7 +21,7 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBL
 COPY package.json yarn.lock ./
 RUN corepack enable && yarn install --frozen-lockfile
 COPY . .
-RUN yarn build       # next build --webpack (output: 'standalone')
+RUN yarn build       # next build --turbopack (output: 'standalone')
 FROM node:22-bookworm-slim AS runtime
 ENV NODE_ENV=production PORT=3000
 WORKDIR /app
