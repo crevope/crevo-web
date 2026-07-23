@@ -10,3 +10,5 @@ out/
 # TypeScript incremental build cache — regenerated automatically.
 tsconfig.tsbuildinfo
 *.tsbuildinfo
+graphify-out/
+.superpowers/
