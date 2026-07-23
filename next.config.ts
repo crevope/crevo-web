@@ -1,14 +1,5 @@
 import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs'
-import withBundleAnalyzer from '@next/bundle-analyzer'
-
-// Bundle analyzer only activates when `ANALYZE=true yarn build`. The wrapper
-// is a no-op otherwise, so it costs nothing in normal builds. Use it to hunt
-// heavy deps: it writes two HTML reports under `.next/analyze/` (one per
-// runtime) that open in the browser automatically.
-const bundleAnalyzer = withBundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-})
 
 /**
  * Backend upstream for the `/api/*` rewrite.
@@ -144,15 +135,12 @@ const isPlaceholderToken =
   sentryToken.includes('placeholder') ||
   sentryToken.toUpperCase().includes('YOUR_TOKEN')
 
-const configuredWithAnalyzer = bundleAnalyzer(nextConfig)
-
 export default isPlaceholderToken
-  ? configuredWithAnalyzer
-  : withSentryConfig(configuredWithAnalyzer, {
+  ? nextConfig
+  : withSentryConfig(nextConfig, {
       org: process.env.SENTRY_ORG,
       project: process.env.SENTRY_PROJECT,
       authToken: sentryToken,
       silent: !process.env.CI,
-      hideSourceMaps: true,
       telemetry: false,
     })
