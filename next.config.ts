@@ -29,6 +29,13 @@ const bundleAnalyzer = withBundleAnalyzer({
 const BACKEND_UPSTREAM_URL = process.env.BACKEND_UPSTREAM_URL?.replace(/\/+$/, '')
 
 const nextConfig: NextConfig = {
+  // ─── Standalone output ─────────────────────────────────────────────────
+  //
+  // Produces a self-contained `.next/standalone` bundle (server + only the
+  // node_modules it actually needs) so the Docker runtime image doesn't
+  // have to ship the full node_modules tree. Required for the Dockerfile.
+  output: 'standalone',
+
   // ─── Image optimization ────────────────────────────────────────────────
   //
   // Serve AVIF when the browser accepts it (≈50% smaller than WebP, ≈75%
