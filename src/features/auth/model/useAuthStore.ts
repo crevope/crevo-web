@@ -17,6 +17,7 @@ interface AuthState {
   }) => Promise<void>
   logout: () => Promise<void>
   loadUser: () => void
+  refreshUser: () => Promise<void>
   setUser: (user: AuthUser) => void
 }
 
@@ -39,6 +40,27 @@ export const useAuthStore = create<AuthState>((set) => ({
   loadUser: () => {
     const user = authRepository.getStoredUser()
     set({ user, isAuthenticated: !!user, isLoading: false })
+  },
+
+  /**
+   * Re-fetch the profile from the server (`/auth/me`) and overwrite the cache.
+   * The localStorage copy is only a hydration shortcut and can go stale after a
+   * server-side change the client never saw (email verification — typically
+   * done from a link opened on another device — or KYC approval). Call this on
+   * entry to the authenticated area so those changes surface without a re-login.
+   *
+   * Failure is non-fatal: a transient error or a truly expired session leaves
+   * the cached user in place; the apiClient interceptor renews the token or, on
+   * a real auth failure, redirects to /login.
+   */
+  refreshUser: async () => {
+    try {
+      const fresh = await authRepository.getMyProfile()
+      authRepository.saveUser(fresh)
+      set({ user: fresh, isAuthenticated: true })
+    } catch {
+      // keep the hydrated cache; see doc comment above
+    }
   },
 
   setUser: (user) => {

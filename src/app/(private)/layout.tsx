@@ -13,7 +13,7 @@ import { usePushNotifications } from '@/shared/hooks/usePushNotifications'
 
 export default function PrivateLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const router = useRouter()
-  const { user, isAuthenticated, isLoading, loadUser } = useAuthStore()
+  const { user, isAuthenticated, isLoading, loadUser, refreshUser } = useAuthStore()
   const {
     unreadCount,
     load: loadNotifications,
@@ -26,8 +26,12 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
   usePushNotifications()
 
   useEffect(() => {
+    // Hydrate instantly from the localStorage cache, then reconcile against the
+    // server so a change the client never saw (email verified from another
+    // device, KYC approved) surfaces here without forcing a re-login.
     loadUser()
-  }, [loadUser])
+    void refreshUser()
+  }, [loadUser, refreshUser])
   useEffect(() => {
     loadNotifications()
   }, [loadNotifications])
