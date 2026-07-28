@@ -22,12 +22,10 @@ import {
 } from 'lucide-react'
 import { loanRepository, useLoanStore } from '@/features/request-loan'
 import { formatCurrency, formatDate, formatDateTime, loanRef } from '@/shared/lib/utils'
-import type { Loan, LoanBalance, Payment } from '@/entities/loan'
+import { canPay, type Loan, type LoanBalance, type Payment } from '@/entities/loan'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 import { Input } from '@/shared/ui/input'
-
-const ACTIVE_STATUSES = ['APPROVED', 'SIGNED', 'ACTIVE', 'OVERDUE']
 
 type PageTab = 'pay' | 'history'
 
@@ -72,7 +70,7 @@ export default function PaymentsPage() {
     loadMyLoans()
   }, [loadMyLoans])
 
-  const activeLoans = loans.filter((l) => ACTIVE_STATUSES.includes(l.status))
+  const payableLoans = loans.filter(canPay)
 
   const loadLoanData = useCallback(async (loanId: string) => {
     setIsLoadingBalance(true)
@@ -92,10 +90,10 @@ export default function PaymentsPage() {
   }, [])
 
   useEffect(() => {
-    if (activeLoans.length > 0 && !selectedLoanId) {
-      setSelectedLoanId(activeLoans[0].id)
+    if (payableLoans.length > 0 && !selectedLoanId) {
+      setSelectedLoanId(payableLoans[0].id)
     }
-  }, [activeLoans, selectedLoanId])
+  }, [payableLoans, selectedLoanId])
 
   // Load full history across all loans when switching to history tab
   useEffect(() => {
@@ -124,8 +122,11 @@ export default function PaymentsPage() {
 
   const selectedLoan = loans.find((l) => l.id === selectedLoanId) ?? null
 
+  // Cuota completa: nunca mayor al saldo pendiente (la última cuota no sobrecobra).
   const paymentAmount =
-    amountType === 'full' ? (selectedLoan?.installmentAmount ?? 0) : parseFloat(customAmount) || 0
+    amountType === 'full'
+      ? Math.min(selectedLoan?.installmentAmount ?? 0, balance?.remaining ?? Infinity)
+      : parseFloat(customAmount) || 0
 
   const handleSubmit = async () => {
     if (!selectedLoanId || paymentAmount <= 0) return
@@ -409,7 +410,7 @@ export default function PaymentsPage() {
                     </div>
                   ))}
                 </div>
-              ) : activeLoans.length === 0 ? (
+              ) : payableLoans.length === 0 ? (
                 <div className="text-center py-8">
                   <FolderOpen
                     className="h-10 w-10 text-gray-300 dark:text-gray-600 mb-3"
@@ -427,7 +428,7 @@ export default function PaymentsPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {activeLoans.map((loan: Loan) => (
+                  {payableLoans.map((loan: Loan) => (
                     <label key={loan.id} className="cursor-pointer block">
                       <input
                         type="radio"

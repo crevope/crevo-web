@@ -54,13 +54,18 @@ export default function PayLoanPage() {
     }
   }, [isLoading, loan, loanId, router])
 
+  // Monto de una cuota, nunca mayor al saldo pendiente (así la última cuota no
+  // sobrecobra). Sin fallback al saldo completo: si installmentAmount fuera 0
+  // (dato inválido) el pago queda en 0 y el botón se deshabilita — fail-safe.
+  const cuotaAmount = loan && balance ? Math.min(loan.installmentAmount, balance.remaining) : 0
+
   const handlePayNow = useCallback(async () => {
-    if (!balance) return
+    if (cuotaAmount <= 0) return
     setIsPaying(true)
     try {
       const { checkoutUrl } = await loanRepository.createCheckout({
         loanId,
-        amount: balance.remaining,
+        amount: cuotaAmount,
         paymentType: 'regular',
       })
       window.location.href = checkoutUrl
@@ -68,7 +73,7 @@ export default function PayLoanPage() {
       toast.error(err instanceof Error ? err.message : 'Error al generar el link de pago')
       setIsPaying(false)
     }
-  }, [balance, loanId])
+  }, [cuotaAmount, loanId])
 
   const handleEarlyPayoff = useCallback(async () => {
     if (!earlyPayoffQuote) return
@@ -317,15 +322,27 @@ export default function PayLoanPage() {
           </div>
 
           <div className="p-4 rounded-lg bg-gray-50 dark:bg-[#0F172A] border border-gray-100 dark:border-white/6 flex justify-between items-center mb-5">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Total a pagar</span>
-            <span className="text-xl font-bold text-[#0A192F] dark:text-[#D4AF37]">
-              {formatCurrency(balance.remaining)}
-            </span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Cuota a pagar</span>
+            <div className="text-right">
+              <span className="text-xl font-bold text-[#0A192F] dark:text-[#D4AF37]">
+                {formatCurrency(cuotaAmount)}
+              </span>
+              {balance.dueDate && (
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                  Vence el{' '}
+                  {new Date(balance.dueDate).toLocaleDateString('es-PE', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </p>
+              )}
+            </div>
           </div>
 
           <button
             onClick={handlePayNow}
-            disabled={isPaying || !user}
+            disabled={isPaying || !user || cuotaAmount <= 0}
             className="w-full bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold py-3 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPaying ? (
@@ -336,7 +353,7 @@ export default function PayLoanPage() {
             ) : (
               <>
                 <Lock className="h-4 w-4" aria-hidden="true" />
-                Pagar {formatCurrency(balance.remaining)}
+                Pagar {formatCurrency(cuotaAmount)}
               </>
             )}
           </button>
