@@ -100,6 +100,22 @@ function buildCsp(isDev: boolean): string {
     // malformed URL — skip
   }
 
+  // Supabase self-hosted: el CSP base solo lista *.supabase.co (hosteado). En
+  // self-hosting (NEXT_PUBLIC_SUPABASE_URL = https://supabase.<env>.crevo.pe) el
+  // navegador bloquearía el WebSocket de Realtime y las signed URLs de Storage
+  // por connect-src. Agregamos el origin real (https + wss) derivado del env,
+  // así funciona en sandbox y prod sin hardcodear el dominio.
+  let supabaseOrigins = ''
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? ''
+    if (/^https?:\/\//.test(supabaseUrl)) {
+      const { origin, host } = new URL(supabaseUrl)
+      supabaseOrigins = ` ${origin} wss://${host}`
+    }
+  } catch {
+    // malformed URL — skip
+  }
+
   // We intentionally ship an `'unsafe-inline'` policy for scripts instead
   // of the stricter nonce + `'strict-dynamic'` variant. Rationale:
   //   - Next 15/16 emits many inline scripts for hydration, Flight, RSC
@@ -130,7 +146,7 @@ function buildCsp(isDev: boolean): string {
     // data: for inline SVG data-uris, blob: for next/image optimization.
     `img-src 'self' data: blob: https:`,
     `font-src 'self' data:`,
-    `connect-src ${CSP_CONNECT_SRC}${apiOrigin}`,
+    `connect-src ${CSP_CONNECT_SRC}${apiOrigin}${supabaseOrigins}`,
     // Allow the Firebase + PWA Service Worker we ship.
     `worker-src 'self' blob:`,
     `manifest-src 'self'`,
