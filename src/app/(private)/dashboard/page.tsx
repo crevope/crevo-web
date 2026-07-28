@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import {
   Loader2,
@@ -31,15 +31,6 @@ import {
 import { useAuthStore } from '@/features/auth'
 import { authRepository } from '@/features/auth'
 import { useLoanStore } from '@/features/request-loan'
-
-// Heavy client-side form (form state, amount slider, installment calculator,
-// bank account picker, legal consent) — only needed the moment the user clicks
-// "Solicitar préstamo", which typically happens at most once per session. Defer
-// the chunk until then to keep the dashboard TTI low.
-const RequestLoanModal = dynamic(
-  () => import('@/features/request-loan').then((m) => ({ default: m.RequestLoanModal })),
-  { ssr: false },
-)
 import { useNotificationStore } from '@/features/notifications'
 import { kycRepository } from '@/features/upload-kyc'
 import { formatCurrency, formatDate, loanRef } from '@/shared/lib/utils'
@@ -69,10 +60,10 @@ const ONBOARDING_STEPS = [
 ]
 
 export default function DashboardPage() {
+  const router = useRouter()
   const { user } = useAuthStore()
   const { loans, activeLoan, isLoading, loadMyLoans } = useLoanStore()
   const { unreadCount, load: loadNotifications } = useNotificationStore()
-  const [showModal, setShowModal] = useState(false)
   const [kycApproved, setKycApproved] = useState(false)
   const [kycLoading, setKycLoading] = useState(true)
   const [resendLoading, setResendLoading] = useState(false)
@@ -136,13 +127,12 @@ export default function DashboardPage() {
             )}
           </Link>
           {kycApproved && !activeLoan && (
-            <button
-              type="button"
-              onClick={() => setShowModal(true)}
+            <Link
+              href="/request-loan"
               className="bg-[#D4AF37] text-[#0A192F] font-medium px-6 py-2 rounded-lg cursor-pointer flex items-center gap-2 hover:bg-[#B8941F] transition-colors"
             >
               <Plus className="h-3 w-3" aria-hidden="true" /> Nuevo Préstamo
-            </button>
+            </Link>
           )}
         </div>
       </div>
@@ -431,7 +421,7 @@ export default function DashboardPage() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => kycApproved && setShowModal(true)}
+                  onClick={() => kycApproved && router.push('/request-loan')}
                   disabled={!kycApproved}
                   className="w-full bg-[#D4AF37] text-[#0A192F] py-3 rounded-xl font-medium hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
@@ -525,12 +515,12 @@ export default function DashboardPage() {
             </p>
           </div>
           {kycApproved && !activeLoan && (
-            <button
-              onClick={() => setShowModal(true)}
-              className="w-full mt-4 py-3 rounded-xl border border-gray-100 dark:border-white/6 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-[#0F172A] hover:border-[#0A192F] dark:hover:border-[#D4AF37] hover:text-[#0A192F] dark:hover:text-[#D4AF37] transition-colors text-sm"
+            <Link
+              href="/request-loan"
+              className="w-full mt-4 py-3 rounded-xl border border-gray-100 dark:border-white/6 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-[#0F172A] hover:border-[#0A192F] dark:hover:border-[#D4AF37] hover:text-[#0A192F] dark:hover:text-[#D4AF37] transition-colors text-sm flex items-center justify-center"
             >
               Ver estado detallado
-            </button>
+            </Link>
           )}
         </div>
       </div>
@@ -772,13 +762,12 @@ export default function DashboardPage() {
                   <strong className="text-[#0A192F] dark:text-[#D4AF37]">S/ 2,000</strong> con
                   aprobación en minutos.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setShowModal(true)}
-                  className="w-full bg-[#D4AF37] text-[#0A192F] font-medium py-3 rounded-lg text-sm cursor-pointer hover:bg-[#B8941F] transition-colors"
+                <Link
+                  href="/request-loan"
+                  className="w-full bg-[#D4AF37] text-[#0A192F] font-medium py-3 rounded-lg text-sm cursor-pointer hover:bg-[#B8941F] transition-colors flex items-center justify-center"
                 >
                   Ver Oferta
-                </button>
+                </Link>
               </div>
             </div>
           )}
@@ -839,8 +828,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-
-      <RequestLoanModal open={showModal} onClose={() => setShowModal(false)} />
     </div>
   )
 }

@@ -278,6 +278,20 @@ export default function RequestLoanPage() {
     return !loanLimits.limits[p].available && !!loanLimits.limits[p].requiredPaidLoans
   }
 
+  // Re-clampea el monto cuando llegan los límites personalizados (async, vía
+  // getMyLimits) para el producto YA seleccionado — antes solo se re-clampeaba
+  // en handleProductChange (cambio manual de pestaña). Sin esto, un usuario
+  // con un máximo aprobado menor al defaultAmount (p. ej. S/ 100 vs 200) queda
+  // con un `amount` inválido que el schema rechaza en submit sin explicación.
+  useEffect(() => {
+    const maxAmt = effectiveMax(productType)
+    if (form.getValues('amount') > maxAmt) {
+      form.setValue('amount', maxAmt, { shouldValidate: true })
+    }
+    // effectiveMax/form.getValues/form.setValue son estables por render; solo
+    // nos interesa reaccionar a cambios en loanLimits o productType.
+  }, [loanLimits, productType]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleProductChange = (p: ProductKey) => {
     const c = PRODUCT_CONFIG[p]
     const maxAmt = effectiveMax(p)
@@ -393,13 +407,19 @@ export default function RequestLoanPage() {
     }
   }
 
-  const canSubmit = form.formState.isValid && !!simulation && kycApproved === true
+  // safeAmount/currentMax se calculan antes de canSubmit para poder exigir,
+  // además de la validación del schema (rango absoluto 100–2000), que el
+  // monto no supere el máximo PERSONALIZADO por tier — form.formState.isValid
+  // por sí solo no lo captura porque el <input type="range"> ya limita su
+  // `max` visualmente, pero no bloquea un `amount` stale mayor al nuevo tope.
+  const safeAmount = Number.isNaN(amount) ? cfg.defaultAmount : amount
+  const currentMax = effectiveMax(productType)
+  const canSubmit =
+    form.formState.isValid && !!simulation && kycApproved === true && safeAmount <= currentMax
 
   // Slider fill style
   const fillColor = mounted && resolvedTheme === 'dark' ? '#D4AF37' : '#0A192F'
   const trackColor = mounted && resolvedTheme === 'dark' ? 'rgba(255,255,255,0.12)' : '#E5E7EB'
-  const safeAmount = Number.isNaN(amount) ? cfg.defaultAmount : amount
-  const currentMax = effectiveMax(productType)
   const fillPct = ((safeAmount - cfg.minAmount) / (currentMax - cfg.minAmount)) * 100
   const rangeStyle = {
     background: `linear-gradient(to right, ${fillColor} ${Math.max(0, Math.min(100, fillPct))}%, ${trackColor} ${Math.max(0, Math.min(100, fillPct))}%)`,

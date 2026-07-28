@@ -1,4 +1,3 @@
-export { RequestLoanModal } from './ui/RequestLoanModal'
 export { useLoanStore } from './model/useLoanStore'
 export { useLoanSummaries, type LoanSummary } from './model/useLoanSummaries'
 export { loanRepository } from './api/loanRepository'
