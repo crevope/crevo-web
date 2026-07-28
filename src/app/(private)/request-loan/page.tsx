@@ -26,7 +26,12 @@ import {
 import { Checkbox } from '@/shared/ui/checkbox'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { useTheme } from 'next-themes'
-import { useLoanStore, loanRepository, type SimulationResult } from '@/features/request-loan'
+import {
+  useLoanStore,
+  loanRepository,
+  AmountSlider,
+  type SimulationResult,
+} from '@/features/request-loan'
 import type { LoanLimits } from '@/entities/loan'
 import {
   bankAccountRepository,
@@ -55,8 +60,6 @@ const TOOLTIPS = {
   igv: 'Impuesto General a las Ventas (18%) aplicado sobre las comisiones.',
   tcea: 'Tasa de Costo Efectivo Anual. Refleja el costo total del préstamo incluyendo intereses y comisiones.',
 }
-
-const STEP = 25
 
 const PRODUCT_CONFIG = {
   EXPRESS: {
@@ -110,10 +113,6 @@ const PRODUCT_CONFIG = {
 } as const
 
 type ProductKey = keyof typeof PRODUCT_CONFIG
-
-function fmtAmt(n: number) {
-  return n.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-}
 
 function range(min: number, max: number): number[] {
   const r: number[] = []
@@ -420,10 +419,6 @@ export default function RequestLoanPage() {
   // Slider fill style
   const fillColor = mounted && resolvedTheme === 'dark' ? '#D4AF37' : '#0A192F'
   const trackColor = mounted && resolvedTheme === 'dark' ? 'rgba(255,255,255,0.12)' : '#E5E7EB'
-  const fillPct = ((safeAmount - cfg.minAmount) / (currentMax - cfg.minAmount)) * 100
-  const rangeStyle = {
-    background: `linear-gradient(to right, ${fillColor} ${Math.max(0, Math.min(100, fillPct))}%, ${trackColor} ${Math.max(0, Math.min(100, fillPct))}%)`,
-  }
 
   // Email not verified
   if (user && !user.emailVerified) {
@@ -546,70 +541,17 @@ export default function RequestLoanPage() {
               />
               <div className="p-6 space-y-6">
                 {/* Amount slider */}
-                <div>
-                  <div className="flex justify-between items-end mb-1">
-                    <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                      ¿Cuánto necesitas?
-                    </p>
-                    <span className="text-2xl font-bold text-[#0A192F] dark:text-white">
-                      S/ {fmtAmt(safeAmount)}
-                    </span>
-                  </div>
-                  {/* Máximo aprobado */}
-                  {!limitsLoading && loanLimits?.score && (
-                    <div className="flex items-center gap-1.5 mb-3">
-                      <CircleCheck className="h-2.5 w-2.5 text-emerald-500" aria-hidden="true" />
-                      <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                        Tu máximo aprobado: S/ {currentMax.toLocaleString('es-PE')}
-                      </span>
-                    </div>
-                  )}
-                  {limitsLoading && (
-                    <div className="h-4 mb-3 w-44 rounded bg-gray-100 dark:bg-white/10 animate-pulse" />
-                  )}
-                  <input
-                    type="range"
-                    title="Slider de monto"
-                    min={cfg.minAmount}
-                    max={currentMax}
-                    step={STEP}
-                    value={safeAmount}
-                    onChange={(e) =>
-                      form.setValue('amount', Number(e.target.value), { shouldValidate: true })
-                    }
-                    style={rangeStyle}
-                    className="w-full h-2 rounded-full appearance-none cursor-pointer
-                      [&::-webkit-slider-thumb]:appearance-none
-                      [&::-webkit-slider-thumb]:w-5
-                      [&::-webkit-slider-thumb]:h-5
-                      [&::-webkit-slider-thumb]:rounded-full
-                      [&::-webkit-slider-thumb]:bg-[#0A192F]
-                      dark:[&::-webkit-slider-thumb]:bg-[#D4AF37]
-                      [&::-webkit-slider-thumb]:border-2
-                      [&::-webkit-slider-thumb]:border-white
-                      [&::-webkit-slider-thumb]:shadow-md
-                      [&::-webkit-slider-thumb]:cursor-pointer
-                      [&::-moz-range-thumb]:w-5
-                      [&::-moz-range-thumb]:h-5
-                      [&::-moz-range-thumb]:rounded-full
-                      [&::-moz-range-thumb]:bg-[#0A192F]
-                      dark:[&::-moz-range-thumb]:bg-[#D4AF37]
-                      [&::-moz-range-thumb]:border-2
-                      [&::-moz-range-thumb]:border-white
-                      [&::-moz-range-thumb]:border-solid
-                      [&::-moz-range-thumb]:shadow-md
-                      [&::-moz-range-thumb]:cursor-pointer"
-                  />
-                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    <span>S/ {cfg.minAmount}</span>
-                    <span>S/ {currentMax.toLocaleString('es-PE')}</span>
-                  </div>
-                  {form.formState.errors.amount && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {form.formState.errors.amount.message}
-                    </p>
-                  )}
-                </div>
+                <AmountSlider
+                  loading={limitsLoading}
+                  amount={safeAmount}
+                  minAmount={cfg.minAmount}
+                  maxAmount={currentMax}
+                  fillColor={fillColor}
+                  trackColor={trackColor}
+                  showApprovedBadge={!!loanLimits?.score}
+                  errorMessage={form.formState.errors.amount?.message}
+                  onChange={(value) => form.setValue('amount', value, { shouldValidate: true })}
+                />
 
                 {/* Product selection */}
                 <div>
