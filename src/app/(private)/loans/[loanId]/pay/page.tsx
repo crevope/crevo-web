@@ -1,26 +1,19 @@
 'use client'
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import {
-  Loader2,
-  Sparkles,
-  TrendingDown,
-  ArrowLeft,
-  TriangleAlert,
-  PiggyBank,
-  Lock,
-  ShieldCheck,
-  CreditCard,
-} from 'lucide-react'
-import { loanRepository, useLoanStore } from '@/features/request-loan'
+import { Loader2, ArrowLeft, TriangleAlert, Lock, ShieldCheck, CreditCard } from 'lucide-react'
+import { useLoanStore, usePaymentCheckout, EarlyPayoffCard } from '@/features/request-loan'
 import { useAuthStore } from '@/features/auth'
 import { canPay } from '@/entities/loan'
 import { formatCurrency, loanRef } from '@/shared/lib/utils'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { Input } from '@/shared/ui/input'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
+
+type AmountType = 'full' | 'custom'
 
 export default function PayLoanPage() {
   const { loanId } = useParams<{ loanId: string }>()
@@ -34,9 +27,9 @@ export default function PayLoanPage() {
     loadEarlyPayoffQuote,
   } = useLoanStore()
   const { user } = useAuthStore()
-  const [showEarlyPayoff, setShowEarlyPayoff] = useState(false)
-  const [isPaying, setIsPaying] = useState(false)
-  const [isEarlyPaying, setIsEarlyPaying] = useState(false)
+  const { pay, isProcessing, error } = usePaymentCheckout()
+  const [amountType, setAmountType] = useState<AmountType>('full')
+  const [customAmount, setCustomAmount] = useState('')
 
   useEffect(() => {
     loadLoanDetails(loanId)
@@ -54,42 +47,20 @@ export default function PayLoanPage() {
     }
   }, [isLoading, loan, loanId, router])
 
+  // usePaymentCheckout keeps a single error slot for whichever payment
+  // action (cuota or anticipado) is in flight — surface it the same way
+  // this page already did (toast), instead of duplicating error UI.
+  useEffect(() => {
+    if (error) toast.error(error)
+  }, [error])
+
   // Monto de una cuota, nunca mayor al saldo pendiente (así la última cuota no
   // sobrecobra). Sin fallback al saldo completo: si installmentAmount fuera 0
   // (dato inválido) el pago queda en 0 y el botón se deshabilita — fail-safe.
   const cuotaAmount = loan && balance ? Math.min(loan.installmentAmount, balance.remaining) : 0
-
-  const handlePayNow = useCallback(async () => {
-    if (cuotaAmount <= 0) return
-    setIsPaying(true)
-    try {
-      const { checkoutUrl } = await loanRepository.createCheckout({
-        loanId,
-        amount: cuotaAmount,
-        paymentType: 'regular',
-      })
-      window.location.href = checkoutUrl
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Error al generar el link de pago')
-      setIsPaying(false)
-    }
-  }, [cuotaAmount, loanId])
-
-  const handleEarlyPayoff = useCallback(async () => {
-    if (!earlyPayoffQuote) return
-    setIsEarlyPaying(true)
-    try {
-      const { checkoutUrl } = await loanRepository.createCheckout({
-        loanId,
-        amount: earlyPayoffQuote.payoffAmount,
-        paymentType: 'early_payoff',
-      })
-      window.location.href = checkoutUrl
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Error al generar el link de pago')
-      setIsEarlyPaying(false)
-    }
-  }, [earlyPayoffQuote, loanId])
+  const customAmountValue = parseFloat(customAmount) || 0
+  const paymentAmount = amountType === 'full' ? cuotaAmount : customAmountValue
+  const isCustomTooLow = amountType === 'custom' && paymentAmount < 50
 
   if (isLoading || !loan || !balance || !canPay(loan)) {
     return (
@@ -155,172 +126,124 @@ export default function PayLoanPage() {
         </div>
       </div>
 
-      {/* Early payoff offer banner */}
-      {earlyPayoffQuote && !showEarlyPayoff && (
-        <div className={`${cardCls} p-5 border-l-2 border-l-emerald-400`}>
-          <div className="flex items-start gap-3">
-            <Sparkles className="h-5 w-5 text-emerald-500 dark:text-emerald-400 shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="font-semibold text-[#0A192F] dark:text-white text-sm">
-                Cancela hoy y ahorra en intereses
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                Solo pagas el capital:{' '}
-                <strong className="text-[#0A192F] dark:text-[#D4AF37]">
-                  {formatCurrency(earlyPayoffQuote.payoffAmount)}
-                </strong>
-                {earlyPayoffQuote.interestSaved > 0 && (
-                  <span className="ml-1 text-emerald-600 dark:text-emerald-400">
-                    — ahorras <strong>{formatCurrency(earlyPayoffQuote.interestSaved)}</strong>
-                  </span>
-                )}
-              </p>
-              <button
-                onClick={() => setShowEarlyPayoff(true)}
-                className="mt-3 flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400 text-sm font-medium hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
-              >
-                <TrendingDown className="h-4 w-4" />
-                Pagar anticipado ({formatCurrency(earlyPayoffQuote.payoffAmount)})
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Early payoff confirm */}
-      {showEarlyPayoff && earlyPayoffQuote && (
-        <div className={`${cardCls} p-6 border border-emerald-200 dark:border-emerald-800`}>
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="h-5 w-5 text-emerald-500" />
-            <h3 className="text-base font-semibold text-emerald-700 dark:text-emerald-300">
-              Pago Anticipado Total
-            </h3>
-          </div>
-
-          {/* Desglose */}
-          <div className="bg-gray-50 dark:bg-white/4 border border-gray-200 dark:border-white/8 rounded-lg p-4 space-y-2 mb-4">
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-              Desglose
-            </p>
-
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Capital pendiente</span>
-              <span className="font-medium text-gray-800 dark:text-gray-200">
-                {formatCurrency(earlyPayoffQuote.outstandingPrincipal)}
-              </span>
-            </div>
-
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-400">
-                Interés devengado
-                <span className="ml-1 text-xs text-gray-400 dark:text-gray-500">
-                  ({earlyPayoffQuote.daysElapsed} días)
-                </span>
-              </span>
-              <span className="font-medium text-gray-800 dark:text-gray-200">
-                {formatCurrency(earlyPayoffQuote.accruedInterest)}
-              </span>
-            </div>
-
-            {earlyPayoffQuote.accruedMaintenanceFee > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">
-                  Com. mantenimiento (proporcional)
-                </span>
-                <span className="font-medium text-gray-800 dark:text-gray-200">
-                  {formatCurrency(earlyPayoffQuote.accruedMaintenanceFee)}
-                </span>
-              </div>
-            )}
-
-            {earlyPayoffQuote.moraAccrued > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-orange-600 dark:text-orange-400">Intereses moratorios</span>
-                <span className="font-medium text-orange-600 dark:text-orange-400">
-                  {formatCurrency(earlyPayoffQuote.moraAccrued)}
-                </span>
-              </div>
-            )}
-
-            {earlyPayoffQuote.collectionFeesAccrued > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-orange-600 dark:text-orange-400">Gastos de cobranza</span>
-                <span className="font-medium text-orange-600 dark:text-orange-400">
-                  {formatCurrency(earlyPayoffQuote.collectionFeesAccrued)}
-                </span>
-              </div>
-            )}
-
-            <div className="flex justify-between text-sm pt-2 border-t border-gray-200 dark:border-white/10">
-              <span className="font-bold text-gray-800 dark:text-gray-100">Total a pagar hoy</span>
-              <span className="font-bold text-emerald-700 dark:text-emerald-300 text-base">
-                {formatCurrency(earlyPayoffQuote.payoffAmount)}
-              </span>
-            </div>
-          </div>
-
-          {earlyPayoffQuote.interestSaved > 0 && (
-            <div className="flex items-center justify-between bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-700/30 rounded-lg px-4 py-2.5 mb-4">
-              <div className="flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-400">
-                <PiggyBank className="h-4 w-4" aria-hidden="true" />
-                <span>Ahorro en intereses futuros</span>
-              </div>
-              <span className="font-semibold text-emerald-700 dark:text-emerald-400 text-sm">
-                −{formatCurrency(earlyPayoffQuote.interestSaved)}
-              </span>
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => setShowEarlyPayoff(false)}
-              className="flex-1 py-3 rounded-xl border border-gray-100 dark:border-white/6 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors text-sm"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleEarlyPayoff}
-              disabled={isEarlyPaying || !user}
-              className="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-60 text-sm flex items-center justify-center gap-2"
-            >
-              {isEarlyPaying ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Procesando...
-                </>
-              ) : (
-                <>
-                  <Lock className="h-4 w-4" aria-hidden="true" />
-                  Pagar {formatCurrency(earlyPayoffQuote.payoffAmount)}
-                </>
-              )}
-            </button>
-          </div>
-          <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-3">
-            <ShieldCheck className="inline h-3 w-3 mr-1" aria-hidden="true" />
-            Pago seguro procesado por Culqi · Cifrado 256-bit
-          </p>
-        </div>
+      {/* Early payoff */}
+      {earlyPayoffQuote && (
+        <EarlyPayoffCard
+          quote={earlyPayoffQuote}
+          onConfirm={() => pay(loanId, earlyPayoffQuote.payoffAmount, 'early_payoff')}
+          isProcessing={isProcessing}
+          disabled={!user}
+        />
       )}
 
       {/* Regular payment */}
-      {!showEarlyPayoff && (
-        <div className={`${cardCls} p-6`}>
-          <div className="flex items-center gap-3 mb-5">
-            <div className="w-9 h-9 rounded-lg bg-[#0A192F]/5 dark:bg-[#D4AF37]/10 flex items-center justify-center text-[#0A192F] dark:text-[#D4AF37]">
-              <CreditCard className="h-4 w-4" aria-hidden="true" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">
-                Pagar con tarjeta
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Visa o Mastercard · confirmación inmediata
-              </p>
-            </div>
+      <div className={`${cardCls} p-6`}>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-lg bg-[#0A192F]/5 dark:bg-[#D4AF37]/10 flex items-center justify-center text-[#0A192F] dark:text-[#D4AF37]">
+            <CreditCard className="h-4 w-4" aria-hidden="true" />
           </div>
+          <div>
+            <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">
+              Pagar con tarjeta
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Visa o Mastercard · confirmación inmediata
+            </p>
+          </div>
+        </div>
 
+        {/* Amount type selector */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          <label className="cursor-pointer block">
+            <input
+              type="radio"
+              name="pay-amount-type"
+              className="sr-only peer"
+              checked={amountType === 'full'}
+              onChange={() => setAmountType('full')}
+            />
+            <div
+              className={`p-4 rounded-lg border-2 transition-all flex items-center justify-between
+              ${
+                amountType === 'full'
+                  ? 'border-[#0A192F] dark:border-[#D4AF37] bg-[#0A192F]/5 dark:bg-[#D4AF37]/5'
+                  : 'border-gray-100 dark:border-white/6 bg-white dark:bg-[#0F172A] hover:bg-gray-50 dark:hover:bg-[#334155]/30'
+              }`}
+            >
+              <div>
+                <h3 className="text-sm font-medium text-[#0A192F] dark:text-white">Pagar cuota</h3>
+                <p className="text-sm font-semibold text-[#0A192F] dark:text-[#D4AF37] mt-0.5">
+                  {formatCurrency(cuotaAmount)}
+                </p>
+              </div>
+              <div
+                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors
+                ${amountType === 'full' ? 'border-[#0A192F] dark:border-[#D4AF37]' : 'border-gray-300 dark:border-gray-500'}`}
+              >
+                {amountType === 'full' && (
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#0A192F] dark:bg-[#D4AF37]" />
+                )}
+              </div>
+            </div>
+          </label>
+
+          <label className="cursor-pointer block">
+            <input
+              type="radio"
+              name="pay-amount-type"
+              className="sr-only peer"
+              checked={amountType === 'custom'}
+              onChange={() => setAmountType('custom')}
+            />
+            <div
+              className={`p-4 rounded-lg border-2 transition-all flex items-center justify-between
+              ${
+                amountType === 'custom'
+                  ? 'border-[#0A192F] dark:border-[#D4AF37] bg-[#0A192F]/5 dark:bg-[#D4AF37]/5'
+                  : 'border-gray-100 dark:border-white/6 bg-white dark:bg-[#0F172A] hover:bg-gray-50 dark:hover:bg-[#334155]/30'
+              }`}
+            >
+              <div>
+                <h3 className="text-sm font-medium text-[#0A192F] dark:text-white">Otro monto</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                  Pago parcial o adelantado
+                </p>
+              </div>
+              <div
+                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors
+                ${amountType === 'custom' ? 'border-[#0A192F] dark:border-[#D4AF37]' : 'border-gray-300 dark:border-gray-500'}`}
+              >
+                {amountType === 'custom' && (
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#0A192F] dark:bg-[#D4AF37]" />
+                )}
+              </div>
+            </div>
+          </label>
+        </div>
+
+        {amountType === 'custom' ? (
+          <div className="mb-5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Ingresa el monto a pagar
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold z-10">
+                S/
+              </span>
+              <Input
+                type="number"
+                placeholder="0.00"
+                value={customAmount}
+                onChange={(e) => setCustomAmount(e.target.value)}
+                className="pl-9 text-lg"
+              />
+            </div>
+            <p className="text-xs text-yellow-600 dark:text-yellow-500 mt-2 flex items-center gap-1">
+              <TriangleAlert className="h-4 w-4" aria-hidden="true" />
+              El monto mínimo aceptado es de S/ 50.00
+            </p>
+          </div>
+        ) : (
           <div className="p-4 rounded-lg bg-gray-50 dark:bg-[#0F172A] border border-gray-100 dark:border-white/6 flex justify-between items-center mb-5">
             <span className="text-sm text-gray-600 dark:text-gray-400">Cuota a pagar</span>
             <div className="text-right">
@@ -339,31 +262,31 @@ export default function PayLoanPage() {
               )}
             </div>
           </div>
+        )}
 
-          <button
-            onClick={handlePayNow}
-            disabled={isPaying || !user || cuotaAmount <= 0}
-            className="w-full bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold py-3 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isPaying ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Procesando...
-              </>
-            ) : (
-              <>
-                <Lock className="h-4 w-4" aria-hidden="true" />
-                Pagar {formatCurrency(cuotaAmount)}
-              </>
-            )}
-          </button>
+        <button
+          onClick={() => pay(loanId, paymentAmount, 'regular')}
+          disabled={isProcessing || !user || paymentAmount <= 0 || isCustomTooLow}
+          className="w-full bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold py-3 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Procesando...
+            </>
+          ) : (
+            <>
+              <Lock className="h-4 w-4" aria-hidden="true" />
+              Pagar {formatCurrency(paymentAmount)}
+            </>
+          )}
+        </button>
 
-          <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-3">
-            <ShieldCheck className="inline h-3 w-3 mr-1" aria-hidden="true" />
-            Pago seguro procesado por Culqi · Cifrado 256-bit
-          </p>
-        </div>
-      )}
+        <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-3">
+          <ShieldCheck className="inline h-3 w-3 mr-1" aria-hidden="true" />
+          Pago seguro procesado por Culqi · Cifrado 256-bit
+        </p>
+      </div>
     </div>
   )
 }
