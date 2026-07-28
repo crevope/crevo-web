@@ -39,7 +39,7 @@ import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/shared/ui/brand-icons'
 import { useLoanStore, loanRepository } from '@/features/request-loan'
 import type { RestructureResult } from '@/features/request-loan'
-import { canSign, isActiveLoan, canPay, LoanStatusBadge } from '@/entities/loan'
+import { canSign, canPay, LoanStatusBadge } from '@/entities/loan'
 import type { InstallmentStatus, EarlyPayoffQuote } from '@/entities/loan'
 import { formatCurrency, formatDate, formatDateTime, loanRef } from '@/shared/lib/utils'
 import { Skeleton } from '@/shared/ui/skeleton'
@@ -367,7 +367,7 @@ export default function LoanDetailPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {(isActiveLoan(loan) || canPay(loan)) && (
+          {canPay(loan) && (
             <Link
               href={`/loans/${loan.id}/pay`}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] text-sm font-medium hover:bg-[#0A192F]/90 dark:hover:bg-[#B8941F] transition-colors"
@@ -673,7 +673,7 @@ export default function LoanDetailPage() {
               Acciones Rápidas
             </h3>
             <div className="space-y-2.5">
-              {(isActiveLoan(loan) || canPay(loan)) && (
+              {canPay(loan) && (
                 <Link
                   href={`/loans/${loan.id}/pay`}
                   className="w-full bg-[#D4AF37] text-[#0A192F] py-2.5 rounded-lg text-center font-medium flex items-center justify-center gap-2 hover:bg-[#B8941F] transition-colors text-sm"
@@ -682,7 +682,7 @@ export default function LoanDetailPage() {
                   Pagar Cuota Actual
                 </Link>
               )}
-              {(isActiveLoan(loan) || canPay(loan)) && (
+              {canPay(loan) && (
                 <button
                   onClick={handleOpenEarlyPayoff}
                   className="w-full bg-white dark:bg-[#0F172A] text-[#0A192F] dark:text-gray-200 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 border border-gray-100 dark:border-white/6 hover:bg-gray-50 dark:hover:bg-[#334155] transition-colors text-sm"

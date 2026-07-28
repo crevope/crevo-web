@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useCallback, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import {
@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { loanRepository, useLoanStore } from '@/features/request-loan'
 import { useAuthStore } from '@/features/auth'
+import { canPay } from '@/entities/loan'
 import { formatCurrency, loanRef } from '@/shared/lib/utils'
 import { Skeleton } from '@/shared/ui/skeleton'
 
@@ -23,6 +24,7 @@ const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-w
 
 export default function PayLoanPage() {
   const { loanId } = useParams<{ loanId: string }>()
+  const router = useRouter()
   const {
     selectedLoan: loan,
     balance,
@@ -42,6 +44,15 @@ export default function PayLoanPage() {
   useEffect(() => {
     if (loan && ['ACTIVE', 'OVERDUE'].includes(loan.status)) loadEarlyPayoffQuote(loanId)
   }, [loanId, loan, loadEarlyPayoffQuote])
+
+  // Guard: this page must not be reachable for loans that aren't payable
+  // (e.g. SIGNED/DISBURSED). Redirect back to the loan detail page instead.
+  useEffect(() => {
+    if (!isLoading && loan && !canPay(loan)) {
+      toast.error('Este préstamo no está disponible para pago en este momento.')
+      router.replace(`/loans/${loanId}`)
+    }
+  }, [isLoading, loan, loanId, router])
 
   const handlePayNow = useCallback(async () => {
     if (!balance) return
@@ -75,7 +86,7 @@ export default function PayLoanPage() {
     }
   }, [earlyPayoffQuote, loanId])
 
-  if (isLoading || !loan || !balance) {
+  if (isLoading || !loan || !balance || !canPay(loan)) {
     return (
       <div className="space-y-6 max-w-2xl">
         <div className="space-y-2">
