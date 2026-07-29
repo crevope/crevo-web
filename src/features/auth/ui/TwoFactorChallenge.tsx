@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { Loader2, ArrowLeft, KeyRound } from 'lucide-react'
 import { authRepository } from '../api/authRepository'
 import type { AuthUser } from '@/entities/user'
-import { inputCls } from './LoginForm'
+import { inputCls } from '../lib/authStyles'
 
 const EXPIRED_MESSAGE = 'La verificación expiró, iniciá sesión de nuevo'
 

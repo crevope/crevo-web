@@ -8,11 +8,9 @@ import Link from 'next/link'
 import { Loader2, ArrowRight, CircleAlert, Eye, EyeOff } from 'lucide-react'
 import { Checkbox } from '@/shared/ui/checkbox'
 import { loginSchema, type LoginInput } from '../lib/authSchemas'
+import { inputCls } from '../lib/authStyles'
 import { useAuthStore } from '../model/useAuthStore'
 import { TwoFactorChallenge } from './TwoFactorChallenge'
-
-export const inputCls =
-  'w-full px-5 py-3 rounded-lg border border-gray-200 dark:border-[#334155] bg-white dark:bg-[#0F172A] text-[#0A192F] dark:text-[#F1F5F9] text-[0.95rem] placeholder-gray-400 dark:placeholder-[#64748B] focus:outline-none focus:border-[#0A192F] dark:focus:border-[#D4AF37] focus:ring-[3px] focus:ring-[#0A192F]/10 dark:focus:ring-[#D4AF37]/15 transition-all'
 
 export function LoginForm() {
   const router = useRouter()

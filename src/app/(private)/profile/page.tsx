@@ -19,9 +19,15 @@ import {
   Plus,
   TriangleAlert,
 } from 'lucide-react'
-import { useAuthStore } from '@/features/auth'
-import { authRepository } from '@/features/auth'
+import {
+  useAuthStore,
+  authRepository,
+  TwoFactorSetup,
+  RecoveryCodesModal,
+  type TwoFactorStatus,
+} from '@/features/auth'
 import { apiClient } from '@/shared/api/client'
+import { formatDate } from '@/shared/lib/utils'
 import {
   bankAccountRepository,
   type BankAccount,
@@ -147,6 +153,16 @@ export default function ProfilePage() {
   const [pwLoading, setPwLoading] = useState(false)
   const [pwDone, setPwDone] = useState(false)
 
+  // 2FA state
+  const [twoFactorStatus, setTwoFactorStatus] = useState<TwoFactorStatus | null>(null)
+  const [twoFactorLoading, setTwoFactorLoading] = useState(false)
+  const [setupModalOpen, setSetupModalOpen] = useState(false)
+  const [showDisableForm, setShowDisableForm] = useState(false)
+  const [recoveryCodesModal, setRecoveryCodesModal] = useState<{
+    open: boolean
+    codes: string[]
+  }>({ open: false, codes: [] })
+
   // Account closure state — two-step confirmation to prevent accidental
   // deletion: user clicks once to open the inline warning, then types
   // "ELIMINAR" before the submit button unlocks.
@@ -198,6 +214,24 @@ export default function ProfilePage() {
       }
     }
   }, [activeSection, loadBankAccounts, bankCatalog.length])
+
+  const loadTwoFactorStatus = useCallback(async () => {
+    setTwoFactorLoading(true)
+    try {
+      const status = await authRepository.getTwoFactorStatus()
+      setTwoFactorStatus(status)
+    } catch {
+      toast.error('No se pudo cargar el estado de la verificación en dos pasos')
+    } finally {
+      setTwoFactorLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (activeSection === 'security') {
+      loadTwoFactorStatus()
+    }
+  }, [activeSection, loadTwoFactorStatus])
 
   // Load full profile (phone + DNI), credit score, and notification prefs on mount
   useEffect(() => {
@@ -1006,16 +1040,29 @@ export default function ProfilePage() {
                 </div>
 
                 {/* 2FA */}
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">
-                      Autenticación de Dos Factores (2FA)
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                      Próximamente disponible
-                    </p>
+                <div className={twoFactorLoading ? 'opacity-50 pointer-events-none' : ''}>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">
+                        Autenticación de Dos Factores (2FA)
+                      </h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                        {twoFactorStatus?.enabled
+                          ? `Activa desde ${twoFactorStatus.confirmedAt ? formatDate(twoFactorStatus.confirmedAt) : 'hace poco'}`
+                          : 'Protege tu cuenta con un segundo factor (app autenticadora)'}
+                      </p>
+                    </div>
+                    <Toggle
+                      checked={twoFactorStatus?.enabled ?? false}
+                      onChange={(next) => {
+                        if (next) {
+                          setSetupModalOpen(true)
+                        } else {
+                          setShowDisableForm(true)
+                        }
+                      }}
+                    />
                   </div>
-                  <Toggle checked={false} onChange={() => {}} />
                 </div>
               </div>
 
@@ -1236,6 +1283,21 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+
+      <TwoFactorSetup
+        open={setupModalOpen}
+        onClose={() => setSetupModalOpen(false)}
+        onConfirmed={(recoveryCodes) => {
+          setSetupModalOpen(false)
+          setRecoveryCodesModal({ open: true, codes: recoveryCodes })
+          loadTwoFactorStatus()
+        }}
+      />
+      <RecoveryCodesModal
+        open={recoveryCodesModal.open}
+        codes={recoveryCodesModal.codes}
+        onClose={() => setRecoveryCodesModal({ open: false, codes: [] })}
+      />
     </div>
   )
 }
