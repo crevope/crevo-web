@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import QRCode from 'qrcode'
 import { Loader2, Copy, ShieldCheck, X } from 'lucide-react'
@@ -27,8 +27,19 @@ export function TwoFactorSetup({ open, onClose, onConfirmed }: Readonly<TwoFacto
   const [code, setCode] = useState('')
   const [confirming, setConfirming] = useState(false)
 
+  // Stash the latest caller-provided callback in a ref so the fetch effect
+  // below can call it without needing to list it as a dependency — the
+  // caller (ProfilePage) passes an inline, unmemoized arrow that changes
+  // identity on every render, and this effect must NOT re-run (re-fetching
+  // setupTwoFactor and issuing a new pending secret) just because of that.
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
+
   useEffect(() => {
     if (!open) return
+    let ignore = false
     setCode('')
     setQrDataUri(null)
     setSecret('')
@@ -36,22 +47,29 @@ export function TwoFactorSetup({ open, onClose, onConfirmed }: Readonly<TwoFacto
     authRepository
       .setupTwoFactor()
       .then(async ({ otpauthUri, secret: pendingSecret }) => {
+        if (ignore) return
         setSecret(pendingSecret)
         try {
           const dataUri = await QRCode.toDataURL(otpauthUri)
-          setQrDataUri(dataUri)
+          if (!ignore) setQrDataUri(dataUri)
         } catch {
           // QR render failed client-side — manual entry with `secret` still works.
         }
       })
       .catch((err: unknown) => {
+        if (ignore) return
         toast.error(
           err instanceof Error ? err.message : 'No se pudo iniciar la configuración de 2FA',
         )
-        onClose()
+        onCloseRef.current()
       })
-      .finally(() => setLoading(false))
-  }, [open, onClose])
+      .finally(() => {
+        if (!ignore) setLoading(false)
+      })
+    return () => {
+      ignore = true
+    }
+  }, [open])
 
   if (!open) return null
 
