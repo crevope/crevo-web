@@ -147,7 +147,8 @@ apiClient.interceptors.response.use(
       url.includes('/auth/refresh') ||
       url.includes('/auth/logout') ||
       url.includes('/auth/login') ||
-      url.includes('/auth/register')
+      url.includes('/auth/register') ||
+      url.includes('/auth/2fa/verify')
 
     if (
       error.response?.status === 401 &&
