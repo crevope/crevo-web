@@ -158,6 +158,8 @@ export default function ProfilePage() {
   const [twoFactorLoading, setTwoFactorLoading] = useState(false)
   const [setupModalOpen, setSetupModalOpen] = useState(false)
   const [showDisableForm, setShowDisableForm] = useState(false)
+  const [disableCode, setDisableCode] = useState('')
+  const [disableLoading, setDisableLoading] = useState(false)
   const [recoveryCodesModal, setRecoveryCodesModal] = useState<{
     open: boolean
     codes: string[]
@@ -297,6 +299,29 @@ export default function ProfilePage() {
       )
     } finally {
       setPwLoading(false)
+    }
+  }
+
+  // 2FA disable handler — confirms a valid current TOTP code before turning
+  // the toggle off; the toggle itself is never optimistically flipped, it
+  // only reflects `twoFactorStatus` after a successful `loadTwoFactorStatus`.
+  const handleDisableTwoFactor = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (disableCode.trim().length !== 6) {
+      toast.error('Ingresa el código de 6 dígitos')
+      return
+    }
+    setDisableLoading(true)
+    try {
+      await authRepository.disableTwoFactor(disableCode.trim())
+      toast.success('2FA desactivado')
+      setShowDisableForm(false)
+      setDisableCode('')
+      await loadTwoFactorStatus()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Código inválido')
+    } finally {
+      setDisableLoading(false)
     }
   }
 
@@ -1063,6 +1088,53 @@ export default function ProfilePage() {
                       }}
                     />
                   </div>
+
+                  {showDisableForm && (
+                    <form onSubmit={handleDisableTwoFactor} className="mt-4 space-y-3">
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        Ingresa el código actual de tu app autenticadora para desactivar el 2FA.
+                      </p>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                          Código de verificación
+                        </label>
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          value={disableCode}
+                          onChange={(e) =>
+                            setDisableCode(e.target.value.replace(/\D/g, '').substring(0, 6))
+                          }
+                          placeholder="000000"
+                          maxLength={6}
+                          autoFocus
+                          className="max-w-[180px] text-center tracking-[0.3em] font-bold"
+                        />
+                      </div>
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          type="submit"
+                          disabled={disableLoading || disableCode.length !== 6}
+                          className="px-4 py-2 text-sm font-semibold rounded-xl bg-red-600 text-white hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {disableLoading && (
+                            <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+                          )}
+                          Desactivar 2FA
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowDisableForm(false)
+                            setDisableCode('')
+                          }}
+                          className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </form>
+                  )}
                 </div>
               </div>
 
