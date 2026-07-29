@@ -1,12 +1,12 @@
 import { create } from 'zustand'
-import { authRepository } from '../api/authRepository'
+import { authRepository, type LoginResult } from '../api/authRepository'
 import type { AuthUser } from '@/entities/user'
 
 interface AuthState {
   user: AuthUser | null
   isAuthenticated: boolean
   isLoading: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string) => Promise<LoginResult>
   register: (dto: {
     email: string
     password: string
@@ -63,15 +63,31 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
+  /**
+   * Adopts an already-authenticated user without going through login() —
+   * used by the 2FA challenge/setup-confirm flows, where the session cookies
+   * are set by /auth/2fa/verify or /auth/2fa/confirm (not /auth/login). This
+   * is the point where `isAuthenticated` actually flips to true for those
+   * flows.
+   */
   setUser: (user) => {
     authRepository.saveUser(user)
-    set({ user })
+    set({ user, isAuthenticated: true })
   },
 
+  /**
+   * Returns the full LoginResult so the caller (LoginForm) can branch on a
+   * pending 2FA challenge instead of always redirecting. Store state is only
+   * updated on the 'success' outcome — 'requires_2fa'/'requires_2fa_setup'
+   * leave the store untouched, since no session was issued yet.
+   */
   login: async (email, password) => {
-    const { user } = await authRepository.login(email, password)
-    authRepository.saveUser(user)
-    set({ user, isAuthenticated: true })
+    const result = await authRepository.login(email, password)
+    if (result.outcome === 'success') {
+      authRepository.saveUser(result.user)
+      set({ user: result.user, isAuthenticated: true })
+    }
+    return result
   },
 
   register: async (dto) => {
