@@ -160,6 +160,9 @@ export default function ProfilePage() {
   const [showDisableForm, setShowDisableForm] = useState(false)
   const [disableCode, setDisableCode] = useState('')
   const [disableLoading, setDisableLoading] = useState(false)
+  const [showRegenerateForm, setShowRegenerateForm] = useState(false)
+  const [regenerateCode, setRegenerateCode] = useState('')
+  const [regenerateLoading, setRegenerateLoading] = useState(false)
   const [recoveryCodesModal, setRecoveryCodesModal] = useState<{
     open: boolean
     codes: string[]
@@ -322,6 +325,30 @@ export default function ProfilePage() {
       toast.error(err instanceof Error ? err.message : 'Código inválido')
     } finally {
       setDisableLoading(false)
+    }
+  }
+
+  // Low recovery-codes regenerate handler — requires a valid current TOTP
+  // code, then swaps in the freshly generated set via RecoveryCodesModal and
+  // refreshes twoFactorStatus (server-driven) so the banner recalculates
+  // from the reloaded unusedRecoveryCodes count.
+  const handleRegenerateCodes = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (regenerateCode.trim().length !== 6) {
+      toast.error('Ingresa el código de 6 dígitos')
+      return
+    }
+    setRegenerateLoading(true)
+    try {
+      const { recoveryCodes } = await authRepository.regenerateRecoveryCodes(regenerateCode.trim())
+      setShowRegenerateForm(false)
+      setRegenerateCode('')
+      setRecoveryCodesModal({ open: true, codes: recoveryCodes })
+      await loadTwoFactorStatus()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Código inválido')
+    } finally {
+      setRegenerateLoading(false)
     }
   }
 
@@ -1136,6 +1163,69 @@ export default function ProfilePage() {
                     </form>
                   )}
                 </div>
+
+                {twoFactorStatus?.enabled && twoFactorStatus.unusedRecoveryCodes <= 2 && (
+                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl p-4 space-y-3">
+                    <p className="text-amber-800 dark:text-amber-300 text-sm leading-relaxed">
+                      Te quedan <strong>{twoFactorStatus.unusedRecoveryCodes}</strong>{' '}
+                      {twoFactorStatus.unusedRecoveryCodes === 1
+                        ? 'código de recuperación'
+                        : 'códigos de recuperación'}
+                      . Regenera un nuevo set antes de quedarte sin ninguno.
+                    </p>
+                    {!showRegenerateForm ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowRegenerateForm(true)}
+                        className="px-4 py-2 text-sm font-semibold rounded-xl bg-amber-600 text-white hover:opacity-90 transition-opacity"
+                      >
+                        Regenerar códigos
+                      </button>
+                    ) : (
+                      <form onSubmit={handleRegenerateCodes} className="space-y-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-1">
+                            Código de verificación
+                          </label>
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            value={regenerateCode}
+                            onChange={(e) =>
+                              setRegenerateCode(e.target.value.replace(/\D/g, '').substring(0, 6))
+                            }
+                            placeholder="000000"
+                            maxLength={6}
+                            autoFocus
+                            className="max-w-[180px] text-center tracking-[0.3em] font-bold"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="submit"
+                            disabled={regenerateLoading || regenerateCode.length !== 6}
+                            className="px-4 py-2 text-sm font-semibold rounded-xl bg-amber-600 text-white hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                          >
+                            {regenerateLoading && (
+                              <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+                            )}
+                            Confirmar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowRegenerateForm(false)
+                              setRegenerateCode('')
+                            }}
+                            className="px-4 py-2 text-sm font-medium rounded-xl border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Danger zone — account closure (Ley 29733 Art. 19) */}
