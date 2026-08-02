@@ -59,10 +59,25 @@ export function setCsrfToken(token: string | null | undefined): void {
   }
 }
 
-/** Reads the CSRF token. Order: in-memory → sessionStorage → document.cookie.
- *  The cookie path only works for same-origin SPAs; for cross-origin it'll be
- *  null but the in-memory / sessionStorage path covers it. */
+/** Reads the CSRF token. Order: document.cookie → in-memory → sessionStorage.
+ *
+ *  The COOKIE WINS when it's readable, and that order matters: the server
+ *  rotates `crevo_csrf` on every login, refresh and 2FA verification, so the
+ *  cookie is always its current value while our copy can be stale. Preferring
+ *  the copy meant that any rotation we didn't capture (a silent refresh whose
+ *  body we never read, a request already in flight) left us echoing a dead
+ *  token — the server compared it against the fresh cookie and answered
+ *  "CSRF token inválido" on the next POST. Reading the cookie makes this
+ *  self-healing: whatever the server last set is what we send back.
+ *
+ *  The copy is still needed for the cross-origin case (SPA on one host, API on
+ *  another): there the cookie isn't readable from JS and `readCookie` is null. */
 export function getCsrfToken(): string | null {
+  const fromCookie = readCookie(CSRF_COOKIE_NAME)
+  if (fromCookie) {
+    csrfTokenCache = fromCookie
+    return fromCookie
+  }
   if (csrfTokenCache) return csrfTokenCache
   if (typeof window !== 'undefined') {
     try {
@@ -75,7 +90,7 @@ export function getCsrfToken(): string | null {
       /* ignore */
     }
   }
-  return readCookie(CSRF_COOKIE_NAME)
+  return null
 }
 
 function clearCsrfToken(): void {
