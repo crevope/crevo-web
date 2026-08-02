@@ -7,7 +7,7 @@ import { Loader2, ArrowLeft, TriangleAlert, Lock, ShieldCheck, CreditCard } from
 import { useLoanStore, usePaymentCheckout, EarlyPayoffCard } from '@/features/request-loan'
 import { useAuthStore } from '@/features/auth'
 import { canPay } from '@/entities/loan'
-import { formatCurrency, loanRef } from '@/shared/lib/utils'
+import { formatCurrency, loanRef, parseDate } from '@/shared/lib/utils'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { Input } from '@/shared/ui/input'
 
@@ -110,7 +110,7 @@ export default function PayLoanPage() {
           {balance.dueDate && (
             <p className="text-gray-300 text-sm">
               Vence el{' '}
-              {new Date(balance.dueDate).toLocaleDateString('es-PE', {
+              {parseDate(balance.dueDate).toLocaleDateString('es-PE', {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric',
@@ -253,7 +253,7 @@ export default function PayLoanPage() {
               {balance.dueDate && (
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                   Vence el{' '}
-                  {new Date(balance.dueDate).toLocaleDateString('es-PE', {
+                  {parseDate(balance.dueDate).toLocaleDateString('es-PE', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',
