@@ -33,6 +33,7 @@ export function RegisterForm() {
     register,
     handleSubmit,
     control,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
@@ -72,7 +73,23 @@ export function RegisterForm() {
       toast.success('¡Cuenta creada! Revisa tu email para verificar tu cuenta.')
       router.push('/dashboard')
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Error al crear la cuenta')
+      const mensaje = err instanceof Error ? err.message : 'Error al crear la cuenta'
+
+      // "Ya existe una cuenta con este email/DNI" se muestra DEBAJO del campo
+      // que corresponde, no sólo como toast: un toast se pierde y no dice cuál
+      // de los dos campos hay que corregir.
+      //
+      // La existencia se comprueba al enviar, a propósito. Validarla mientras
+      // se escribe exigiría un endpoint que responda "este DNI ya está
+      // registrado" a cualquiera, y eso permite enumerar: con una lista de DNI
+      // —que en Perú circulan— se podría averiguar quién tiene un préstamo acá.
+      // Ser cliente de una financiera es información privada.
+      const campo = /email|correo/i.test(mensaje) ? 'email' : /dni/i.test(mensaje) ? 'dni' : null
+
+      if (campo) {
+        setError(campo, { type: 'server', message: mensaje }, { shouldFocus: true })
+      }
+      toast.error(mensaje)
     }
   }
 
@@ -141,6 +158,8 @@ export function RegisterForm() {
             <input
               type="tel"
               placeholder="999 123 456"
+              maxLength={9}
+              inputMode="numeric"
               className={`${inputCls} rounded-l-none`}
               {...register('phone')}
             />
