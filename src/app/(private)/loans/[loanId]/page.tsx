@@ -1082,7 +1082,9 @@ export default function LoanDetailPage() {
                 const subtitle = !loan.contractUrl
                   ? 'Pendiente de generación'
                   : isSigned
-                    ? `Firmado el ${formatDate(loan.updatedAt)}`
+                    ? loan.signedAt
+                      ? `Firmado el ${formatDate(loan.signedAt)}`
+                      : 'Firmado'
                     : 'Disponible para revisar — pendiente de firma'
                 return (
                   <button
