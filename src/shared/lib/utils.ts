@@ -23,9 +23,9 @@ export function formatCurrency(amount: number): string {
  */
 export function parseDate(date: string | Date): Date {
   if (date instanceof Date) return date
-  const soloFecha = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)
-  if (!soloFecha) return new Date(date)
-  return new Date(Number(soloFecha[1]), Number(soloFecha[2]) - 1, Number(soloFecha[3]))
+  const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)
+  if (!dateOnlyMatch) return new Date(date)
+  return new Date(Number(dateOnlyMatch[1]), Number(dateOnlyMatch[2]) - 1, Number(dateOnlyMatch[3]))
 }
 
 export function formatDate(date: string | Date): string {
