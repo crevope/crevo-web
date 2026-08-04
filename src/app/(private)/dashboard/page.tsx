@@ -49,7 +49,7 @@ const ONBOARDING_STEPS = [
     id: 'kyc' as const,
     icon: IdCard,
     title: 'Verifica tu identidad',
-    desc: 'DNI + selfie. Menos de 2 minutos.',
+    desc: 'Verificación guiada. Menos de 2 minutos.',
   },
   {
     id: 'loan' as const,
