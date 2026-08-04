@@ -1,7 +1,14 @@
 import Link from 'next/link'
 import { ShieldAlert, ArrowRight } from 'lucide-react'
+import { getKycStatusMessage, type KycStatus } from '@/features/upload-kyc'
 
-export function KycBanner() {
+interface Props {
+  kycStatus: Pick<KycStatus, 'status' | 'providerStatus'>
+}
+
+export function KycBanner({ kycStatus }: Readonly<Props>) {
+  const { title, description, canStart } = getKycStatusMessage(kycStatus)
+
   return (
     <div className="relative overflow-hidden rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
       {/* Subtle glow */}
@@ -13,17 +20,15 @@ export function KycBanner() {
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-amber-200">Verifica tu identidad</p>
-          <p className="text-xs text-amber-400/80 mt-0.5">
-            Necesitas verificar tu DNI para solicitar préstamos.
-          </p>
+          <p className="text-sm font-semibold text-amber-200">{title}</p>
+          <p className="text-xs text-amber-400/80 mt-0.5">{description}</p>
         </div>
 
         <Link
           href="/kyc"
           className="flex shrink-0 items-center gap-1 rounded-lg bg-amber-500/15 border border-amber-500/30 px-3 py-1.5 text-xs font-semibold text-amber-300 hover:bg-amber-500/25 transition-colors"
         >
-          Verificar
+          {canStart ? 'Verificar' : 'Ver estado'}
           <ArrowRight className="h-3 w-3" />
         </Link>
       </div>
