@@ -26,9 +26,10 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
   usePushNotifications()
 
   useEffect(() => {
-    // Hydrate instantly from the localStorage cache, then reconcile against the
-    // server so a change the client never saw (email verified from another
-    // device, KYC approved) surfaces here without forcing a re-login.
+    // Hydrate instantly from localStorage so the skeleton isn't visible while
+    // refreshUser() fetches. The store exposes `isLoading` only until the first
+    // server response lands — after that any stale fields from the cache are
+    // already overwritten. See useAuthStore for the contract.
     loadUser()
     void refreshUser()
   }, [loadUser, refreshUser])

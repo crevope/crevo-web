@@ -39,15 +39,20 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   loadUser: () => {
     const user = authRepository.getStoredUser()
-    set({ user, isAuthenticated: !!user, isLoading: false })
+    // Keep isLoading true — the cached user is used as a placeholder so the
+    // skeleton doesn't flash while refreshUser() fetches the real one. If we
+    // set isLoading: false here the dashboard renders with stale fields
+    // (emailVerified: false from before the verification click) and the user
+    // sees a step flicker from incomplete → complete.
+    set({ user, isAuthenticated: !!user, isLoading: !user })
   },
 
   /**
    * Re-fetch the profile from the server (`/auth/me`) and overwrite the cache.
    * The localStorage copy is only a hydration shortcut and can go stale after a
-   * server-side change the client never saw (email verification — typically
-   * done from a link opened on another device — or KYC approval). Call this on
-   * entry to the authenticated area so those changes surface without a re-login.
+   * server-side change the client never saw (email verification or KYC
+   * approval). `isLoading` is cleared HERE — the server response is what the
+   * UI should render.
    *
    * Failure is non-fatal: a transient error or a truly expired session leaves
    * the cached user in place; the apiClient interceptor renews the token or, on
@@ -57,9 +62,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const fresh = await authRepository.getMyProfile()
       authRepository.saveUser(fresh)
-      set({ user: fresh, isAuthenticated: true })
+      set({ user: fresh, isAuthenticated: true, isLoading: false })
     } catch {
       // keep the hydrated cache; see doc comment above
+      set({ isLoading: false })
     }
   },
 
