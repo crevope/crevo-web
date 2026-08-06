@@ -86,6 +86,8 @@ export const authRepository = {
     lastName: string
     dni: string
     phone: string
+    /** Calendar date, `YYYY-MM-DD`. */
+    birthDate: string
   }): Promise<{ user: AuthUser }> {
     const { data } = await apiClient.post('/auth/register', dto)
     // Backend returns: { id, email, firstName, lastName, emailVerified }

@@ -8,6 +8,7 @@ import {
   Loader2,
   User,
   IdCard,
+  Calendar,
   Mail,
   Lock,
   Eye,
@@ -42,6 +43,7 @@ export function RegisterForm() {
       lastName: '',
       dni: '',
       phone: '',
+      birthDate: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -166,6 +168,27 @@ export function RegisterForm() {
           </div>
           {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone.message}</p>}
         </div>
+      </div>
+
+      {/* Row 2b: Fecha de nacimiento */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          Fecha de nacimiento
+        </label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Calendar className="h-4 w-4 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+          </div>
+          <input
+            type="date"
+            max={new Date().toISOString().slice(0, 10)}
+            className={`${inputCls} pl-10`}
+            {...register('birthDate')}
+          />
+        </div>
+        {errors.birthDate && (
+          <p className="text-xs text-red-500 mt-1">{errors.birthDate.message}</p>
+        )}
       </div>
 
       {/* Row 3: Email */}

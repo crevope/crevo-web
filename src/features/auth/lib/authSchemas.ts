@@ -21,6 +21,24 @@ export const registerSchema = z
       .string()
       .length(9, 'El celular debe tener exactamente 9 dígitos')
       .regex(/^9\d{8}$/, 'Debe empezar en 9 y contener solo números'),
+    // The backend re-validates the date and the age (see BirthDate); this only
+    // surfaces the error on the field without a round trip.
+    birthDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Ingresa tu fecha de nacimiento')
+      .refine((v) => {
+        const d = new Date(`${v}T00:00:00Z`)
+        return !Number.isNaN(d.getTime()) && d.getTime() <= Date.now()
+      }, 'La fecha no es válida')
+      .refine((v) => {
+        const [y, m, d] = v.split('-').map(Number)
+        const today = new Date()
+        let age = today.getUTCFullYear() - y!
+        const monthDiff = today.getUTCMonth() + 1 - m!
+        const dayDiff = today.getUTCDate() - d!
+        if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age -= 1
+        return age >= 21
+      }, 'Debes tener al menos 21 años para registrarte'),
     email: z.string().email('Email inválido'),
     password: z.string().min(8, 'Mínimo 8 caracteres'),
     confirmPassword: z.string(),

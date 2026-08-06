@@ -14,6 +14,7 @@ interface AuthState {
     lastName: string
     dni: string
     phone: string
+    birthDate: string
   }) => Promise<void>
   logout: () => Promise<void>
   loadUser: () => void
