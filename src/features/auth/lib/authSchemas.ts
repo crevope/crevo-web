@@ -70,3 +70,9 @@ export const registerSchema = z
 
 export type LoginInput = z.infer<typeof loginSchema>
 export type RegisterInput = z.infer<typeof registerSchema>
+
+// The single source of truth for POST /auth/register's body: RegisterInput
+// minus the two client-only guard fields. authRepository and useAuthStore
+// both consume this instead of redeclaring it, so a field added here cannot
+// be forgotten in one of the copies (see birthDate's tsc breakage).
+export type RegisterDto = Omit<RegisterInput, 'confirmPassword' | 'acceptTerms'>

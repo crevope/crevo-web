@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { authRepository, type LoginResult } from '../api/authRepository'
+import type { RegisterDto } from '../lib/authSchemas'
 import type { AuthUser } from '@/entities/user'
 
 interface AuthState {
@@ -7,15 +8,7 @@ interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   login: (email: string, password: string) => Promise<LoginResult>
-  register: (dto: {
-    email: string
-    password: string
-    firstName: string
-    lastName: string
-    dni: string
-    phone: string
-    birthDate: string
-  }) => Promise<void>
+  register: (dto: RegisterDto) => Promise<void>
   logout: () => Promise<void>
   loadUser: () => void
   refreshUser: () => Promise<void>
