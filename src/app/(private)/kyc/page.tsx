@@ -39,6 +39,16 @@ const SETTLED_PROVIDER_STATUSES: readonly KycProviderStatus[] = [
   'Kyc Expired',
 ]
 
+function isSettledStatus(
+  status: Pick<KycStatus, 'isIdentityVerified' | 'providerStatus'>,
+): boolean {
+  return (
+    status.isIdentityVerified ||
+    (status.providerStatus !== undefined &&
+      SETTLED_PROVIDER_STATUSES.includes(status.providerStatus))
+  )
+}
+
 function KycVerified() {
   return (
     <div className={`${cardCls} p-10 text-center`}>
@@ -180,11 +190,17 @@ function KycPageContent() {
   // `verificationSessionId` marks a return from Didit; its `status` is user-controlled, never trusted.
   const isReturningFromProvider = !!searchParams.get('verificationSessionId')
   const [isWaitingForWebhook, setIsWaitingForWebhook] = useState(isReturningFromProvider)
+  // True once the return poll exhausted its budget without a settled verdict —
+  // guards against offering a paid re-verification while the webhook is still in flight.
+  const [pollGaveUpUnsettled, setPollGaveUpUnsettled] = useState(false)
 
   const loadStatus = () => {
     kycRepository
       .getStatus()
-      .then(setKycStatus)
+      .then((fresh) => {
+        setKycStatus(fresh)
+        if (isSettledStatus(fresh)) setPollGaveUpUnsettled(false)
+      })
       .catch(() => setKycStatus({ status: 'PENDING_VERIFICATION', isIdentityVerified: false }))
   }
 
@@ -204,17 +220,16 @@ function KycPageContent() {
         const fresh = await kycRepository.getStatus()
         if (cancelled) return
         setKycStatus(fresh)
-        const settled =
-          fresh.isIdentityVerified ||
-          (fresh.providerStatus !== undefined &&
-            SETTLED_PROVIDER_STATUSES.includes(fresh.providerStatus))
+        const settled = isSettledStatus(fresh)
         if (settled || attempts >= RETURN_POLL_ATTEMPTS) {
           setIsWaitingForWebhook(false)
+          if (!settled) setPollGaveUpUnsettled(true)
           return
         }
       } catch {
         if (attempts >= RETURN_POLL_ATTEMPTS) {
           setIsWaitingForWebhook(false)
+          setPollGaveUpUnsettled(true)
           return
         }
       }
@@ -249,8 +264,12 @@ function KycPageContent() {
 
   const message = getKycStatusMessage(kycStatus)
   const isDeclined = kycStatus.providerStatus === 'Declined' || kycStatus.status === 'KYC_REJECTED'
-  const needsAction = !kycStatus.isIdentityVerified && message.canStart
-  const isWaiting = !kycStatus.isIdentityVerified && !message.canStart
+  // The poll gave up without a verdict but the message still reads as "start a new one" —
+  // a real confirmation (webhook or manual refresh) clears pollGaveUpUnsettled first.
+  const unconfirmedAfterPoll =
+    pollGaveUpUnsettled && !kycStatus.isIdentityVerified && message.canStart
+  const needsAction = !kycStatus.isIdentityVerified && message.canStart && !unconfirmedAfterPoll
+  const isWaiting = !kycStatus.isIdentityVerified && (!message.canStart || unconfirmedAfterPoll)
 
   return (
     <div className="space-y-8 max-w-2xl">
@@ -309,8 +328,12 @@ function KycPageContent() {
           {kycStatus.isIdentityVerified && <KycVerified />}
           {isWaiting && (
             <KycWaiting
-              title={message.title}
-              description={message.description}
+              title={unconfirmedAfterPoll ? 'Estamos confirmando tu verificación' : message.title}
+              description={
+                unconfirmedAfterPoll
+                  ? 'Ya completaste el proceso con el proveedor. La confirmación está tardando más de lo usual; vuelve a intentarlo en unos segundos.'
+                  : message.description
+              }
               onRefresh={loadStatus}
             />
           )}
