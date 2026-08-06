@@ -3,7 +3,7 @@ import { ShieldAlert, ArrowRight } from 'lucide-react'
 import { getKycStatusMessage, type KycStatus } from '@/features/upload-kyc'
 
 interface Props {
-  kycStatus: Pick<KycStatus, 'status' | 'providerStatus'>
+  kycStatus: Pick<KycStatus, 'status' | 'kycStatus' | 'providerStatus'>
 }
 
 export function KycBanner({ kycStatus }: Readonly<Props>) {

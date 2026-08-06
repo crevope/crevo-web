@@ -8,6 +8,15 @@ export type KycUserStatus =
   | 'SUSPENDED'
 
 /**
+ * Business status of the latest verification attempt (mirrors the backend's
+ * `KycVerificationStatus`). This is what governs the customer-facing message —
+ * a verification can be `IN_REVIEW` (held by us for a human) even while
+ * `providerStatus` still reads 'Approved', because Didit did approve the
+ * document; the hold is ours. Absent when the user never started one.
+ */
+export type KycVerificationStatus = 'PENDING' | 'IN_REVIEW' | 'APPROVED' | 'REJECTED' | 'ERROR'
+
+/**
  * Raw state as reported by the identity-verification provider (Didit). May be
  * absent on verifications created before the provider migration.
  */
@@ -26,6 +35,7 @@ export type KycProviderStatus =
 export interface KycStatus {
   isIdentityVerified: boolean
   status: KycUserStatus
+  kycStatus?: KycVerificationStatus
   providerStatus?: KycProviderStatus
 }
 
@@ -40,6 +50,7 @@ export const kycRepository = {
     return {
       isIdentityVerified: data.data.isIdentityVerified,
       status: data.data.status as KycUserStatus,
+      kycStatus: data.data.kycStatus as KycVerificationStatus | undefined,
       providerStatus: data.data.providerStatus as KycProviderStatus | undefined,
     }
   },

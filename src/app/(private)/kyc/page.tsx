@@ -1,5 +1,6 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import {
   Loader2,
@@ -14,9 +15,49 @@ import {
   Lock,
   ArrowRight,
 } from 'lucide-react'
-import { kycRepository, getKycStatusMessage, type KycStatus } from '@/features/upload-kyc'
+import {
+  kycRepository,
+  getKycStatusMessage,
+  type KycStatus,
+  type KycVerificationStatus,
+  type KycProviderStatus,
+} from '@/features/upload-kyc'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
+
+// Didit returns here once the borrower finishes; the webhook may still be in flight.
+const RETURN_POLL_INTERVAL_MS = 3000
+const RETURN_POLL_ATTEMPTS = 10
+
+// The business status is the verdict — a hold-for-review or a rejection is
+// settled even when Didit's own status still reads 'Approved'.
+const SETTLED_KYC_STATUSES: readonly KycVerificationStatus[] = [
+  'IN_REVIEW',
+  'APPROVED',
+  'REJECTED',
+  'ERROR',
+]
+
+// Provider states with no business-status equivalent: Didit maps a session
+// that never got a verdict back to the same 'PENDING' as one still in
+// progress, but no webhook is coming for these — waiting out the poll budget
+// would just delay letting the borrower start over.
+const PROVIDER_ONLY_SETTLED_STATUSES: readonly KycProviderStatus[] = [
+  'Abandoned',
+  'Expired',
+  'Kyc Expired',
+]
+
+function isSettledStatus(
+  status: Pick<KycStatus, 'isIdentityVerified' | 'kycStatus' | 'providerStatus'>,
+): boolean {
+  return (
+    status.isIdentityVerified ||
+    (status.kycStatus !== undefined && SETTLED_KYC_STATUSES.includes(status.kycStatus)) ||
+    (status.providerStatus !== undefined &&
+      PROVIDER_ONLY_SETTLED_STATUSES.includes(status.providerStatus))
+  )
+}
 
 function KycVerified() {
   return (
@@ -135,20 +176,82 @@ function KycStartAction({
   )
 }
 
-export default function KycPage() {
+function KycPolling() {
+  return (
+    <div className={`${cardCls} p-8 text-center`}>
+      <div className="w-20 h-20 rounded-full bg-[#D4AF37]/10 flex items-center justify-center mx-auto mb-5">
+        <Loader2 className="h-9 w-9 text-[#D4AF37] animate-spin" aria-hidden="true" />
+      </div>
+      <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">
+        Estamos procesando tu verificación
+      </h2>
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-sm mx-auto">
+        Esto puede tomar unos segundos.
+      </p>
+    </div>
+  )
+}
+
+function KycPageContent() {
   const [kycStatus, setKycStatus] = useState<KycStatus | null>(null)
   const [isStarting, setIsStarting] = useState(false)
+
+  const searchParams = useSearchParams()
+  // `verificationSessionId` marks a return from Didit; its `status` is user-controlled, never trusted.
+  const isReturningFromProvider = !!searchParams.get('verificationSessionId')
+  const [isWaitingForWebhook, setIsWaitingForWebhook] = useState(isReturningFromProvider)
+  // True once the return poll exhausted its budget without a settled verdict —
+  // guards against offering a paid re-verification while the webhook is still in flight.
+  const [pollGaveUpUnsettled, setPollGaveUpUnsettled] = useState(false)
 
   const loadStatus = () => {
     kycRepository
       .getStatus()
-      .then(setKycStatus)
+      .then((fresh) => {
+        setKycStatus(fresh)
+        if (isSettledStatus(fresh)) setPollGaveUpUnsettled(false)
+      })
       .catch(() => setKycStatus({ status: 'PENDING_VERIFICATION', isIdentityVerified: false }))
   }
 
   useEffect(() => {
     loadStatus()
   }, [])
+
+  useEffect(() => {
+    if (!isReturningFromProvider) return
+
+    let attempts = 0
+    let cancelled = false
+
+    const tick = async () => {
+      attempts += 1
+      try {
+        const fresh = await kycRepository.getStatus()
+        if (cancelled) return
+        setKycStatus(fresh)
+        const settled = isSettledStatus(fresh)
+        if (settled || attempts >= RETURN_POLL_ATTEMPTS) {
+          setIsWaitingForWebhook(false)
+          if (!settled) setPollGaveUpUnsettled(true)
+          return
+        }
+      } catch {
+        if (attempts >= RETURN_POLL_ATTEMPTS) {
+          setIsWaitingForWebhook(false)
+          setPollGaveUpUnsettled(true)
+          return
+        }
+      }
+      if (!cancelled) handle = setTimeout(tick, RETURN_POLL_INTERVAL_MS)
+    }
+
+    let handle = setTimeout(tick, RETURN_POLL_INTERVAL_MS)
+    return () => {
+      cancelled = true
+      clearTimeout(handle)
+    }
+  }, [isReturningFromProvider])
 
   const handleStartVerification = async () => {
     setIsStarting(true)
@@ -171,8 +274,12 @@ export default function KycPage() {
 
   const message = getKycStatusMessage(kycStatus)
   const isDeclined = kycStatus.providerStatus === 'Declined' || kycStatus.status === 'KYC_REJECTED'
-  const needsAction = !kycStatus.isIdentityVerified && message.canStart
-  const isWaiting = !kycStatus.isIdentityVerified && !message.canStart
+  // The poll gave up without a verdict but the message still reads as "start a new one" —
+  // a real confirmation (webhook or manual refresh) clears pollGaveUpUnsettled first.
+  const unconfirmedAfterPoll =
+    pollGaveUpUnsettled && !kycStatus.isIdentityVerified && message.canStart
+  const needsAction = !kycStatus.isIdentityVerified && message.canStart && !unconfirmedAfterPoll
+  const isWaiting = !kycStatus.isIdentityVerified && (!message.canStart || unconfirmedAfterPoll)
 
   return (
     <div className="space-y-8 max-w-2xl">
@@ -224,23 +331,47 @@ export default function KycPage() {
       </div>
 
       {/* Status views */}
-      {kycStatus.isIdentityVerified && <KycVerified />}
-      {isWaiting && (
-        <KycWaiting
-          title={message.title}
-          description={message.description}
-          onRefresh={loadStatus}
-        />
-      )}
-      {needsAction && (
-        <KycStartAction
-          title={message.title}
-          description={message.description}
-          tone={isDeclined ? 'danger' : 'neutral'}
-          isStarting={isStarting}
-          onStart={handleStartVerification}
-        />
+      {isWaitingForWebhook ? (
+        <KycPolling />
+      ) : (
+        <>
+          {kycStatus.isIdentityVerified && <KycVerified />}
+          {isWaiting && (
+            <KycWaiting
+              title={unconfirmedAfterPoll ? 'Estamos confirmando tu verificación' : message.title}
+              description={
+                unconfirmedAfterPoll
+                  ? 'Ya completaste el proceso con el proveedor. La confirmación está tardando más de lo usual; vuelve a intentarlo en unos segundos.'
+                  : message.description
+              }
+              onRefresh={loadStatus}
+            />
+          )}
+          {needsAction && (
+            <KycStartAction
+              title={message.title}
+              description={message.description}
+              tone={isDeclined ? 'danger' : 'neutral'}
+              isStarting={isStarting}
+              onStart={handleStartVerification}
+            />
+          )}
+        </>
       )}
     </div>
+  )
+}
+
+export default function KycPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="h-10 w-10 animate-spin text-[#0A192F] dark:text-[#D4AF37]" />
+        </div>
+      }
+    >
+      <KycPageContent />
+    </Suspense>
   )
 }

@@ -1,5 +1,6 @@
 import { apiClient, USER_STORAGE_KEY, clearClientSession } from '@/shared/api/client'
 import type { AuthUser } from '@/entities/user'
+import type { RegisterDto } from '../lib/authSchemas'
 
 /**
  * Auth API adapter.
@@ -79,14 +80,7 @@ export const authRepository = {
     return { outcome: 'success', user: mapAuthUser(payload.user as RawAuthUser) }
   },
 
-  async register(dto: {
-    email: string
-    password: string
-    firstName: string
-    lastName: string
-    dni: string
-    phone: string
-  }): Promise<{ user: AuthUser }> {
+  async register(dto: RegisterDto): Promise<{ user: AuthUser }> {
     const { data } = await apiClient.post('/auth/register', dto)
     // Backend returns: { id, email, firstName, lastName, emailVerified }
     const { id, email, firstName, lastName, emailVerified } = data.data

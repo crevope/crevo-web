@@ -21,6 +21,38 @@ export const registerSchema = z
       .string()
       .length(9, 'El celular debe tener exactamente 9 dígitos')
       .regex(/^9\d{8}$/, 'Debe empezar en 9 y contener solo números'),
+    // The backend re-validates the date and the age (see BirthDate); this only
+    // surfaces the error on the field without a round trip.
+    birthDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Ingresa tu fecha de nacimiento')
+      .refine((v) => {
+        const d = new Date(`${v}T00:00:00Z`)
+        // Round trip catches a date that does not exist: '1990-02-30' silently
+        // normalizes to 1 March, so the reformatted string no longer matches.
+        return (
+          !Number.isNaN(d.getTime()) &&
+          d.toISOString().slice(0, 10) === v &&
+          d.getTime() <= Date.now()
+        )
+      }, 'La fecha no es válida')
+      .refine((v) => {
+        const [y, m, d] = v.split('-').map(Number)
+        // "Today" is Lima's calendar day, not the instant's raw UTC day: near a
+        // Lima evening, UTC has already rolled over to tomorrow.
+        const limaParts = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'America/Lima',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).formatToParts(new Date())
+        const pick = (type: string) => Number(limaParts.find((p) => p.type === type)?.value)
+        let age = pick('year') - y!
+        const monthDiff = pick('month') - m!
+        const dayDiff = pick('day') - d!
+        if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age -= 1
+        return age >= 21
+      }, 'Debes tener al menos 21 años para registrarte'),
     email: z.string().email('Email inválido'),
     password: z.string().min(8, 'Mínimo 8 caracteres'),
     confirmPassword: z.string(),
@@ -38,3 +70,9 @@ export const registerSchema = z
 
 export type LoginInput = z.infer<typeof loginSchema>
 export type RegisterInput = z.infer<typeof registerSchema>
+
+// The single source of truth for POST /auth/register's body: RegisterInput
+// minus the two client-only guard fields. authRepository and useAuthStore
+// both consume this instead of redeclaring it, so a field added here cannot
+// be forgotten in one of the copies (see birthDate's tsc breakage).
+export type RegisterDto = Omit<RegisterInput, 'confirmPassword' | 'acceptTerms'>
