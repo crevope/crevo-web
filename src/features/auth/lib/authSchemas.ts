@@ -28,14 +28,28 @@ export const registerSchema = z
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Ingresa tu fecha de nacimiento')
       .refine((v) => {
         const d = new Date(`${v}T00:00:00Z`)
-        return !Number.isNaN(d.getTime()) && d.getTime() <= Date.now()
+        // Round trip catches a date that does not exist: '1990-02-30' silently
+        // normalizes to 1 March, so the reformatted string no longer matches.
+        return (
+          !Number.isNaN(d.getTime()) &&
+          d.toISOString().slice(0, 10) === v &&
+          d.getTime() <= Date.now()
+        )
       }, 'La fecha no es válida')
       .refine((v) => {
         const [y, m, d] = v.split('-').map(Number)
-        const today = new Date()
-        let age = today.getUTCFullYear() - y!
-        const monthDiff = today.getUTCMonth() + 1 - m!
-        const dayDiff = today.getUTCDate() - d!
+        // "Today" is Lima's calendar day, not the instant's raw UTC day: near a
+        // Lima evening, UTC has already rolled over to tomorrow.
+        const limaParts = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'America/Lima',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).formatToParts(new Date())
+        const pick = (type: string) => Number(limaParts.find((p) => p.type === type)?.value)
+        let age = pick('year') - y!
+        const monthDiff = pick('month') - m!
+        const dayDiff = pick('day') - d!
         if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age -= 1
         return age >= 21
       }, 'Debes tener al menos 21 años para registrarte'),
