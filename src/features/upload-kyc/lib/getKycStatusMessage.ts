@@ -8,21 +8,29 @@ export interface KycStatusMessage {
 }
 
 /**
- * Turns the raw provider status into the copy shown to the customer, falling
- * back to the coarser business status when `providerStatus` is absent (older
- * verifications created before the Didit migration).
+ * Turns the backend's status into the copy shown to the customer.
+ *
+ * `kycStatus` (the business status) governs: our own cross-check can hold a
+ * verification `IN_REVIEW` even while the provider's own status still reads
+ * 'Approved' — Didit approved the document, but the hold is ours, and the
+ * customer must see "under review", never an invitation to pay for another
+ * session. `providerStatus` only adds detail once `kycStatus` isn't already
+ * decisive; `status` (the coarser per-user status) is the last resort for
+ * verifications created before either field existed.
  */
 export function getKycStatusMessage(
-  kycStatus: Pick<KycStatus, 'status' | 'providerStatus'>,
+  kycStatus: Pick<KycStatus, 'status' | 'kycStatus' | 'providerStatus'>,
 ): KycStatusMessage {
+  if (kycStatus.kycStatus === 'IN_REVIEW') {
+    return {
+      title: 'Estamos revisando tu verificación',
+      description:
+        'Ya completaste el proceso. Nuestro equipo la está revisando y te avisaremos apenas tengamos el resultado.',
+      canStart: false,
+    }
+  }
+
   switch (kycStatus.providerStatus) {
-    case 'In Review':
-      return {
-        title: 'Estamos revisando tu verificación',
-        description:
-          'Ya completaste el proceso. Nuestro equipo la está revisando y te avisaremos apenas tengamos el resultado.',
-        canStart: false,
-      }
     case 'In Progress':
     case 'Awaiting User':
     case 'Resubmitted':
@@ -46,6 +54,9 @@ export function getKycStatusMessage(
         description: 'La verificación no fue aprobada. Puedes intentarlo nuevamente.',
         canStart: true,
       }
+    // 'In Review' always drives `kycStatus` to 'IN_REVIEW' too (see
+    // toKycStatus on the backend), so it's already handled above.
+    case 'In Review':
     case 'Not Started':
     case 'Approved':
     case undefined:

@@ -19,6 +19,7 @@ import {
   kycRepository,
   getKycStatusMessage,
   type KycStatus,
+  type KycVerificationStatus,
   type KycProviderStatus,
 } from '@/features/upload-kyc'
 
@@ -28,24 +29,33 @@ const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-w
 const RETURN_POLL_INTERVAL_MS = 3000
 const RETURN_POLL_ATTEMPTS = 10
 
-// Terminal provider states. Listed as what IS settled, not what isn't — `Not
-// Started`/`In Progress` are where a fresh verification starts, not a stop condition.
-const SETTLED_PROVIDER_STATUSES: readonly KycProviderStatus[] = [
-  'Approved',
-  'Declined',
-  'In Review',
+// The business status is the verdict — a hold-for-review or a rejection is
+// settled even when Didit's own status still reads 'Approved'.
+const SETTLED_KYC_STATUSES: readonly KycVerificationStatus[] = [
+  'IN_REVIEW',
+  'APPROVED',
+  'REJECTED',
+  'ERROR',
+]
+
+// Provider states with no business-status equivalent: Didit maps a session
+// that never got a verdict back to the same 'PENDING' as one still in
+// progress, but no webhook is coming for these — waiting out the poll budget
+// would just delay letting the borrower start over.
+const PROVIDER_ONLY_SETTLED_STATUSES: readonly KycProviderStatus[] = [
   'Abandoned',
   'Expired',
   'Kyc Expired',
 ]
 
 function isSettledStatus(
-  status: Pick<KycStatus, 'isIdentityVerified' | 'providerStatus'>,
+  status: Pick<KycStatus, 'isIdentityVerified' | 'kycStatus' | 'providerStatus'>,
 ): boolean {
   return (
     status.isIdentityVerified ||
+    (status.kycStatus !== undefined && SETTLED_KYC_STATUSES.includes(status.kycStatus)) ||
     (status.providerStatus !== undefined &&
-      SETTLED_PROVIDER_STATUSES.includes(status.providerStatus))
+      PROVIDER_ONLY_SETTLED_STATUSES.includes(status.providerStatus))
   )
 }
 
