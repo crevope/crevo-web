@@ -26,12 +26,17 @@ test.describe('analítica de demanda', () => {
     await grantAnalyticsConsent(page)
     await page.goto('/')
 
+    // El id nace en el efecto del tracker, que corre tras la hidratación: hay
+    // que esperarlo, no leerlo de una.
+    await expect
+      .poll(() => page.evaluate((k) => localStorage.getItem(k), VISITOR_KEY), { timeout: 15_000 })
+      .toMatch(/^[0-9a-f-]{36}$/)
     const first = await page.evaluate((k) => localStorage.getItem(k), VISITOR_KEY)
-    expect(first).toMatch(/^[0-9a-f-]{36}$/)
 
     await page.reload()
-    const second = await page.evaluate((k) => localStorage.getItem(k), VISITOR_KEY)
-    expect(second).toBe(first)
+    await expect
+      .poll(() => page.evaluate((k) => localStorage.getItem(k), VISITOR_KEY), { timeout: 15_000 })
+      .toBe(first)
   })
 
   test('envía la visita con las cabeceras de identidad', async ({ page }) => {
@@ -59,8 +64,10 @@ test.describe('analítica de demanda', () => {
     await grantAnalyticsConsent(page)
     await page.goto('/')
 
+    await expect
+      .poll(() => page.evaluate((k) => sessionStorage.getItem(k), SESSION_KEY), { timeout: 15_000 })
+      .toBeTruthy()
     const first = await page.evaluate((k) => sessionStorage.getItem(k), SESSION_KEY)
-    expect(first).toBeTruthy()
 
     await page.evaluate(
       ([k, v]) => sessionStorage.setItem(k!, v!),
@@ -86,6 +93,10 @@ test.describe('analítica de demanda', () => {
     })
 
     await page.goto('/')
+
+    // Esperar a que el tracker haya corrido de verdad: si no, la ausencia de
+    // identidad podría ser solo que aún no le dio tiempo.
+    await expect.poll(() => headers.length, { timeout: 15_000 }).toBeGreaterThan(0)
 
     const visitor = await page.evaluate((k) => localStorage.getItem(k), VISITOR_KEY)
     const session = await page.evaluate((k) => sessionStorage.getItem(k), SESSION_KEY)
