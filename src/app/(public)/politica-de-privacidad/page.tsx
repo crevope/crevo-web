@@ -80,6 +80,13 @@ export default function PrivacyPolicyPage() {
           ).
         </li>
         <li>Logs de actividad en la Plataforma (acciones, horarios, resultados).</li>
+        <li>
+          <strong>Identificadores de medición de demanda</strong>: un identificador aleatorio de
+          navegador y uno de sesión, sin ningún dato tuyo dentro, que solo se generan si aceptas la
+          analítica. Identifican a un navegador, no a una persona. Junto a ellos guardamos tu IP
+          cifrada de forma irreversible con una clave que cambia cada día, de modo que no es posible
+          reconstruirla ni seguirte de un día para otro.
+        </li>
       </ul>
 
       <h2>3. Finalidades del tratamiento</h2>
@@ -189,6 +196,10 @@ export default function PrivacyPolicyPage() {
         </li>
         <li>
           <strong>Logs de seguridad</strong>: doce (12) meses, salvo necesidad probatoria mayor.
+        </li>
+        <li>
+          <strong>Eventos de medición de demanda</strong>: veinticuatro (24) meses, tras los cuales
+          se eliminan automáticamente.
         </li>
       </ul>
 

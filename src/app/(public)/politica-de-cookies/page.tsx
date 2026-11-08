@@ -62,6 +62,16 @@ export default function CookiesPolicyPage() {
         <li>
           <strong>Vercel Analytics</strong> — métricas agregadas y anónimas de tráfico.
         </li>
+        <li>
+          <strong>Medición propia de demanda</strong> — guardamos en tu navegador dos
+          identificadores aleatorios, sin ningún dato tuyo dentro: <code>crevo_visitor_id</code>{' '}
+          (permanente, para no contarte dos veces si vuelves) y <code>crevo_session_id</code> (se
+          renueva a los 30 minutos de inactividad). Nos permiten saber cuántos visitantes distintos
+          usan el simulador y qué montos consultan. Identifican a un navegador, no a una persona, no
+          se comparten con terceros y no se instalan si rechazas la analítica. Del lado del servidor
+          guardamos además tu dirección IP cifrada de forma irreversible, con una clave que cambia
+          cada día, solo para no contarte dos veces dentro de la misma jornada.
+        </li>
       </ul>
 
       <h3>2.3. Cookies de terceros</h3>

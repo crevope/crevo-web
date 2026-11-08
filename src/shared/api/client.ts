@@ -119,9 +119,15 @@ export function captureCsrfFromResponse(payload: unknown): void {
 apiClient.interceptors.request.use((config) => {
   if (typeof window === 'undefined') return config
 
-  config.headers = config.headers ?? {}
-  ;(config.headers as Record<string, string>)['X-Visitor-Id'] = getVisitorId()
-  ;(config.headers as Record<string, string>)['X-Session-Id'] = getSessionId()
+  // Absent when the visitor declined analytics: we send no identity at all
+  // rather than an empty header the backend would have to second-guess.
+  const visitorId = getVisitorId()
+  const sessionId = getSessionId()
+  if (visitorId || sessionId) {
+    config.headers = config.headers ?? {}
+    if (visitorId) (config.headers as Record<string, string>)['X-Visitor-Id'] = visitorId
+    if (sessionId) (config.headers as Record<string, string>)['X-Session-Id'] = sessionId
+  }
 
   // Safe methods don't mutate state and are exempt from CSRF validation.
   const method = (config.method ?? 'get').toLowerCase()
