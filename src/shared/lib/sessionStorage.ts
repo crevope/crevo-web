@@ -1,4 +1,5 @@
 import { CONSENT_STORAGE_KEY } from '@/features/cookie-consent/lib/consentStorage'
+import { VISITOR_ID_KEY } from '@/shared/lib/visitorIdentity'
 
 /**
  * localStorage keys that must SURVIVE a logout (manual or automatic).
@@ -11,12 +12,16 @@ import { CONSENT_STORAGE_KEY } from '@/features/cookie-consent/lib/consentStorag
  * - Theme: pure UX preference. People expect dark mode to stick across
  *   sessions; next-themes persists it under the `theme` key.
  *
+ * - Visitor identity: pseudonymous identifier for demand analytics. Wiping it
+ *   on logout would miscount the returning borrower as a brand-new visitor.
+ *
  * Add anything else that's a long-lived user preference (language, currency
  * format, opt-out flags, etc.) to this list.
  */
 const PRESERVED_KEYS: ReadonlySet<string> = new Set([
   CONSENT_STORAGE_KEY, // 'crevo_cookie_consent'
   'theme', // next-themes
+  VISITOR_ID_KEY, // 'crevo_visitor_id'
 ])
 
 /**

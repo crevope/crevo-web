@@ -12,3 +12,7 @@ tsconfig.tsbuildinfo
 *.tsbuildinfo
 graphify-out/
 .superpowers/
+
+# Artefactos de Playwright — se regeneran en cada corrida.
+test-results/
+playwright-report/

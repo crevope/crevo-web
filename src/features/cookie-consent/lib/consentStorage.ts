@@ -13,7 +13,9 @@
 
 /** Sube este número cada vez que cambien las finalidades, categorías o
  *  proveedores. Fuerza a todos los visitantes a re-consentir. */
-export const CONSENT_VERSION = 1
+// v2 (2026-11-07): se añadió la medición propia de demanda (identificadores
+// crevo_visitor_id / crevo_session_id) como finalidad analítica nueva.
+export const CONSENT_VERSION = 2
 
 export const CONSENT_STORAGE_KEY = 'crevo_cookie_consent'
 
