@@ -130,11 +130,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set({ isHydrating: true })
     try {
       const { conversation, messages } = await chatRepository.getMine()
-      set({
+      set((s) => ({
         conversation,
-        messages,
+        // Se conservan los mensajes optimistas en vuelo: hydrate ahora también
+        // lo dispara el realtime, y sin esto la burbuja que el usuario acaba de
+        // enviar desaparecería hasta que resuelva su POST.
+        messages: [...messages, ...s.messages.filter((m) => isTempId(m.id))],
         unreadInPanel: conversation?.unreadCount ?? 0,
-      })
+      }))
       if (conversation && conversation.status === 'OPEN') {
         get().subscribe(conversation.id)
       }
@@ -230,26 +233,21 @@ export const useChatStore = create<ChatState>((set, get) => ({
           : undefined,
       )
 
-      // Swap the temp for the canonical entry. Two possible race orders:
-      //   (A) REST response wins: the temp (tempId) is still in the
-      //       array → replace by tempId.
-      //   (B) Broadcast wins (rare but real — matters for attachments
-      //       because the broadcast carries NO signed download URL, so
-      //       without this fix the bubble ends up showing "Imagen no
-      //       disponible" until refresh). The broadcast handler already
-      //       replaced temp with an incoming-id entry; we find it by
-      //       saved.id and overwrite so the richer `saved` (with the
-      //       server-signed URL) wins.
+      // Cambiamos el temporal por la entrada canónica.
+      //
+      // Se filtran AMBOS ids en vez de reemplazar el primero que aparezca:
+      // `hydrate` ahora también lo dispara el realtime, así que puede haber
+      // traído del servidor la versión canónica mientras este POST seguía en
+      // vuelo. En ese caso el temporal y la canónica conviven, y reemplazar
+      // sólo una dejaba la otra colgada como burbuja duplicada.
       set((s) => {
-        const idx = s.messages.findIndex((m) => m.id === tempId || m.id === saved.id)
-        if (idx >= 0) {
-          const next = [...s.messages]
-          next[idx] = saved
-          return { messages: next, isSending: false }
-        }
-        // Defensive: neither matched (message was somehow removed?) →
-        // append so we never lose it.
-        return { messages: [...s.messages, saved], isSending: false }
+        const rest = s.messages.filter((m) => m.id !== tempId && m.id !== saved.id)
+        const next = [...rest, saved]
+        // Reordenar por fecha: si hydrate intercaló mensajes posteriores del
+        // agente, appendear al final descolocaría el hilo. Los ISO 8601
+        // ordenan lexicográficamente igual que cronológicamente.
+        next.sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+        return { messages: next, isSending: false }
       })
 
       // Revoke the local blob URL — the server-signed URL on `saved`
@@ -403,6 +401,32 @@ export const useChatStore = create<ChatState>((set, get) => ({
 // ─── Realtime event handler ───────────────────────────────────────────────
 
 /**
+ * Refetch coalescente disparado por el realtime.
+ *
+ * `hydrate` tiene un guard de concurrencia (`isHydrating`), así que un evento
+ * que llega mientras hay un hydrate en vuelo se perdería en silencio — y los
+ * mensajes de chat llegan en ráfaga. Cuando pasa, encolamos UNA re-corrida
+ * para cuando termine: alcanza con una, porque hydrate siempre trae el estado
+ * completo, no un delta.
+ */
+let _rehydrateQueued = false
+
+function _requestRefetch(get: () => ChatState): void {
+  if (get().isHydrating) {
+    _rehydrateQueued = true
+    return
+  }
+  void get()
+    .hydrate()
+    .then(() => {
+      if (_rehydrateQueued) {
+        _rehydrateQueued = false
+        _requestRefetch(get)
+      }
+    })
+}
+
+/**
  * Idempotent merge of a broadcast event into the store. Pulled out as a
  * standalone function so tests can exercise it without instantiating a
  * full RealtimeChannel.
@@ -416,46 +440,22 @@ function _handleEvent(
 
   switch (event.type) {
     case 'message': {
-      const incoming = event.message
+      // El evento es sólo un aviso: no trae el cuerpo, porque el canal no
+      // está autenticado (ver ChatBroadcastMessageEvent en ../types). El
+      // contenido —y la URL firmada del adjunto, siempre fresca— llega por
+      // la API autenticada. Ya no hace falta deduplicar contra el mensaje
+      // optimista: hydrate trae la lista canónica y los temporales que sigan
+      // en vuelo se preservan ahí.
       const state = get()
-      // Dedupe — REST round-trip may have already swapped the temp for
-      // the canonical id by the time the broadcast lands.
-      if (state.messages.some((m) => m.id === incoming.id)) return
-      // Also dedupe against any optimistic temp from THIS user. Match by
-      // (senderType + body + ~createdAt within 5s) for the rare case
-      // where the broadcast beat the REST response.
-      const tempIdx = state.messages.findIndex(
-        (m) => isTempId(m.id) && m.senderType === incoming.senderType && m.body === incoming.body,
-      )
-      if (tempIdx >= 0) {
-        const next = [...state.messages]
-        const previousTemp = state.messages[tempIdx]
-        // Preserve the optimistic local blob URL on attachments — the
-        // broadcast event carries `attachmentPath` but NOT a signed
-        // download URL (signed URLs would expire while sitting in the
-        // Realtime envelope). If we blindly replace, the bubble flashes
-        // "Imagen no disponible" until the REST response catches up.
-        // Holding the blob URL bridges that gap smoothly; the actual
-        // server-signed URL lands when the REST `send` resolves.
-        next[tempIdx] = {
-          ...incoming,
-          attachmentUrl: incoming.attachmentUrl ?? previousTemp.attachmentUrl ?? null,
-        }
-        set({ messages: next })
-        return
-      }
-
-      const isAgent = incoming.senderType === 'agent'
+      const isAgent = event.message.senderType === 'agent'
       const isPanelOpen = state.isPanelOpen
-      set((s) => ({
-        messages: [...s.messages, incoming],
-        // Only bump the unread badge for AGENT messages while the panel
-        // is closed. SYSTEM messages don't count (welcome, close notice).
-        unreadInPanel: isAgent && !isPanelOpen ? s.unreadInPanel + 1 : s.unreadInPanel,
-      }))
 
-      // If the panel is open and this is an agent message, mark as read
-      // immediately — saves a round-trip on the next user interaction.
+      // El unreadInPanel tampoco se incrementa a mano: hydrate toma el
+      // unreadCount autoritativo del servidor.
+      _requestRefetch(get)
+
+      // Si el panel está abierto y escribió el agente, marcamos leído al
+      // toque — ahorra un round-trip en la siguiente interacción.
       if (isAgent && isPanelOpen) {
         setTimeout(() => {
           void get().markPanelRead()

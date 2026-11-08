@@ -10,3 +10,9 @@ out/
 # TypeScript incremental build cache — regenerated automatically.
 tsconfig.tsbuildinfo
 *.tsbuildinfo
+graphify-out/
+.superpowers/
+
+# Artefactos de Playwright — se regeneran en cada corrida.
+test-results/
+playwright-report/

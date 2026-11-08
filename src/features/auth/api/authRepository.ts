@@ -1,5 +1,6 @@
 import { apiClient, USER_STORAGE_KEY, clearClientSession } from '@/shared/api/client'
 import type { AuthUser } from '@/entities/user'
+import type { RegisterDto } from '../lib/authSchemas'
 
 /**
  * Auth API adapter.
@@ -9,31 +10,77 @@ import type { AuthUser } from '@/entities/user'
  * owns the cached `user` profile in localStorage for fast client-side
  * hydration before /auth/me resolves.
  */
+
+// ── 2FA (TOTP) — see docs/superpowers/specs/2026-07-28-crevo-2fa-totp-design.md
+// Types mirror crevo-backend's AuthController /auth/2fa/* JSON verbatim.
+
+export interface TwoFactorStatus {
+  enabled: boolean
+  confirmedAt: string | null
+  unusedRecoveryCodes: number
+}
+
+export interface TwoFactorSetupData {
+  otpauthUri: string
+  secret: string
+}
+
+/**
+ * `LoginUser.execute` on the backend returns one of three outcomes; the
+ * controller maps them 1:1 into the JSON body (`requires2fa`/`challengeToken`
+ * or `requires2faSetup`/`setupToken`, or `user`/`csrfToken`). A borrower
+ * (crevo-web) should only ever see 'success' or 'requires_2fa' —
+ * 'requires_2fa_setup' is the staff-only mandatory-enrollment path
+ * (crevo-admin), but it's modeled here so `login()` can't silently swallow
+ * it if it were ever hit.
+ */
+export type LoginResult =
+  | { outcome: 'success'; user: AuthUser }
+  | { outcome: 'requires_2fa'; challengeToken: string }
+  | { outcome: 'requires_2fa_setup' }
+
+interface RawAuthUser {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  emailVerified?: boolean
+  isIdentityVerified?: boolean
+}
+
+function mapAuthUser(u: RawAuthUser): AuthUser {
+  return {
+    id: u.id,
+    email: u.email,
+    firstName: u.firstName,
+    lastName: u.lastName,
+    emailVerified: u.emailVerified ?? false,
+    isIdentityVerified: u.isIdentityVerified ?? false,
+  }
+}
+
 export const authRepository = {
-  async login(email: string, password: string): Promise<{ user: AuthUser }> {
+  async login(email: string, password: string): Promise<LoginResult> {
     const { data } = await apiClient.post('/auth/login', { email, password })
-    // Backend returns: { user: { id, email, firstName, lastName, emailVerified, isIdentityVerified } }
-    // Cookies (crevo_at, crevo_rt, crevo_csrf) are set server-side via Set-Cookie.
-    const u = data.data.user
-    const user: AuthUser = {
-      id: u.id,
-      email: u.email,
-      firstName: u.firstName,
-      lastName: u.lastName,
-      emailVerified: u.emailVerified ?? false,
-      isIdentityVerified: u.isIdentityVerified ?? false,
+    const payload = data.data as {
+      user?: RawAuthUser
+      requires2fa?: boolean
+      challengeToken?: string
+      requires2faSetup?: boolean
     }
-    return { user }
+
+    if (payload.requires2fa && payload.challengeToken) {
+      return { outcome: 'requires_2fa', challengeToken: payload.challengeToken }
+    }
+    if (payload.requires2faSetup) {
+      return { outcome: 'requires_2fa_setup' }
+    }
+    // Backend guarantees `user` on every non-2FA outcome (LoginUser's
+    // 'success' branch always populates it) — see AuthController.login.
+    return { outcome: 'success', user: mapAuthUser(payload.user as RawAuthUser) }
   },
 
-  async register(dto: {
-    email: string
-    password: string
-    firstName: string
-    lastName: string
-    dni: string
-    phone: string
-  }): Promise<{ user: AuthUser }> {
+  async register(dto: RegisterDto): Promise<{ user: AuthUser }> {
     const { data } = await apiClient.post('/auth/register', dto)
     // Backend returns: { id, email, firstName, lastName, emailVerified }
     const { id, email, firstName, lastName, emailVerified } = data.data
@@ -92,6 +139,62 @@ export const authRepository = {
       phone: u.phone,
       dni: u.dni,
     }
+  },
+
+  // ── 2FA (TOTP) — opt-in client flow ────────────────────────────────────
+
+  /** GET /auth/2fa/status — session-authenticated. */
+  async getTwoFactorStatus(): Promise<TwoFactorStatus> {
+    const { data } = await apiClient.get('/auth/2fa/status')
+    return data.data
+  },
+
+  /** POST /auth/2fa/setup — session-authenticated (web never uses a
+   *  setupToken; that path is staff-only mandatory enrollment in
+   *  crevo-admin). Generates a PENDING secret; does NOT enable 2FA. Throws
+   *  if 2FA is already enabled (disable first to reconfigure). */
+  async setupTwoFactor(): Promise<TwoFactorSetupData> {
+    const { data } = await apiClient.post('/auth/2fa/setup', {})
+    return data.data
+  },
+
+  /** POST /auth/2fa/confirm — verifies the pending secret with a 6-digit
+   *  code, enables 2FA, and returns the 8 recovery codes in clear text
+   *  (the backend never returns them again after this call). */
+  async confirmTwoFactor(code: string): Promise<{ recoveryCodes: string[] }> {
+    const { data } = await apiClient.post('/auth/2fa/confirm', { code })
+    return { recoveryCodes: data.data.recoveryCodes }
+  },
+
+  /** POST /auth/2fa/disable — requires a valid current TOTP code.
+   *  Client-only; the backend rejects staff accounts. */
+  async disableTwoFactor(code: string): Promise<void> {
+    await apiClient.post('/auth/2fa/disable', { code })
+  },
+
+  /** POST /auth/2fa/verify — no session yet (challengeToken only). Verifies
+   *  a TOTP code OR a recovery code and, on success, the backend sets the
+   *  session cookies exactly like a normal login. `useRecoveryCode` is a UI
+   *  hint only — the backend always tries TOTP first regardless. */
+  async verifyTwoFactor(
+    challengeToken: string,
+    code: string,
+    useRecoveryCode = false,
+  ): Promise<{ user: AuthUser }> {
+    const { data } = await apiClient.post('/auth/2fa/verify', {
+      challengeToken,
+      code,
+      useRecoveryCode,
+    })
+    return { user: mapAuthUser(data.data.user) }
+  },
+
+  /** POST /auth/2fa/recovery-codes/regenerate — requires a valid current
+   *  TOTP code. Invalidates every existing recovery code and returns a
+   *  fresh set of 8 (shown once). */
+  async regenerateRecoveryCodes(code: string): Promise<{ recoveryCodes: string[] }> {
+    const { data } = await apiClient.post('/auth/2fa/recovery-codes/regenerate', { code })
+    return { recoveryCodes: data.data.recoveryCodes }
   },
 
   // ── User profile cache (localStorage) ──────────────────────────────────

@@ -28,6 +28,10 @@ const EXAMPLE_PARAMS = {
   paymentFrequency: 'MENSUAL' as const,
   numInstallments: 1,
   scoreTier: 'TIER_B' as const,
+  // Fijo por regulación: aunque un usuario logueado vea la landing, este ejemplo
+  // debe permanecer en TIER_B (score promedio 650–799). referential evita que el
+  // backend lo personalice al tier real del cliente.
+  referential: true as const,
 }
 
 function fmt(n: number) {

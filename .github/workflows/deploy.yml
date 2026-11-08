@@ -1,0 +1,83 @@
+name: deploy
+
+# SOLO develop → sandbox (VPS). Producción (main) se despliega en Vercel vía su
+# integración de git — este workflow NO maneja main (ver Ignored Build Step en
+# Vercel para que develop no despliegue ahí).
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: 'SHA a redeployar (rollback). Vacío = HEAD de develop.'
+        required: false
+
+concurrency:
+  group: deploy-web-sandbox
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: yarn }
+      - run: corepack enable && yarn install --frozen-lockfile
+      - run: yarn lint
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+  build:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: sandbox # aporta las vars públicas NEXT_PUBLIC_* / BACKEND_UPSTREAM_URL
+    permissions: { contents: read, packages: write }
+    outputs:
+      sha: ${{ steps.meta.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.sha || github.sha }}
+      - id: meta
+        run: echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.sha }}
+            ghcr.io/${{ github.repository }}:sandbox
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_SUPABASE_URL=${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+            NEXT_PUBLIC_CULQI_PUBLIC_KEY=${{ vars.NEXT_PUBLIC_CULQI_PUBLIC_KEY }}
+            NEXT_PUBLIC_FIREBASE_API_KEY=${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+            NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+            NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+            NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+            NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+            NEXT_PUBLIC_FIREBASE_APP_ID=${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+            NEXT_PUBLIC_FIREBASE_VAPID_KEY=${{ vars.NEXT_PUBLIC_FIREBASE_VAPID_KEY }}
+            NEXT_PUBLIC_FB_APP_ID=${{ vars.NEXT_PUBLIC_FB_APP_ID }}
+            NEXT_PUBLIC_BING_SITE_VERIFICATION=${{ vars.NEXT_PUBLIC_BING_SITE_VERIFICATION }}
+            BACKEND_UPSTREAM_URL=${{ vars.BACKEND_UPSTREAM_URL }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /opt/crevo/infra
+            bash deploy/deploy.sh web sandbox

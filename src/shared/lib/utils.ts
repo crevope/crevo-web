@@ -13,12 +13,27 @@ export function formatCurrency(amount: number): string {
   }).format(amount)
 }
 
+/**
+ * Convierte a Date respetando el día que dice el string.
+ *
+ * `new Date('2026-08-31')` se interpreta como medianoche UTC, que en Lima
+ * (UTC-5) es el 30 a las 19:00 — la cuota se mostraba un día antes de su
+ * vencimiento. Las fechas sin hora (`YYYY-MM-DD`, como `installments.due_date`)
+ * son días de calendario, no instantes: se construyen en horario local.
+ */
+export function parseDate(date: string | Date): Date {
+  if (date instanceof Date) return date
+  const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)
+  if (!dateOnlyMatch) return new Date(date)
+  return new Date(Number(dateOnlyMatch[1]), Number(dateOnlyMatch[2]) - 1, Number(dateOnlyMatch[3]))
+}
+
 export function formatDate(date: string | Date): string {
   return new Intl.DateTimeFormat('es-PE', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
-  }).format(new Date(date))
+  }).format(parseDate(date))
 }
 
 export function formatDateTime(date: string | Date): string {
@@ -28,11 +43,11 @@ export function formatDateTime(date: string | Date): string {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(date))
+  }).format(parseDate(date))
 }
 
 export function formatRelativeDate(date: string | Date): string {
-  const diff = Math.floor((Date.now() - new Date(date).getTime()) / 1000)
+  const diff = Math.floor((Date.now() - parseDate(date).getTime()) / 1000)
   if (diff < 60) return 'hace un momento'
   if (diff < 3600) return `hace ${Math.floor(diff / 60)} min`
   if (diff < 86400) return `hace ${Math.floor(diff / 3600)} h`

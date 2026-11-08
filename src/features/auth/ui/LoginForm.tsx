@@ -8,15 +8,15 @@ import Link from 'next/link'
 import { Loader2, ArrowRight, CircleAlert, Eye, EyeOff } from 'lucide-react'
 import { Checkbox } from '@/shared/ui/checkbox'
 import { loginSchema, type LoginInput } from '../lib/authSchemas'
+import { inputCls } from '../lib/authStyles'
 import { useAuthStore } from '../model/useAuthStore'
-
-const inputCls =
-  'w-full px-5 py-3 rounded-lg border border-gray-200 dark:border-[#334155] bg-white dark:bg-[#0F172A] text-[#0A192F] dark:text-[#F1F5F9] text-[0.95rem] placeholder-gray-400 dark:placeholder-[#64748B] focus:outline-none focus:border-[#0A192F] dark:focus:border-[#D4AF37] focus:ring-[3px] focus:ring-[#0A192F]/10 dark:focus:ring-[#D4AF37]/15 transition-all'
+import { TwoFactorChallenge } from './TwoFactorChallenge'
 
 export function LoginForm() {
   const router = useRouter()
-  const { login } = useAuthStore()
+  const { login, setUser } = useAuthStore()
   const [showPass, setShowPass] = useState(false)
+  const [challengeToken, setChallengeToken] = useState<string | null>(null)
 
   const {
     register,
@@ -26,11 +26,38 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginInput) => {
     try {
-      await login(values.email, values.password)
-      router.push('/dashboard')
+      const result = await login(values.email, values.password)
+      if (result.outcome === 'success') {
+        router.push('/dashboard')
+        return
+      }
+      if (result.outcome === 'requires_2fa') {
+        setChallengeToken(result.challengeToken)
+        return
+      }
+      // 'requires_2fa_setup' is staff-only mandatory enrollment
+      // (crevo-admin's job) — a borrower should never hit this, but fail
+      // loud instead of silently retrying or crashing. See
+      // docs/superpowers/specs/2026-07-28-crevo-2fa-totp-design.md.
+      toast.error(
+        'Esta cuenta requiere configurar la verificación en dos pasos desde el panel de administración. Contacta a soporte.',
+      )
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Credenciales incorrectas')
     }
+  }
+
+  if (challengeToken) {
+    return (
+      <TwoFactorChallenge
+        challengeToken={challengeToken}
+        onVerified={(user) => {
+          setUser(user)
+          router.push('/dashboard')
+        }}
+        onCancel={() => setChallengeToken(null)}
+      />
+    )
   }
 
   return (

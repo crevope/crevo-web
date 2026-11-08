@@ -14,6 +14,10 @@ export interface SimulateParams {
    *  Para ejemplos regulatorios "representativos" se recomienda TIER_B,
    *  que corresponde al score promedio de un cliente nuevo (650–799). */
   scoreTier?: ScoreTier
+  /** Modo referencial: fuerza el scoreTier explícito e ignora la personalización
+   *  por sesión. Úsalo en widgets ilustrativos fijos (Ejemplo representativo SBS)
+   *  para que NO muestren el tier real de un usuario logueado. */
+  referential?: boolean
 }
 
 export interface ScheduleItem {

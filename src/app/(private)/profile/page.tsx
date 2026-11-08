@@ -19,9 +19,15 @@ import {
   Plus,
   TriangleAlert,
 } from 'lucide-react'
-import { useAuthStore } from '@/features/auth'
-import { authRepository } from '@/features/auth'
+import {
+  useAuthStore,
+  authRepository,
+  TwoFactorSetup,
+  RecoveryCodesModal,
+  type TwoFactorStatus,
+} from '@/features/auth'
 import { apiClient } from '@/shared/api/client'
+import { formatDate } from '@/shared/lib/utils'
 import {
   bankAccountRepository,
   type BankAccount,
@@ -147,6 +153,21 @@ export default function ProfilePage() {
   const [pwLoading, setPwLoading] = useState(false)
   const [pwDone, setPwDone] = useState(false)
 
+  // 2FA state
+  const [twoFactorStatus, setTwoFactorStatus] = useState<TwoFactorStatus | null>(null)
+  const [twoFactorLoading, setTwoFactorLoading] = useState(false)
+  const [setupModalOpen, setSetupModalOpen] = useState(false)
+  const [showDisableForm, setShowDisableForm] = useState(false)
+  const [disableCode, setDisableCode] = useState('')
+  const [disableLoading, setDisableLoading] = useState(false)
+  const [showRegenerateForm, setShowRegenerateForm] = useState(false)
+  const [regenerateCode, setRegenerateCode] = useState('')
+  const [regenerateLoading, setRegenerateLoading] = useState(false)
+  const [recoveryCodesModal, setRecoveryCodesModal] = useState<{
+    open: boolean
+    codes: string[]
+  }>({ open: false, codes: [] })
+
   // Account closure state — two-step confirmation to prevent accidental
   // deletion: user clicks once to open the inline warning, then types
   // "ELIMINAR" before the submit button unlocks.
@@ -198,6 +219,24 @@ export default function ProfilePage() {
       }
     }
   }, [activeSection, loadBankAccounts, bankCatalog.length])
+
+  const loadTwoFactorStatus = useCallback(async () => {
+    setTwoFactorLoading(true)
+    try {
+      const status = await authRepository.getTwoFactorStatus()
+      setTwoFactorStatus(status)
+    } catch {
+      toast.error('No se pudo cargar el estado de la verificación en dos pasos')
+    } finally {
+      setTwoFactorLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (activeSection === 'security') {
+      loadTwoFactorStatus()
+    }
+  }, [activeSection, loadTwoFactorStatus])
 
   // Load full profile (phone + DNI), credit score, and notification prefs on mount
   useEffect(() => {
@@ -263,6 +302,53 @@ export default function ProfilePage() {
       )
     } finally {
       setPwLoading(false)
+    }
+  }
+
+  // 2FA disable handler — confirms a valid current TOTP code before turning
+  // the toggle off; the toggle itself is never optimistically flipped, it
+  // only reflects `twoFactorStatus` after a successful `loadTwoFactorStatus`.
+  const handleDisableTwoFactor = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (disableCode.trim().length !== 6) {
+      toast.error('Ingresa el código de 6 dígitos')
+      return
+    }
+    setDisableLoading(true)
+    try {
+      await authRepository.disableTwoFactor(disableCode.trim())
+      toast.success('2FA desactivado')
+      setShowDisableForm(false)
+      setDisableCode('')
+      await loadTwoFactorStatus()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Código inválido')
+    } finally {
+      setDisableLoading(false)
+    }
+  }
+
+  // Low recovery-codes regenerate handler — requires a valid current TOTP
+  // code, then swaps in the freshly generated set via RecoveryCodesModal and
+  // refreshes twoFactorStatus (server-driven) so the banner recalculates
+  // from the reloaded unusedRecoveryCodes count.
+  const handleRegenerateCodes = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (regenerateCode.trim().length !== 6) {
+      toast.error('Ingresa el código de 6 dígitos')
+      return
+    }
+    setRegenerateLoading(true)
+    try {
+      const { recoveryCodes } = await authRepository.regenerateRecoveryCodes(regenerateCode.trim())
+      setShowRegenerateForm(false)
+      setRegenerateCode('')
+      setRecoveryCodesModal({ open: true, codes: recoveryCodes })
+      await loadTwoFactorStatus()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Código inválido')
+    } finally {
+      setRegenerateLoading(false)
     }
   }
 
@@ -1006,17 +1092,140 @@ export default function ProfilePage() {
                 </div>
 
                 {/* 2FA */}
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">
-                      Autenticación de Dos Factores (2FA)
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                      Próximamente disponible
-                    </p>
+                <div className={twoFactorLoading ? 'opacity-50 pointer-events-none' : ''}>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-semibold text-[#0A192F] dark:text-white text-sm">
+                        Autenticación de Dos Factores (2FA)
+                      </h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                        {twoFactorStatus?.enabled
+                          ? `Activa desde ${twoFactorStatus.confirmedAt ? formatDate(twoFactorStatus.confirmedAt) : 'hace poco'}`
+                          : 'Protege tu cuenta con un segundo factor (app autenticadora)'}
+                      </p>
+                    </div>
+                    <Toggle
+                      checked={twoFactorStatus?.enabled ?? false}
+                      onChange={(next) => {
+                        if (next) {
+                          setSetupModalOpen(true)
+                        } else {
+                          setShowDisableForm(true)
+                        }
+                      }}
+                    />
                   </div>
-                  <Toggle checked={false} onChange={() => {}} />
+
+                  {showDisableForm && (
+                    <form onSubmit={handleDisableTwoFactor} className="mt-4 space-y-3">
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        Ingresa el código actual de tu app autenticadora para desactivar el 2FA.
+                      </p>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                          Código de verificación
+                        </label>
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          value={disableCode}
+                          onChange={(e) =>
+                            setDisableCode(e.target.value.replace(/\D/g, '').substring(0, 6))
+                          }
+                          placeholder="000000"
+                          maxLength={6}
+                          autoFocus
+                          className="max-w-[180px] text-center tracking-[0.3em] font-bold"
+                        />
+                      </div>
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          type="submit"
+                          disabled={disableLoading || disableCode.length !== 6}
+                          className="px-4 py-2 text-sm font-semibold rounded-xl bg-red-600 text-white hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {disableLoading && (
+                            <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+                          )}
+                          Desactivar 2FA
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowDisableForm(false)
+                            setDisableCode('')
+                          }}
+                          className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </form>
+                  )}
                 </div>
+
+                {twoFactorStatus?.enabled && twoFactorStatus.unusedRecoveryCodes <= 2 && (
+                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl p-4 space-y-3">
+                    <p className="text-amber-800 dark:text-amber-300 text-sm leading-relaxed">
+                      Te quedan <strong>{twoFactorStatus.unusedRecoveryCodes}</strong>{' '}
+                      {twoFactorStatus.unusedRecoveryCodes === 1
+                        ? 'código de recuperación'
+                        : 'códigos de recuperación'}
+                      . Regenera un nuevo set antes de quedarte sin ninguno.
+                    </p>
+                    {!showRegenerateForm ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowRegenerateForm(true)}
+                        className="px-4 py-2 text-sm font-semibold rounded-xl bg-amber-600 text-white hover:opacity-90 transition-opacity"
+                      >
+                        Regenerar códigos
+                      </button>
+                    ) : (
+                      <form onSubmit={handleRegenerateCodes} className="space-y-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-1">
+                            Código de verificación
+                          </label>
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            value={regenerateCode}
+                            onChange={(e) =>
+                              setRegenerateCode(e.target.value.replace(/\D/g, '').substring(0, 6))
+                            }
+                            placeholder="000000"
+                            maxLength={6}
+                            autoFocus
+                            className="max-w-[180px] text-center tracking-[0.3em] font-bold"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="submit"
+                            disabled={regenerateLoading || regenerateCode.length !== 6}
+                            className="px-4 py-2 text-sm font-semibold rounded-xl bg-amber-600 text-white hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+                          >
+                            {regenerateLoading && (
+                              <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+                            )}
+                            Confirmar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowRegenerateForm(false)
+                              setRegenerateCode('')
+                            }}
+                            className="px-4 py-2 text-sm font-medium rounded-xl border border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Danger zone — account closure (Ley 29733 Art. 19) */}
@@ -1236,6 +1445,21 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+
+      <TwoFactorSetup
+        open={setupModalOpen}
+        onClose={() => setSetupModalOpen(false)}
+        onConfirmed={(recoveryCodes) => {
+          setSetupModalOpen(false)
+          setRecoveryCodesModal({ open: true, codes: recoveryCodes })
+          loadTwoFactorStatus()
+        }}
+      />
+      <RecoveryCodesModal
+        open={recoveryCodesModal.open}
+        codes={recoveryCodesModal.codes}
+        onClose={() => setRecoveryCodesModal({ open: false, codes: [] })}
+      />
     </div>
   )
 }

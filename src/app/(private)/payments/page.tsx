@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import {
@@ -20,14 +20,23 @@ import {
   ShieldCheck,
   Download,
 } from 'lucide-react'
-import { loanRepository, useLoanStore } from '@/features/request-loan'
+import {
+  loanRepository,
+  useLoanStore,
+  usePaymentCheckout,
+  EarlyPayoffCard,
+} from '@/features/request-loan'
 import { formatCurrency, formatDate, formatDateTime, loanRef } from '@/shared/lib/utils'
-import type { Loan, LoanBalance, Payment } from '@/entities/loan'
+import {
+  canPay,
+  type Loan,
+  type LoanBalance,
+  type EarlyPayoffQuote,
+  type Payment,
+} from '@/entities/loan'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 import { Input } from '@/shared/ui/input'
-
-const ACTIVE_STATUSES = ['APPROVED', 'SIGNED', 'ACTIVE', 'OVERDUE']
 
 type PageTab = 'pay' | 'history'
 
@@ -59,9 +68,9 @@ export default function PaymentsPage() {
   const [customAmount, setCustomAmount] = useState('')
   const [balance, setBalance] = useState<LoanBalance | null>(null)
   const [payments, setPayments] = useState<Payment[]>([])
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [earlyPayoffQuote, setEarlyPayoffQuote] = useState<EarlyPayoffQuote | null>(null)
   const [isLoadingBalance, setIsLoadingBalance] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { pay, isProcessing, error } = usePaymentCheckout()
 
   // History tab state
   const [historyEntries, setHistoryEntries] = useState<HistoryEntry[]>([])
@@ -72,30 +81,13 @@ export default function PaymentsPage() {
     loadMyLoans()
   }, [loadMyLoans])
 
-  const activeLoans = loans.filter((l) => ACTIVE_STATUSES.includes(l.status))
-
-  const loadLoanData = useCallback(async (loanId: string) => {
-    setIsLoadingBalance(true)
-    try {
-      const [bal, pays] = await Promise.all([
-        loanRepository.getLoanBalance(loanId),
-        loanRepository.getLoanPayments(loanId),
-      ])
-      setBalance(bal)
-      setPayments(pays)
-    } catch {
-      setBalance(null)
-      setPayments([])
-    } finally {
-      setIsLoadingBalance(false)
-    }
-  }, [])
+  const payableLoans = loans.filter(canPay)
 
   useEffect(() => {
-    if (activeLoans.length > 0 && !selectedLoanId) {
-      setSelectedLoanId(activeLoans[0].id)
+    if (payableLoans.length > 0 && !selectedLoanId) {
+      setSelectedLoanId(payableLoans[0].id)
     }
-  }, [activeLoans, selectedLoanId])
+  }, [payableLoans, selectedLoanId])
 
   // Load full history across all loans when switching to history tab
   useEffect(() => {
@@ -118,31 +110,52 @@ export default function PaymentsPage() {
       .finally(() => setHistoryLoading(false))
   }, [pageTab, loans])
 
+  // Carga balance/pagos/quote del préstamo seleccionado. Flag de cancelación:
+  // si cambian de préstamo antes de que resuelva, se descarta la respuesta
+  // vieja para no mezclar el monto de un préstamo con otro (race de red).
   useEffect(() => {
-    if (selectedLoanId) loadLoanData(selectedLoanId)
-  }, [selectedLoanId, loadLoanData])
+    if (!selectedLoanId) return
+    let active = true
+    setIsLoadingBalance(true)
+    Promise.all([
+      loanRepository.getLoanBalance(selectedLoanId),
+      loanRepository.getLoanPayments(selectedLoanId),
+      loanRepository.getEarlyPayoffQuote(selectedLoanId).catch(() => null),
+    ])
+      .then(([bal, pays, quote]) => {
+        if (!active) return
+        setBalance(bal)
+        setPayments(pays)
+        setEarlyPayoffQuote(quote)
+      })
+      .catch(() => {
+        if (!active) return
+        setBalance(null)
+        setPayments([])
+        setEarlyPayoffQuote(null)
+      })
+      .finally(() => {
+        if (active) setIsLoadingBalance(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [selectedLoanId])
 
   const selectedLoan = loans.find((l) => l.id === selectedLoanId) ?? null
 
+  // Cuota completa: nunca mayor al saldo pendiente (la última cuota no sobrecobra).
   const paymentAmount =
-    amountType === 'full' ? (selectedLoan?.installmentAmount ?? 0) : parseFloat(customAmount) || 0
+    amountType === 'full'
+      ? Math.min(selectedLoan?.installmentAmount ?? 0, balance?.remaining ?? Infinity)
+      : parseFloat(customAmount) || 0
 
-  const handleSubmit = async () => {
-    if (!selectedLoanId || paymentAmount <= 0) return
-    setIsSubmitting(true)
-    setError(null)
-    try {
-      const { checkoutUrl } = await loanRepository.createCheckout({
-        loanId: selectedLoanId,
-        amount: paymentAmount,
-        paymentType: 'regular',
-      })
-      window.location.href = checkoutUrl
-    } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message
-      setError(msg ?? 'Ocurrió un error al generar el link de pago. Inténtalo de nuevo.')
-      setIsSubmitting(false)
-    }
+  // "Otro monto": mínimo S/50, igual que /pay. Enforzado en el botón de pago.
+  const isCustomTooLow = amountType === 'custom' && paymentAmount < 50
+
+  const handleSubmit = () => {
+    if (!selectedLoanId) return
+    pay(selectedLoanId, paymentAmount, 'regular')
   }
 
   const filteredHistory =
@@ -409,7 +422,7 @@ export default function PaymentsPage() {
                     </div>
                   ))}
                 </div>
-              ) : activeLoans.length === 0 ? (
+              ) : payableLoans.length === 0 ? (
                 <div className="text-center py-8">
                   <FolderOpen
                     className="h-10 w-10 text-gray-300 dark:text-gray-600 mb-3"
@@ -427,7 +440,7 @@ export default function PaymentsPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {activeLoans.map((loan: Loan) => (
+                  {payableLoans.map((loan: Loan) => (
                     <label key={loan.id} className="cursor-pointer block">
                       <input
                         type="radio"
@@ -536,7 +549,7 @@ export default function PaymentsPage() {
                       >
                         <div>
                           <h3 className="text-sm font-medium text-[#0A192F] dark:text-white">
-                            Pago Total de Cuota
+                            Pagar cuota
                           </h3>
                           <p className="text-sm font-semibold text-[#0A192F] dark:text-[#D4AF37] mt-0.5">
                             {formatCurrency(selectedLoan!.installmentAmount)}
@@ -572,7 +585,7 @@ export default function PaymentsPage() {
                       >
                         <div>
                           <h3 className="text-sm font-medium text-[#0A192F] dark:text-white">
-                            Otro Monto
+                            Otro monto
                           </h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                             Pago parcial o adelantado
@@ -691,10 +704,12 @@ export default function PaymentsPage() {
 
                   <button
                     onClick={handleSubmit}
-                    disabled={isSubmitting || !selectedLoanId || paymentAmount <= 0}
+                    disabled={
+                      isProcessing || !selectedLoanId || paymentAmount <= 0 || isCustomTooLow
+                    }
                     className="w-full bg-[#0A192F] dark:bg-[#D4AF37] hover:opacity-90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-[#0A192F] py-2.5 rounded-lg flex justify-center items-center gap-2 mb-3 font-semibold transition-all text-sm"
                   >
-                    {isSubmitting ? (
+                    {isProcessing ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                         Procesando...
@@ -714,6 +729,17 @@ export default function PaymentsPage() {
                 </>
               )}
             </section>
+
+            {/* Early payoff */}
+            {earlyPayoffQuote && (
+              <EarlyPayoffCard
+                quote={earlyPayoffQuote}
+                onConfirm={() =>
+                  pay(selectedLoanId!, earlyPayoffQuote.payoffAmount, 'early_payoff')
+                }
+                isProcessing={isProcessing}
+              />
+            )}
 
             {/* Recent payments */}
             <section className={`${cardCls} p-5`}>

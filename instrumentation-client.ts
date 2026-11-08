@@ -21,6 +21,7 @@ Sentry.init({
   sendDefaultPii: false,
 })
 
-// Note: `onRouterTransitionStart` hook is a Sentry v9+ feature; on v8.x the
-// navigation traces are wired up automatically by the client SDK via the
-// browser tracing integration. Re-add the export when we upgrade to v9.
+// Client-side navigation instrumentation (Sentry v9+ / Next 15+ convention):
+// starts a span at the beginning of each client route transition so
+// navigation traces are captured. Required on @sentry/nextjs v10.
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart

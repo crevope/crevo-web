@@ -1,47 +1,63 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import {
   Loader2,
   RefreshCw,
   IdCard,
-  Camera,
   ShieldCheck,
   HandCoins,
   Home,
   Clock,
   Check,
   CircleX,
-  Circle,
-  Upload,
-  CircleCheck,
-  CloudUpload,
   Lock,
+  ArrowRight,
 } from 'lucide-react'
-import { kycRepository, type KycStatus } from '@/features/upload-kyc'
+import {
+  kycRepository,
+  getKycStatusMessage,
+  type KycStatus,
+  type KycVerificationStatus,
+  type KycProviderStatus,
+} from '@/features/upload-kyc'
 
 const cardCls = 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-white/6 rounded-lg'
 
-const DOC_FIELDS = [
-  {
-    key: 'dniFront' as const,
-    label: 'DNI – Anverso (parte delantera)',
-    hint: 'Sube la parte frontal de tu DNI',
-    icon: IdCard,
-  },
-  {
-    key: 'dniBack' as const,
-    label: 'DNI – Reverso (parte trasera)',
-    hint: 'Sube la parte trasera de tu DNI',
-    icon: IdCard,
-  },
-  {
-    key: 'selfie' as const,
-    label: 'Selfie sosteniendo el DNI',
-    hint: 'Tómate una foto con tu DNI visible',
-    icon: Camera,
-  },
+// Didit returns here once the borrower finishes; the webhook may still be in flight.
+const RETURN_POLL_INTERVAL_MS = 3000
+const RETURN_POLL_ATTEMPTS = 10
+
+// The business status is the verdict — a hold-for-review or a rejection is
+// settled even when Didit's own status still reads 'Approved'.
+const SETTLED_KYC_STATUSES: readonly KycVerificationStatus[] = [
+  'IN_REVIEW',
+  'APPROVED',
+  'REJECTED',
+  'ERROR',
 ]
+
+// Provider states with no business-status equivalent: Didit maps a session
+// that never got a verdict back to the same 'PENDING' as one still in
+// progress, but no webhook is coming for these — waiting out the poll budget
+// would just delay letting the borrower start over.
+const PROVIDER_ONLY_SETTLED_STATUSES: readonly KycProviderStatus[] = [
+  'Abandoned',
+  'Expired',
+  'Kyc Expired',
+]
+
+function isSettledStatus(
+  status: Pick<KycStatus, 'isIdentityVerified' | 'kycStatus' | 'providerStatus'>,
+): boolean {
+  return (
+    status.isIdentityVerified ||
+    (status.kycStatus !== undefined && SETTLED_KYC_STATUSES.includes(status.kycStatus)) ||
+    (status.providerStatus !== undefined &&
+      PROVIDER_ONLY_SETTLED_STATUSES.includes(status.providerStatus))
+  )
+}
 
 function KycVerified() {
   return (
@@ -75,43 +91,22 @@ function KycVerified() {
   )
 }
 
-function KycUnderReview({ onRefresh }: { onRefresh: () => void }) {
+function KycWaiting({
+  title,
+  description,
+  onRefresh,
+}: Readonly<{ title: string; description: string; onRefresh: () => void }>) {
   return (
     <div className={`${cardCls} p-8 text-center`}>
       <div className="w-20 h-20 rounded-full bg-yellow-50 dark:bg-yellow-900/30 flex items-center justify-center mx-auto mb-5">
         <Clock className="h-9 w-9 text-yellow-500" aria-hidden="true" />
       </div>
       <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">
-        Verificando tu identidad
+        {title}
       </h2>
-      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
-        Hemos recibido tus documentos. La verificación suele tardar entre 1 y 5 minutos. Te
-        notificaremos cuando esté lista.
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-sm mx-auto">
+        {description}
       </p>
-      <div className="max-w-xs mx-auto text-left space-y-3 mb-6">
-        {[
-          { done: true, label: 'Documentos subidos correctamente' },
-          { done: false, label: 'Verificando DNI contra RENIEC' },
-          { done: false, label: 'Validando reconocimiento facial' },
-        ].map((step) => (
-          <div key={step.label} className="flex items-center gap-3">
-            {step.done ? (
-              <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-500 shrink-0">
-                <Check className="h-3 w-3" aria-hidden="true" />
-              </div>
-            ) : (
-              <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-[#334155] flex items-center justify-center shrink-0">
-                <Loader2 className="h-3 w-3 animate-spin text-gray-400" />
-              </div>
-            )}
-            <span
-              className={`text-sm ${step.done ? 'text-gray-800 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400'}`}
-            >
-              {step.label}
-            </span>
-          </div>
-        ))}
-      </div>
       <button
         onClick={onRefresh}
         className="flex items-center gap-2 mx-auto px-5 py-2.5 rounded-lg border border-gray-100 dark:border-white/6 text-gray-700 dark:text-gray-300 font-medium text-sm hover:bg-gray-50 dark:hover:bg-[#0F172A] transition-colors"
@@ -123,73 +118,99 @@ function KycUnderReview({ onRefresh }: { onRefresh: () => void }) {
   )
 }
 
-function KycRejected({ onRetry }: { onRetry: () => void }) {
+function KycStartAction({
+  title,
+  description,
+  tone,
+  isStarting,
+  onStart,
+}: Readonly<{
+  title: string
+  description: string
+  tone: 'neutral' | 'danger'
+  isStarting: boolean
+  onStart: () => void
+}>) {
+  const isDanger = tone === 'danger'
   return (
-    <div className={`${cardCls} p-8 text-center border-l-2 border-l-red-400`}>
-      <div className="w-20 h-20 rounded-full bg-red-50 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-5">
-        <CircleX className="h-9 w-9 text-red-500" aria-hidden="true" />
+    <div className={`${cardCls} p-8 text-center ${isDanger ? 'border-l-2 border-l-red-400' : ''}`}>
+      <div
+        className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 ${
+          isDanger ? 'bg-red-50 dark:bg-red-900/30' : 'bg-[#D4AF37]/10'
+        }`}
+      >
+        {isDanger ? (
+          <CircleX className="h-9 w-9 text-red-500" aria-hidden="true" />
+        ) : (
+          <IdCard className="h-9 w-9 text-[#D4AF37]" aria-hidden="true" />
+        )}
       </div>
       <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">
-        Verificación no aprobada
+        {title}
       </h2>
-      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
-        No pudimos verificar tu identidad. Asegúrate de que las fotos sean nítidas y vuelve a
-        intentarlo.
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-sm mx-auto">
+        {description}
       </p>
-      <div className="max-w-xs mx-auto text-left mb-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50">
-        <p className="text-sm font-semibold text-red-700 dark:text-red-400 mb-2">
-          Consejos para el reintento:
-        </p>
-        <ul className="space-y-1.5 text-xs text-red-600 dark:text-red-400">
-          <li>
-            <Circle
-              className="inline h-1 w-1 fill-current mr-1 relative -top-1"
-              aria-hidden="true"
-            />
-            Foto del DNI en ambiente bien iluminado, sin reflejos
-          </li>
-          <li>
-            <Circle
-              className="inline h-1 w-1 fill-current mr-1 relative -top-1"
-              aria-hidden="true"
-            />
-            Toda la información debe ser legible
-          </li>
-          <li>
-            <Circle
-              className="inline h-1 w-1 fill-current mr-1 relative -top-1"
-              aria-hidden="true"
-            />
-            En la selfie, sostén el DNI de forma visible
-          </li>
-        </ul>
-      </div>
       <button
-        onClick={onRetry}
-        className="w-full max-w-xs mx-auto bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold py-3 rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+        onClick={onStart}
+        disabled={isStarting}
+        className="w-full max-w-xs mx-auto bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold py-3.5 rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <RefreshCw className="h-4 w-4" />
-        Volver a intentar
+        {isStarting ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Redirigiendo...
+          </>
+        ) : (
+          <>
+            Iniciar verificación
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </>
+        )}
       </button>
+      <p className="mt-4 text-center text-xs text-gray-400 dark:text-gray-500">
+        <Lock className="inline h-3 w-3 mr-1" aria-hidden="true" />
+        Te llevaremos a una plataforma segura para completar la verificación
+      </p>
     </div>
   )
 }
 
-export default function KycPage() {
+function KycPolling() {
+  return (
+    <div className={`${cardCls} p-8 text-center`}>
+      <div className="w-20 h-20 rounded-full bg-[#D4AF37]/10 flex items-center justify-center mx-auto mb-5">
+        <Loader2 className="h-9 w-9 text-[#D4AF37] animate-spin" aria-hidden="true" />
+      </div>
+      <h2 className="text-xl font-semibold text-[#0A192F] dark:text-white mb-2 tracking-tight">
+        Estamos procesando tu verificación
+      </h2>
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-sm mx-auto">
+        Esto puede tomar unos segundos.
+      </p>
+    </div>
+  )
+}
+
+function KycPageContent() {
   const [kycStatus, setKycStatus] = useState<KycStatus | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const [showForm, setShowForm] = useState(false)
-  const [files, setFiles] = useState<{ dniFront?: File; dniBack?: File; selfie?: File }>({})
-  const refs = {
-    dniFront: useRef<HTMLInputElement>(null),
-    dniBack: useRef<HTMLInputElement>(null),
-    selfie: useRef<HTMLInputElement>(null),
-  }
+  const [isStarting, setIsStarting] = useState(false)
+
+  const searchParams = useSearchParams()
+  // `verificationSessionId` marks a return from Didit; its `status` is user-controlled, never trusted.
+  const isReturningFromProvider = !!searchParams.get('verificationSessionId')
+  const [isWaitingForWebhook, setIsWaitingForWebhook] = useState(isReturningFromProvider)
+  // True once the return poll exhausted its budget without a settled verdict —
+  // guards against offering a paid re-verification while the webhook is still in flight.
+  const [pollGaveUpUnsettled, setPollGaveUpUnsettled] = useState(false)
 
   const loadStatus = () => {
     kycRepository
       .getStatus()
-      .then(setKycStatus)
+      .then((fresh) => {
+        setKycStatus(fresh)
+        if (isSettledStatus(fresh)) setPollGaveUpUnsettled(false)
+      })
       .catch(() => setKycStatus({ status: 'PENDING_VERIFICATION', isIdentityVerified: false }))
   }
 
@@ -197,35 +218,51 @@ export default function KycPage() {
     loadStatus()
   }, [])
 
-  const handleUpload = async () => {
-    if (!files.dniFront || !files.dniBack || !files.selfie) {
-      toast.error('Debes subir los tres documentos')
-      return
-    }
-    setIsUploading(true)
-    try {
-      const result = await kycRepository.upload({
-        dniFront: files.dniFront,
-        dniBack: files.dniBack,
-        selfie: files.selfie,
-      })
-      setKycStatus(result)
-      setShowForm(false)
-      if (result.isIdentityVerified) {
-        toast.success('¡Identidad verificada correctamente!')
-      } else {
-        toast.success('Documentos recibidos. Verificando en instantes...')
+  useEffect(() => {
+    if (!isReturningFromProvider) return
+
+    let attempts = 0
+    let cancelled = false
+
+    const tick = async () => {
+      attempts += 1
+      try {
+        const fresh = await kycRepository.getStatus()
+        if (cancelled) return
+        setKycStatus(fresh)
+        const settled = isSettledStatus(fresh)
+        if (settled || attempts >= RETURN_POLL_ATTEMPTS) {
+          setIsWaitingForWebhook(false)
+          if (!settled) setPollGaveUpUnsettled(true)
+          return
+        }
+      } catch {
+        if (attempts >= RETURN_POLL_ATTEMPTS) {
+          setIsWaitingForWebhook(false)
+          setPollGaveUpUnsettled(true)
+          return
+        }
       }
+      if (!cancelled) handle = setTimeout(tick, RETURN_POLL_INTERVAL_MS)
+    }
+
+    let handle = setTimeout(tick, RETURN_POLL_INTERVAL_MS)
+    return () => {
+      cancelled = true
+      clearTimeout(handle)
+    }
+  }, [isReturningFromProvider])
+
+  const handleStartVerification = async () => {
+    setIsStarting(true)
+    try {
+      const { sessionUrl } = await kycRepository.createSession()
+      window.location.href = sessionUrl
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Error al subir documentos')
-    } finally {
-      setIsUploading(false)
+      toast.error(err instanceof Error ? err.message : 'No pudimos iniciar la verificación')
+      setIsStarting(false)
     }
   }
-
-  const allSelected = !!files.dniFront && !!files.dniBack && !!files.selfie
-
-  const showUploadForm = !kycStatus || kycStatus.status === 'PENDING_VERIFICATION' || showForm
 
   if (!kycStatus) {
     return (
@@ -234,6 +271,15 @@ export default function KycPage() {
       </div>
     )
   }
+
+  const message = getKycStatusMessage(kycStatus)
+  const isDeclined = kycStatus.providerStatus === 'Declined' || kycStatus.status === 'KYC_REJECTED'
+  // The poll gave up without a verdict but the message still reads as "start a new one" —
+  // a real confirmation (webhook or manual refresh) clears pollGaveUpUnsettled first.
+  const unconfirmedAfterPoll =
+    pollGaveUpUnsettled && !kycStatus.isIdentityVerified && message.canStart
+  const needsAction = !kycStatus.isIdentityVerified && message.canStart && !unconfirmedAfterPoll
+  const isWaiting = !kycStatus.isIdentityVerified && (!message.canStart || unconfirmedAfterPoll)
 
   return (
     <div className="space-y-8 max-w-2xl">
@@ -250,18 +296,8 @@ export default function KycPage() {
       {/* Progress indicator */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          {
-            step: 1,
-            label: 'Sube documentos',
-            done: !showUploadForm || kycStatus.status !== 'PENDING_VERIFICATION',
-            active: showUploadForm,
-          },
-          {
-            step: 2,
-            label: 'En revisión',
-            done: kycStatus.isIdentityVerified,
-            active: kycStatus.status === 'KYC_UNDER_REVIEW',
-          },
+          { step: 1, label: 'Inicia verificación', done: !needsAction, active: needsAction },
+          { step: 2, label: 'En revisión', done: kycStatus.isIdentityVerified, active: isWaiting },
           { step: 3, label: 'Verificado', done: kycStatus.isIdentityVerified, active: false },
         ].map((s) => (
           <div
@@ -295,120 +331,47 @@ export default function KycPage() {
       </div>
 
       {/* Status views */}
-      {kycStatus.isIdentityVerified && <KycVerified />}
-      {!kycStatus.isIdentityVerified && kycStatus.status === 'KYC_UNDER_REVIEW' && (
-        <KycUnderReview onRefresh={loadStatus} />
-      )}
-      {!kycStatus.isIdentityVerified && kycStatus.status === 'KYC_REJECTED' && !showForm && (
-        <KycRejected
-          onRetry={() => {
-            setFiles({})
-            setShowForm(true)
-          }}
-        />
-      )}
-
-      {/* Upload form */}
-      {showUploadForm && (
-        <div className={cardCls}>
-          <div className="p-6 border-b border-gray-100 dark:border-white/6">
-            <h2 className="text-lg font-semibold text-[#0A192F] dark:text-white">
-              Documentos Requeridos
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              DNI (anverso y reverso) + selfie sosteniéndolo · JPG o PNG · Máx. 5 MB
-            </p>
-          </div>
-
-          <div className="p-6 space-y-4">
-            {DOC_FIELDS.map(({ key, label, hint, icon }) => (
-              <div key={key}>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{label}</p>
-                <div
-                  className={`flex items-center gap-4 rounded-lg border-2 border-dashed p-4 cursor-pointer transition-all
-                    ${
-                      files[key]
-                        ? 'border-green-400 bg-green-50 dark:bg-green-900/20'
-                        : 'border-gray-100 dark:border-white/6 hover:border-[#00E5FF] hover:bg-[#00E5FF]/5'
-                    }`}
-                  onClick={() => refs[key].current?.click()}
-                >
-                  <div
-                    className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${
-                      files[key]
-                        ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400'
-                        : 'bg-gray-100 dark:bg-[#0F172A] text-gray-400 dark:text-gray-500'
-                    }`}
-                  >
-                    {files[key] ? (
-                      <CircleCheck className="h-6 w-6" aria-hidden="true" />
-                    ) : (
-                      (() => {
-                        const FieldIcon = icon
-                        return <FieldIcon className="h-6 w-6" aria-hidden="true" />
-                      })()
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p
-                      className={`text-sm font-medium truncate ${files[key] ? 'text-green-700 dark:text-green-400' : 'text-gray-600 dark:text-gray-400'}`}
-                    >
-                      {files[key] ? files[key]!.name : hint}
-                    </p>
-                    {files[key] ? (
-                      <p className="text-xs text-gray-400 dark:text-gray-500">
-                        {(files[key]!.size / 1024).toFixed(0)} KB · Listo para subir
-                      </p>
-                    ) : (
-                      <p className="text-xs text-gray-400 dark:text-gray-500">
-                        Toca para seleccionar
-                      </p>
-                    )}
-                  </div>
-                  {!files[key] && (
-                    <Upload
-                      className="h-5 w-5 text-gray-300 dark:text-gray-600 shrink-0"
-                      aria-hidden="true"
-                    />
-                  )}
-                </div>
-                <input
-                  ref={refs[key]}
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png"
-                  className="hidden"
-                  onChange={(e) => setFiles((prev) => ({ ...prev, [key]: e.target.files?.[0] }))}
-                />
-              </div>
-            ))}
-
-            <div className="mt-2">
-              <button
-                onClick={handleUpload}
-                disabled={isUploading || !allSelected}
-                className="w-full bg-[#0A192F] dark:bg-[#D4AF37] text-white dark:text-[#0A192F] font-semibold py-4 rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isUploading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Enviando documentos...
-                  </>
-                ) : (
-                  <>
-                    <CloudUpload className="h-4 w-4" aria-hidden="true" />
-                    Enviar documentos
-                  </>
-                )}
-              </button>
-            </div>
-
-            <p className="text-center text-xs text-gray-400 dark:text-gray-500">
-              <Lock className="inline h-3 w-3 mr-1" aria-hidden="true" />
-              Tus datos se transmiten de forma segura conforme a la Ley N° 29733
-            </p>
-          </div>
-        </div>
+      {isWaitingForWebhook ? (
+        <KycPolling />
+      ) : (
+        <>
+          {kycStatus.isIdentityVerified && <KycVerified />}
+          {isWaiting && (
+            <KycWaiting
+              title={unconfirmedAfterPoll ? 'Estamos confirmando tu verificación' : message.title}
+              description={
+                unconfirmedAfterPoll
+                  ? 'Ya completaste el proceso con el proveedor. La confirmación está tardando más de lo usual; vuelve a intentarlo en unos segundos.'
+                  : message.description
+              }
+              onRefresh={loadStatus}
+            />
+          )}
+          {needsAction && (
+            <KycStartAction
+              title={message.title}
+              description={message.description}
+              tone={isDeclined ? 'danger' : 'neutral'}
+              isStarting={isStarting}
+              onStart={handleStartVerification}
+            />
+          )}
+        </>
       )}
     </div>
+  )
+}
+
+export default function KycPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <Loader2 className="h-10 w-10 animate-spin text-[#0A192F] dark:text-[#D4AF37]" />
+        </div>
+      }
+    >
+      <KycPageContent />
+    </Suspense>
   )
 }

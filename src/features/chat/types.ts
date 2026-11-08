@@ -75,9 +75,26 @@ export interface ChatAttachmentUploadUrl {
 
 // ─── Broadcast event union (mirrors backend IChatBroadcaster) ────────────────
 
+/**
+ * Aviso de "hay un mensaje nuevo", SIN contenido.
+ *
+ * El canal `chat:{uuid}` es un broadcast sin autenticación: cualquiera con el
+ * anon key (que es público, va horneado en este bundle) y el UUID puede
+ * escucharlo. Por eso el backend no manda el cuerpo ni los datos del adjunto
+ * — sólo la metadata mínima para decidir si refetchear. El contenido se trae
+ * por la API REST autenticada. Espeja `ChatBroadcastMessageEvent` del backend;
+ * si agregás un campo acá, agregalo allá primero y preguntate si puede leerlo
+ * un tercero.
+ */
 export interface ChatBroadcastMessageEvent {
   type: 'message'
-  message: ChatMessageView
+  message: {
+    id: string
+    conversationId: string
+    senderType: 'user' | 'agent' | 'system'
+    senderId: string | null
+    createdAt: string
+  }
 }
 
 export interface ChatBroadcastReadReceiptEvent {

@@ -13,7 +13,7 @@ import { usePushNotifications } from '@/shared/hooks/usePushNotifications'
 
 export default function PrivateLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const router = useRouter()
-  const { user, isAuthenticated, isLoading, loadUser } = useAuthStore()
+  const { user, isAuthenticated, isLoading, loadUser, refreshUser } = useAuthStore()
   const {
     unreadCount,
     load: loadNotifications,
@@ -26,8 +26,13 @@ export default function PrivateLayout({ children }: Readonly<{ children: React.R
   usePushNotifications()
 
   useEffect(() => {
+    // Hydrate instantly from localStorage so the skeleton isn't visible while
+    // refreshUser() fetches. The store exposes `isLoading` only until the first
+    // server response lands — after that any stale fields from the cache are
+    // already overwritten. See useAuthStore for the contract.
     loadUser()
-  }, [loadUser])
+    void refreshUser()
+  }, [loadUser, refreshUser])
   useEffect(() => {
     loadNotifications()
   }, [loadNotifications])

@@ -27,6 +27,10 @@ export interface Loan {
   summaryUrl?: string
   scheduleUrl?: string
   rejectionReason?: string
+  /** Instante de la firma del contrato. Puede faltar en préstamos
+   *  históricos sin PDF firmado en storage. NO usar updatedAt: se mueve
+   *  con cualquier escritura y hacía que el contrato cambiara de fecha. */
+  signedAt?: string
   disbursedAt?: string
   createdAt: string
   updatedAt: string

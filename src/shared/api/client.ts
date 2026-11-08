@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import { env } from '@/shared/config/env'
 import { clearAuthLocalStorage } from '@/shared/lib/sessionStorage'
+import { getVisitorId, getSessionId } from '@/shared/lib/visitorIdentity'
 
 // ─── Cookie / header / storage names shared with the backend ────────────────
 // Must stay in sync with `src/shared/utils/authCookies.ts` on the server.
@@ -59,10 +60,25 @@ export function setCsrfToken(token: string | null | undefined): void {
   }
 }
 
-/** Reads the CSRF token. Order: in-memory → sessionStorage → document.cookie.
- *  The cookie path only works for same-origin SPAs; for cross-origin it'll be
- *  null but the in-memory / sessionStorage path covers it. */
+/** Reads the CSRF token. Order: document.cookie → in-memory → sessionStorage.
+ *
+ *  The COOKIE WINS when it's readable, and that order matters: the server
+ *  rotates `crevo_csrf` on every login, refresh and 2FA verification, so the
+ *  cookie is always its current value while our copy can be stale. Preferring
+ *  the copy meant that any rotation we didn't capture (a silent refresh whose
+ *  body we never read, a request already in flight) left us echoing a dead
+ *  token — the server compared it against the fresh cookie and answered
+ *  "CSRF token inválido" on the next POST. Reading the cookie makes this
+ *  self-healing: whatever the server last set is what we send back.
+ *
+ *  The copy is still needed for the cross-origin case (SPA on one host, API on
+ *  another): there the cookie isn't readable from JS and `readCookie` is null. */
 export function getCsrfToken(): string | null {
+  const fromCookie = readCookie(CSRF_COOKIE_NAME)
+  if (fromCookie) {
+    csrfTokenCache = fromCookie
+    return fromCookie
+  }
   if (csrfTokenCache) return csrfTokenCache
   if (typeof window !== 'undefined') {
     try {
@@ -75,7 +91,7 @@ export function getCsrfToken(): string | null {
       /* ignore */
     }
   }
-  return readCookie(CSRF_COOKIE_NAME)
+  return null
 }
 
 function clearCsrfToken(): void {
@@ -98,10 +114,20 @@ export function captureCsrfFromResponse(payload: unknown): void {
   }
 }
 
-// ─── Request interceptor: attach CSRF header ─────────────────────────────────
+// ─── Request interceptor: attach visitor identity & CSRF header ──────────────
 
 apiClient.interceptors.request.use((config) => {
   if (typeof window === 'undefined') return config
+
+  // Absent when the visitor declined analytics: we send no identity at all
+  // rather than an empty header the backend would have to second-guess.
+  const visitorId = getVisitorId()
+  const sessionId = getSessionId()
+  if (visitorId || sessionId) {
+    config.headers = config.headers ?? {}
+    if (visitorId) (config.headers as Record<string, string>)['X-Visitor-Id'] = visitorId
+    if (sessionId) (config.headers as Record<string, string>)['X-Session-Id'] = sessionId
+  }
 
   // Safe methods don't mutate state and are exempt from CSRF validation.
   const method = (config.method ?? 'get').toLowerCase()
@@ -110,7 +136,6 @@ apiClient.interceptors.request.use((config) => {
 
   const csrfToken = getCsrfToken()
   if (csrfToken) {
-    config.headers = config.headers ?? {}
     ;(config.headers as Record<string, string>)[CSRF_HEADER_NAME] = csrfToken
   }
   return config
@@ -147,7 +172,8 @@ apiClient.interceptors.response.use(
       url.includes('/auth/refresh') ||
       url.includes('/auth/logout') ||
       url.includes('/auth/login') ||
-      url.includes('/auth/register')
+      url.includes('/auth/register') ||
+      url.includes('/auth/2fa/verify')
 
     if (
       error.response?.status === 401 &&
