@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import { env } from '@/shared/config/env'
 import { clearAuthLocalStorage } from '@/shared/lib/sessionStorage'
+import { getVisitorId, getSessionId } from '@/shared/lib/visitorIdentity'
 
 // ─── Cookie / header / storage names shared with the backend ────────────────
 // Must stay in sync with `src/shared/utils/authCookies.ts` on the server.
@@ -113,10 +114,14 @@ export function captureCsrfFromResponse(payload: unknown): void {
   }
 }
 
-// ─── Request interceptor: attach CSRF header ─────────────────────────────────
+// ─── Request interceptor: attach visitor identity & CSRF header ──────────────
 
 apiClient.interceptors.request.use((config) => {
   if (typeof window === 'undefined') return config
+
+  config.headers = config.headers ?? {}
+  ;(config.headers as Record<string, string>)['X-Visitor-Id'] = getVisitorId()
+  ;(config.headers as Record<string, string>)['X-Session-Id'] = getSessionId()
 
   // Safe methods don't mutate state and are exempt from CSRF validation.
   const method = (config.method ?? 'get').toLowerCase()
@@ -125,7 +130,6 @@ apiClient.interceptors.request.use((config) => {
 
   const csrfToken = getCsrfToken()
   if (csrfToken) {
-    config.headers = config.headers ?? {}
     ;(config.headers as Record<string, string>)[CSRF_HEADER_NAME] = csrfToken
   }
   return config
