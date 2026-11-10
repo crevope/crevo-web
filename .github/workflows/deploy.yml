@@ -80,4 +80,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /opt/crevo/infra
-            bash deploy/deploy.sh web sandbox
+            bash deploy/deploy.sh web sandbox ${{ needs.build.outputs.sha }}
