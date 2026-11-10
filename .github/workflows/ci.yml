@@ -2,9 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [develop, main]
+  # Tambien en PR a develop: antes solo corria hacia main, asi que develop
+  # recibia codigo sin pasar por Playwright, lint ni typecheck.
   pull_request:
-    branches: [main]
+    branches: [develop, main]
 
 # Cancel an in-progress run if a new commit lands on the same PR so we
 # don't queue stale jobs when someone push-force-fixes a review.
