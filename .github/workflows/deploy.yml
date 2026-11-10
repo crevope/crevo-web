@@ -73,14 +73,23 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          # Un pull con reintentos puede tardar minutos sin imprimir nada: el
-          # defecto de 10m mata el deploy a mitad. REP ya lo sufrio como Broken pipe.
-          command_timeout: 20m
-          script: |
-            cd /opt/crevo/infra
-            bash deploy/deploy.sh web sandbox ${{ needs.build.outputs.sha }}
+      # ssh plano en vez de appleboy/ssh-action: la llave del CI ya no abre shell
+      # en el VPS, solo acepta `deploy <svc> <env> <sha>` (forced command). El
+      # action mandaba un script de shell entero, que el forced command rechaza.
+      - name: Deploy por SSH
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          SSH_TARGET: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+          SHA: ${{ needs.build.outputs.sha }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          # Keepalive: un pull con reintentos tarda minutos sin imprimir nada y la
+          # conexion moria como Broken pipe; es lo que REP ya sufrio.
+          # Solo sandbox: la web de produccion la sirve Vercel, no el VPS.
+          ssh -i ~/.ssh/deploy_key -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            -o ServerAliveInterval=30 -o ServerAliveCountMax=10 \
+            "$SSH_TARGET" deploy web sandbox "$SHA"
