@@ -78,6 +78,9 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+          # Un pull con reintentos puede tardar minutos sin imprimir nada: el
+          # defecto de 10m mata el deploy a mitad. REP ya lo sufrio como Broken pipe.
+          command_timeout: 20m
           script: |
             cd /opt/crevo/infra
-            bash deploy/deploy.sh web sandbox
+            bash deploy/deploy.sh web sandbox ${{ needs.build.outputs.sha }}
